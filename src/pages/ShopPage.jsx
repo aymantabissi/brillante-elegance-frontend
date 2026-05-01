@@ -24,6 +24,36 @@ const sortOptions = [
 
 const productsPerPage = 8
 
+function SkeletonCard() {
+  return (
+    <div className="bg-white rounded-2xl overflow-hidden border border-stone-100">
+      <div className="w-full h-52 bg-gradient-to-r from-stone-200 via-stone-100 to-stone-200 animate-pulse" style={{backgroundSize: '200% 100%', animation: 'shimmer 1.5s infinite'}} />
+      <div className="p-4 space-y-2">
+        <div className="h-3 bg-stone-200 rounded-full animate-pulse w-full" />
+        <div className="h-3 bg-stone-200 rounded-full animate-pulse w-3/4" />
+        <div className="h-4 bg-stone-200 rounded-full animate-pulse w-1/3 mt-3" />
+      </div>
+    </div>
+  )
+}
+
+function SkeletonSidebar() {
+  return (
+    <div className="bg-white rounded-2xl border border-stone-100 p-6 sticky top-24">
+      <div className="h-3 bg-stone-200 rounded-full animate-pulse w-1/2 mb-5" />
+      {Array(6).fill(null).map(function(_, i) {
+        return <div key={i} className="h-9 bg-stone-100 rounded-xl animate-pulse mb-2" />
+      })}
+      <div className="mt-8 h-3 bg-stone-200 rounded-full animate-pulse w-1/2 mb-4" />
+      <div className="h-2 bg-stone-200 rounded-full animate-pulse w-full" />
+      <div className="flex justify-between mt-3">
+        <div className="h-2 bg-stone-200 rounded-full animate-pulse w-12" />
+        <div className="h-2 bg-stone-200 rounded-full animate-pulse w-12" />
+      </div>
+    </div>
+  )
+}
+
 export default function ShopPage() {
   const dispatch = useDispatch()
   const { items: products, loading } = useSelector((state) => state.products)
@@ -38,17 +68,9 @@ export default function ShopPage() {
   const [addedId,     setAddedId]     = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
 
-  useEffect(function() {
-    dispatch(fetchProducts())
-  }, [dispatch])
-
-  useEffect(function() {
-    if (catParam) setCategory(catParam)
-  }, [catParam])
-
-  useEffect(function() {
-    setCurrentPage(1)
-  }, [category, search, sort, maxPrice])
+  useEffect(function() { dispatch(fetchProducts()) }, [dispatch])
+  useEffect(function() { if (catParam) setCategory(catParam) }, [catParam])
+  useEffect(function() { setCurrentPage(1) }, [category, search, sort, maxPrice])
 
   const filtered = useMemo(function() {
     let list = [...products]
@@ -73,9 +95,7 @@ export default function ShopPage() {
       _id: product._id,
       name: product.name,
       price: product.price,
-      image: product.image && product.image.startsWith('http')
-        ? product.image
-        : 'https://via.placeholder.com/400',
+      image: product.image && product.image.startsWith('http') ? product.image : 'https://via.placeholder.com/400',
       qty: 1,
     }))
     setAddedId(product._id)
@@ -91,44 +111,64 @@ export default function ShopPage() {
   return (
     <main className="bg-[#f9f8f6] min-h-screen">
 
-      <div className="bg-[#f5f3f0] py-14 text-center">
-        <p className="text-xs tracking-[0.5em] uppercase text-stone-400 mb-2">Notre boutique</p>
-        <h1 className="text-4xl font-light tracking-[0.2em] uppercase text-stone-900 mb-4">Shop</h1>
-        <div className="flex items-center justify-center gap-2 text-sm text-stone-400">
-          <Link to="/" className="hover:text-stone-700 transition">Home</Link>
-          <span>›</span>
-          <span className="text-stone-600">Shop</span>
+      {/* Hero */}
+      {loading ? (
+        <div className="bg-[#f5f3f0] py-14 text-center">
+          <div className="h-3 bg-stone-200 rounded-full animate-pulse w-24 mx-auto mb-4" />
+          <div className="h-10 bg-stone-200 rounded-full animate-pulse w-32 mx-auto mb-4" />
+          <div className="h-3 bg-stone-200 rounded-full animate-pulse w-40 mx-auto" />
         </div>
-      </div>
+      ) : (
+        <div className="bg-[#f5f3f0] py-14 text-center">
+          <p className="text-xs tracking-[0.5em] uppercase text-stone-400 mb-2">Notre boutique</p>
+          <h1 className="text-4xl font-light tracking-[0.2em] uppercase text-stone-900 mb-4">Shop</h1>
+          <div className="flex items-center justify-center gap-2 text-sm text-stone-400">
+            <Link to="/" className="hover:text-stone-700 transition">Home</Link>
+            <span>›</span>
+            <span className="text-stone-600">Shop</span>
+          </div>
+        </div>
+      )}
 
       <div className="max-w-7xl mx-auto px-4 py-10">
 
+        {/* Search + Sort */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1">
-            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
-            <input
-              type="text"
-              value={search}
-              onChange={function(e) { setSearch(e.target.value) }}
-              placeholder="Rechercher un produit..."
-              className="w-full pl-10 pr-4 py-3 bg-white border border-stone-200 rounded-xl text-sm text-stone-700 focus:outline-none focus:border-stone-400 transition"
-            />
-            {search && (
-              <button onClick={function() { setSearch('') }} className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700">
-                <X size={14} />
-              </button>
+            {loading ? (
+              <div className="w-full h-12 bg-white border border-stone-200 rounded-xl animate-pulse" />
+            ) : (
+              <>
+                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={function(e) { setSearch(e.target.value) }}
+                  placeholder="Rechercher un produit..."
+                  className="w-full pl-10 pr-4 py-3 bg-white border border-stone-200 rounded-xl text-sm text-stone-700 focus:outline-none focus:border-stone-400 transition"
+                />
+                {search && (
+                  <button onClick={function() { setSearch('') }} className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700">
+                    <X size={14} />
+                  </button>
+                )}
+              </>
             )}
           </div>
 
-          <select
-            value={sort}
-            onChange={function(e) { setSort(e.target.value) }}
-            className="bg-white border border-stone-200 rounded-xl px-4 py-3 text-sm text-stone-700 focus:outline-none focus:border-stone-400"
-          >
-            {sortOptions.map(function(o) {
-              return <option key={o.value} value={o.value}>{o.label}</option>
-            })}
-          </select>
+          {loading ? (
+            <div className="w-44 h-12 bg-white border border-stone-200 rounded-xl animate-pulse" />
+          ) : (
+            <select
+              value={sort}
+              onChange={function(e) { setSort(e.target.value) }}
+              className="bg-white border border-stone-200 rounded-xl px-4 py-3 text-sm text-stone-700 focus:outline-none focus:border-stone-400"
+            >
+              {sortOptions.map(function(o) {
+                return <option key={o.value} value={o.value}>{o.label}</option>
+              })}
+            </select>
+          )}
 
           <button
             onClick={function() { setShowFilters(!showFilters) }}
@@ -140,83 +180,86 @@ export default function ShopPage() {
 
         <div className="flex gap-8">
 
+          {/* Sidebar */}
           <aside className={'flex-shrink-0 w-56 ' + (showFilters ? 'block' : 'hidden sm:block')}>
-            <div className="bg-white rounded-2xl border border-stone-100 p-6 sticky top-24">
-
-              <div className="mb-7">
-                <h3 className="text-xs tracking-[0.3em] uppercase font-medium text-stone-900 mb-4">Categories</h3>
-                <div className="flex flex-col gap-2">
-                  {categories.map(function(cat) {
-                    return (
-                      <button
-                        key={cat.value}
-                        onClick={function() { setCategory(cat.value) }}
-                        className={'text-left text-sm px-3 py-2 rounded-xl transition ' + (category === cat.value ? 'bg-stone-900 text-white' : 'text-stone-500 hover:bg-stone-50 hover:text-stone-800')}
-                      >
-                        {cat.label}
-                      </button>
-                    )
-                  })}
+            {loading ? (
+              <SkeletonSidebar />
+            ) : (
+              <div className="bg-white rounded-2xl border border-stone-100 p-6 sticky top-24">
+                <div className="mb-7">
+                  <h3 className="text-xs tracking-[0.3em] uppercase font-medium text-stone-900 mb-4">Categories</h3>
+                  <div className="flex flex-col gap-2">
+                    {categories.map(function(cat) {
+                      return (
+                        <button
+                          key={cat.value}
+                          onClick={function() { setCategory(cat.value) }}
+                          className={'text-left text-sm px-3 py-2 rounded-xl transition ' + (category === cat.value ? 'bg-stone-900 text-white' : 'text-stone-500 hover:bg-stone-50 hover:text-stone-800')}
+                        >
+                          {cat.label}
+                        </button>
+                      )
+                    })}
+                  </div>
                 </div>
-              </div>
 
-              <div className="mb-7">
-                <h3 className="text-xs tracking-[0.3em] uppercase font-medium text-stone-900 mb-4">Prix max</h3>
-                <input
-                  type="range" min={100} max={1000} step={10}
-                  value={maxPrice}
-                  onChange={function(e) { setMaxPrice(Number(e.target.value)) }}
-                  className="w-full accent-stone-900"
-                />
-                <div className="flex justify-between text-xs text-stone-400 mt-2">
-                  <span>100 MAD</span>
-                  <span className="font-medium text-stone-700">{maxPrice} MAD</span>
+                <div className="mb-7">
+                  <h3 className="text-xs tracking-[0.3em] uppercase font-medium text-stone-900 mb-4">Prix max</h3>
+                  <input
+                    type="range" min={100} max={1000} step={10}
+                    value={maxPrice}
+                    onChange={function(e) { setMaxPrice(Number(e.target.value)) }}
+                    className="w-full accent-stone-900"
+                  />
+                  <div className="flex justify-between text-xs text-stone-400 mt-2">
+                    <span>100 MAD</span>
+                    <span className="font-medium text-stone-700">{maxPrice} MAD</span>
+                  </div>
                 </div>
-              </div>
 
-              <div>
-                <h3 className="text-xs tracking-[0.3em] uppercase font-medium text-stone-900 mb-4">Promotions</h3>
+                <div>
+                  <h3 className="text-xs tracking-[0.3em] uppercase font-medium text-stone-900 mb-4">Promotions</h3>
+                  <button
+                    onClick={function() { setSort(sort === 'discount' ? 'default' : 'discount') }}
+                    className={'w-full text-sm px-3 py-2 rounded-xl transition text-left ' + (sort === 'discount' ? 'bg-amber-500 text-white' : 'bg-stone-50 text-stone-600 hover:bg-stone-100')}
+                  >
+                    Meilleures promos
+                  </button>
+                </div>
+
                 <button
-                  onClick={function() { setSort(sort === 'discount' ? 'default' : 'discount') }}
-                  className={'w-full text-sm px-3 py-2 rounded-xl transition text-left ' + (sort === 'discount' ? 'bg-amber-500 text-white' : 'bg-stone-50 text-stone-600 hover:bg-stone-100')}
+                  onClick={function() { setCategory('all'); setSort('default'); setMaxPrice(1000); setSearch('') }}
+                  className="w-full mt-6 text-xs tracking-widest uppercase text-stone-400 hover:text-stone-700 transition"
                 >
-                  Meilleures promos
+                  Reinitialiser
                 </button>
               </div>
-
-              <button
-                onClick={function() { setCategory('all'); setSort('default'); setMaxPrice(1000); setSearch('') }}
-                className="w-full mt-6 text-xs tracking-widest uppercase text-stone-400 hover:text-stone-700 transition"
-              >
-                Reinitialiser
-              </button>
-            </div>
+            )}
           </aside>
 
+          {/* Products Grid */}
           <div className="flex-1">
 
-            <div className="flex items-center justify-between mb-5">
-              <p className="text-sm text-stone-400">
-                <span className="font-medium text-stone-700">{filtered.length}</span> produits trouves
-              </p>
-            </div>
+            {loading ? (
+              <div className="h-4 bg-stone-200 rounded-full animate-pulse w-32 mb-5" />
+            ) : (
+              <div className="flex items-center justify-between mb-5">
+                <p className="text-sm text-stone-400">
+                  <span className="font-medium text-stone-700">{filtered.length}</span> produits trouves
+                </p>
+              </div>
+            )}
 
+            {/* Skeleton */}
             {loading && (
               <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
                 {Array(8).fill(null).map(function(_, i) {
-                  return (
-                    <div key={i} className="bg-white rounded-2xl overflow-hidden border border-stone-100">
-                      <div className="w-full h-52 bg-stone-100 animate-pulse" />
-                      <div className="p-4">
-                        <div className="h-3 bg-stone-100 rounded animate-pulse mb-2" />
-                        <div className="h-3 bg-stone-100 rounded animate-pulse w-2/3" />
-                      </div>
-                    </div>
-                  )
+                  return <SkeletonCard key={i} />
                 })}
               </div>
             )}
 
+            {/* Empty */}
             {!loading && filtered.length === 0 && (
               <div className="text-center py-20">
                 <div className="text-5xl mb-4">🔍</div>
@@ -230,41 +273,32 @@ export default function ShopPage() {
               </div>
             )}
 
+            {/* Products */}
             {!loading && paginated.length > 0 && (
               <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
                 {paginated.map(function(product) {
                   return (
                     <div key={product._id} className="group bg-white rounded-2xl overflow-hidden border border-stone-100 hover:shadow-md transition duration-300 cursor-pointer">
-
                       <div className="relative overflow-hidden">
                         <img
                           src={getImageUrl(product.image)}
                           alt={product.name}
                           className="w-full h-52 object-cover transition-transform duration-500 group-hover:scale-105"
                         />
-
                         <div className="absolute top-2 left-2 flex flex-col gap-1">
                           {product.discount > 0 && (
-                            <span className="bg-red-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
-                              -{product.discount}%
-                            </span>
+                            <span className="bg-red-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">-{product.discount}%</span>
                           )}
                           {product.hot && (
-                            <span className="bg-amber-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
-                              HOT
-                            </span>
+                            <span className="bg-amber-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">HOT</span>
                           )}
                           {product.stock === 0 && (
-                            <span className="bg-stone-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
-                              Rupture
-                            </span>
+                            <span className="bg-stone-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">Rupture</span>
                           )}
                         </div>
-
                         <button className="absolute top-2 right-2 w-7 h-7 bg-white rounded-full flex items-center justify-center shadow hover:scale-110 transition">
                           <span className="text-stone-400 text-xs">♡</span>
                         </button>
-
                         <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
                           <button
                             onClick={function() { handleAdd(product) }}
@@ -275,7 +309,6 @@ export default function ShopPage() {
                           </button>
                         </div>
                       </div>
-
                       <div className="p-4">
                         <h3 className="text-xs font-medium text-stone-800 mb-2 leading-snug line-clamp-2">{product.name}</h3>
                         <div className="flex items-center gap-2">
@@ -285,7 +318,6 @@ export default function ShopPage() {
                           )}
                         </div>
                       </div>
-
                     </div>
                   )
                 })}
@@ -302,7 +334,6 @@ export default function ShopPage() {
                 >
                   &#8249;
                 </button>
-
                 {Array.from({ length: totalPages }, function(_, i) { return i + 1 }).map(function(page) {
                   return (
                     <button
@@ -314,7 +345,6 @@ export default function ShopPage() {
                     </button>
                   )
                 })}
-
                 <button
                   onClick={function() { setCurrentPage(function(p) { return Math.min(totalPages, p + 1) }) }}
                   disabled={currentPage === totalPages}
