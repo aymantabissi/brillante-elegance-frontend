@@ -46,10 +46,10 @@ export default function Navbar() {
           {/* Logo */}
           <Link to="/" className="flex flex-col leading-none">
             <span className="text-2xl font-bold tracking-[0.15em] text-stone-900 uppercase">
-              Elegance
+              Brillante
             </span>
             <span className="text-[9px] tracking-[0.4em] text-stone-400 uppercase">
-              Accessoires
+              Elegance
             </span>
           </Link>
 
