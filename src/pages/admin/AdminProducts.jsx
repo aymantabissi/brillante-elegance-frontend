@@ -37,7 +37,8 @@ const handleImageUpload = async function(e) {
 
   setUploadingImage(true)
   try {
-    const response = await fetch('http://localhost:5000/api/products/upload', {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+    const response = await fetch(apiUrl + '/products/upload', {
       method: 'POST',
       headers: {
         Authorization: 'Bearer ' + JSON.parse(localStorage.getItem('user'))?.token,
