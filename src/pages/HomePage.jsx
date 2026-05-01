@@ -31,14 +31,7 @@ const categories = [
   { label: 'Montres',   emoji: '⌚', to: '/shop?cat=montres' },
 ]
 
-const trendingProducts = [
-  { id: 1, name: 'Pack Red',        price: 299, oldPrice: 370, discount: 19, hot: true,  image: 'https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?w=400&q=80' },
-  { id: 2, name: 'Pack Gold White', price: 299, oldPrice: 370, discount: 19, hot: true,  image: 'https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=600&q=80' },
-  { id: 3, name: 'Pack Full Black', price: 299, oldPrice: 370, discount: 19, hot: true,  image: 'https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=600&q=80' },
-  { id: 4, name: 'Collier Perles',  price: 199, oldPrice: 250, discount: 20, hot: false, image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&q=80' },
-  { id: 5, name: 'Bracelet Gold',   price: 179, oldPrice: 220, discount: 18, hot: true,  image: 'https://images.unsplash.com/photo-1573408301185-9519f94816b5?w=600&q=80' },
-  { id: 6, name: 'Bague Elegante',  price: 249, oldPrice: 300, discount: 17, hot: false, image: 'https://images.unsplash.com/photo-1635767798638-3e25273a8236?w=600&q=80' },
-]
+
 
 const testimonials = [
   { id: 1, name: 'Salma B.',   location: 'Casablanca', avatar: 'S', rating: 5, text: 'Qualite exceptionnelle ! Mon bracelet Vancleef est absolument magnifique. Livraison rapide et emballage soigne. Je recommande vivement !', product: 'Bracelet Vancleef' },
@@ -171,57 +164,121 @@ function FeaturedCategories() {
 
 function TrendingProducts() {
   const dispatch = useDispatch()
+  const { items: products, loading } = useSelector((state) => state.products)
   const [addedId, setAddedId] = useState(null)
 
+  useEffect(function() {
+    dispatch(fetchProducts())
+  }, [dispatch])
+
   const handleAdd = (product) => {
-    dispatch(addToCart({ _id: product.id, name: product.name, price: product.price, image: product.image, qty: 1 }))
-    setAddedId(product.id)
+    dispatch(addToCart({
+      _id: product._id,
+      name: product.name,
+      price: product.price,
+      image: product.image && product.image.startsWith('http') ? product.image : 'https://via.placeholder.com/400',
+      qty: 1,
+    }))
+    setAddedId(product._id)
     setTimeout(() => setAddedId(null), 1500)
   }
+
+  const getImageUrl = (image) => {
+    if (!image) return 'https://via.placeholder.com/400'
+    if (image.startsWith('http')) return image
+    return 'https://via.placeholder.com/400'
+  }
+
+  // Show max 6 products
+  const displayed = products.slice(0, 6)
 
   return (
     <section className="bg-white py-16 px-4">
       <div className="bg-black text-white text-center py-5 mb-10 rounded-xl mx-auto max-w-6xl">
         <h2 className="text-2xl md:text-3xl font-bold tracking-wide">Trending Products</h2>
       </div>
-      <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {trendingProducts.map((product) => (
-          <div key={product.id} className="group relative cursor-pointer">
-            <div className="relative overflow-hidden rounded-2xl">
-              <img src={product.image} alt={product.name} className="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-105" />
-              <div className="absolute bottom-0 left-0 right-0 bg-black py-1.5 overflow-hidden">
-                <div className="flex gap-4 animate-scroll-left whitespace-nowrap w-max">
-                  {Array(10).fill(null).map((_, i) => (
-                    <span key={i} className="text-white text-[10px] tracking-wider flex items-center gap-1">HOT SALE{product.discount}%OFF <span className="text-red-500">⚡</span></span>
-                  ))}
+
+      {/* Skeleton */}
+      {loading && (
+        <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array(6).fill(null).map((_, i) => (
+            <div key={i} className="rounded-2xl overflow-hidden">
+              <div className="w-full h-72 bg-stone-200 animate-pulse rounded-2xl" />
+              <div className="mt-3 space-y-2">
+                <div className="h-3 bg-stone-200 rounded-full animate-pulse w-2/3" />
+                <div className="h-3 bg-stone-200 rounded-full animate-pulse w-1/3" />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Products */}
+      {!loading && (
+        <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {displayed.map((product) => (
+            <div key={product._id} className="group relative cursor-pointer">
+              <div className="relative overflow-hidden rounded-2xl">
+                <img
+                  src={getImageUrl(product.image)}
+                  alt={product.name}
+                  className="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-black py-1.5 overflow-hidden">
+                  <div className="flex gap-4 animate-scroll-left whitespace-nowrap w-max">
+                    {Array(10).fill(null).map((_, i) => (
+                      <span key={i} className="text-white text-[10px] tracking-wider flex items-center gap-1">
+                        HOT SALE{product.discount}%OFF <span className="text-red-500">⚡</span>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+                  {product.discount > 0 && (
+                    <span className="bg-red-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">-{product.discount}%</span>
+                  )}
+                  {product.hot && (
+                    <span className="bg-amber-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">HOT</span>
+                  )}
+                </div>
+                <button className="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow hover:scale-110 transition">
+                  <span className="text-stone-400 hover:text-red-400 transition text-sm">♡</span>
+                </button>
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <button
+                    onClick={() => handleAdd(product)}
+                    disabled={product.stock === 0}
+                    className={'text-xs tracking-[0.2em] uppercase px-7 py-3 rounded-full font-medium shadow-lg transition duration-300 disabled:opacity-50 ' + (addedId === product._id ? 'bg-stone-900 text-white' : 'bg-white text-stone-900 hover:bg-stone-900 hover:text-white')}
+                  >
+                    {product.stock === 0 ? 'Rupture' : addedId === product._id ? 'Ajoute !' : 'Add to Cart'}
+                  </button>
                 </div>
               </div>
-              <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-                <span className="bg-red-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">-{product.discount}%</span>
-                {product.hot && <span className="bg-amber-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">HOT</span>}
-              </div>
-              <button className="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow hover:scale-110 transition">
-                <span className="text-stone-400 hover:text-red-400 transition text-sm">♡</span>
-              </button>
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <button
-                  onClick={() => handleAdd(product)}
-                  className={'text-xs tracking-[0.2em] uppercase px-7 py-3 rounded-full font-medium shadow-lg transition duration-300 ' + (addedId === product.id ? 'bg-stone-900 text-white' : 'bg-white text-stone-900 hover:bg-stone-900 hover:text-white')}
-                >
-                  {addedId === product.id ? 'Ajoute !' : 'Add to Cart'}
-                </button>
+              <div className="mt-3 px-1">
+                <h3 className="text-sm font-medium text-stone-800 tracking-wide line-clamp-1">{product.name}</h3>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-stone-900 font-semibold text-sm">{product.price}.00 MAD</span>
+                  {product.oldPrice > 0 && (
+                    <span className="text-stone-400 text-xs line-through">{product.oldPrice}.00 MAD</span>
+                  )}
+                </div>
               </div>
             </div>
-            <div className="mt-3 px-1">
-              <h3 className="text-sm font-medium text-stone-800 tracking-wide">{product.name}</h3>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-stone-900 font-semibold text-sm">{product.price}.00 MAD</span>
-                <span className="text-stone-400 text-xs line-through">{product.oldPrice}.00 MAD</span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
+
+      {/* View All */}
+      {!loading && products.length > 6 && (
+        <div className="text-center mt-10">
+          <Link
+            to="/shop"
+            className="inline-block border border-stone-800 text-stone-800 text-xs tracking-[0.3em] uppercase px-10 py-3.5 hover:bg-stone-800 hover:text-white transition"
+          >
+            Voir tout — {products.length} produits
+          </Link>
+        </div>
+      )}
     </section>
   )
 }
