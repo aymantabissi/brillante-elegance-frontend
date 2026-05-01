@@ -13,16 +13,14 @@ const heroSlides = [
 ]
 
 const stripImages = [
-  'https://images.unsplash.com/photo-1601121141461-9d6647bef0a1?w=400&q=80',
+  'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=400&q=80',
+  'https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=400&q=80',
+  'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400&q=80',
+  'https://images.unsplash.com/photo-1617038220319-276d3cfab638?w=400&q=80',
+  'https://images.unsplash.com/photo-1584302179602-e4c3d3fd629d?w=400&q=80',
+  'https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?w=400&q=80',
   'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&q=80',
   'https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=400&q=80',
-  'https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=400&q=80',
-  'https://images.unsplash.com/photo-1589128777073-263566ae5e4d?w=400&q=80',
-  'https://images.unsplash.com/photo-1573408301185-9519f94816b5?w=400&q=80',
-  'https://images.unsplash.com/photo-1635767798638-3e25273a8236?w=400&q=80',
-  'https://images.unsplash.com/photo-1608042314453-ae338d80c427?w=400&q=80',
-  'https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?w=400&q=80',
-  'https://images.unsplash.com/photo-1617038220319-276d3cfab638?w=400&q=80',
 ]
 
 const categories = [
@@ -448,7 +446,33 @@ function WhyUs() {
   )
 }
 
+// Kopji had function o bdel InstagramSection f HomePage.jsx
+
 function InstagramSection() {
+  const { items: products } = useSelector(function(state) { return state.products })
+
+  const realImages = products
+    .filter(function(p) { return p.image && p.image.startsWith('http') })
+    .slice(0, 5)
+
+  const useReal = realImages.length >= 3
+
+  const igSvg = (
+    <svg className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition duration-300" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+    </svg>
+  )
+
+  const linkClass = function(i) {
+    return 'relative overflow-hidden group flex-shrink-0 cursor-pointer ' + (i === 2 ? 'w-48 md:w-56 rounded-3xl' : 'w-44 md:w-48 rounded-2xl')
+  }
+
+  const overlay = (
+    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition duration-300 flex items-center justify-center">
+      {igSvg}
+    </div>
+  )
+
   return (
     <section className="bg-white py-0">
       <div className="bg-black text-white text-center py-5">
@@ -456,21 +480,35 @@ function InstagramSection() {
       </div>
       <div className="max-w-6xl mx-auto px-4 py-10">
         <div className="flex gap-4 justify-center flex-wrap md:flex-nowrap">
-          {instaImages.map(function(img, i) {
-            return (
-              <a key={i} href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className={'relative overflow-hidden group flex-shrink-0 cursor-pointer ' + (i === 2 ? 'w-48 md:w-56 rounded-3xl' : 'w-44 md:w-48 rounded-2xl')}>
-                <img src={img} alt={'instagram ' + (i + 1)} className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105" />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition duration-300 flex items-center justify-center">
-                  <svg className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition duration-300" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-                  </svg>
-                </div>
-              </a>
-            )
-          })}
+          {useReal
+            ? realImages.map(function(product, i) {
+                const id = product._id
+                const src = product.image
+                const name = product.name
+                return (
+                  <a key={id} href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className={linkClass(i)}>
+                    <img src={src} alt={name} className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105" />
+                    {overlay}
+                  </a>
+                )
+              })
+            : instaImages.map(function(img, i) {
+                return (
+                  <a key={i} href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className={linkClass(i)}>
+                    <img src={img} alt={'instagram ' + (i + 1)} className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105" />
+                    {overlay}
+                  </a>
+                )
+              })
+          }
         </div>
         <div className="text-center mt-8">
-          <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="inline-block bg-red-500 hover:bg-red-600 text-white text-sm font-semibold px-10 py-3.5 rounded-full transition duration-300 shadow-md hover:shadow-lg">
+          <a
+            href={INSTAGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block bg-red-500 hover:bg-red-600 text-white text-sm font-semibold px-10 py-3.5 rounded-full transition duration-300 shadow-md hover:shadow-lg"
+          >
             Visit Our Instagram
           </a>
         </div>
@@ -478,7 +516,6 @@ function InstagramSection() {
     </section>
   )
 }
-
 function Newsletter() {
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
