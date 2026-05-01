@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { addToCart } from '../store/slices/cartSlice'
+import { useSelector } from 'react-redux'
+import { fetchProducts } from '../store/slices/productSlice'
 
 const heroSlides = [
   { id: 1, image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1600&q=80', title: 'New Collection', subtitle: 'Summer 2025' },
