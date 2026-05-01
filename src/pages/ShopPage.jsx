@@ -12,7 +12,7 @@ const categories = [
   { value: 'bagues',    label: 'Bagues' },
   { value: 'lunettes',  label: 'Lunettes' },
   { value: 'montres',   label: 'Montres' },
-{ value: 'Sacs',   label: 'Sacs' },
+  { value: 'Sacs',      label: 'Sacs' },
 ]
 
 const sortOptions = [
@@ -21,6 +21,8 @@ const sortOptions = [
   { value: 'price-desc', label: 'Prix decroissant' },
   { value: 'discount',   label: 'Meilleures promos' },
 ]
+
+const productsPerPage = 8
 
 export default function ShopPage() {
   const dispatch = useDispatch()
@@ -34,15 +36,19 @@ export default function ShopPage() {
   const [maxPrice,    setMaxPrice]    = useState(1000)
   const [showFilters, setShowFilters] = useState(false)
   const [addedId,     setAddedId]     = useState(null)
+  const [currentPage, setCurrentPage] = useState(1)
 
   useEffect(function() {
     dispatch(fetchProducts())
   }, [dispatch])
 
-  // Update category when URL param changes
   useEffect(function() {
     if (catParam) setCategory(catParam)
   }, [catParam])
+
+  useEffect(function() {
+    setCurrentPage(1)
+  }, [category, search, sort, maxPrice])
 
   const filtered = useMemo(function() {
     let list = [...products]
@@ -55,33 +61,36 @@ export default function ShopPage() {
     return list
   }, [products, category, search, sort, maxPrice])
 
+  const totalPages = Math.ceil(filtered.length / productsPerPage)
+
+  const paginated = useMemo(function() {
+    const start = (currentPage - 1) * productsPerPage
+    return filtered.slice(start, start + productsPerPage)
+  }, [filtered, currentPage])
+
   const handleAdd = function(product) {
     dispatch(addToCart({
       _id: product._id,
       name: product.name,
       price: product.price,
-      image: product.image.startsWith('/uploads')
-        ? 'http://localhost:5000' + product.image
-        : product.image,
+      image: product.image && product.image.startsWith('http')
+        ? product.image
+        : 'https://via.placeholder.com/400',
       qty: 1,
     }))
     setAddedId(product._id)
     setTimeout(function() { setAddedId(null) }, 1500)
   }
 
- const getImageUrl = function(image) {
-  if (!image) return 'https://via.placeholder.com/400x400?text=No+Image'
-  // Cloudinary URL — katban direct
-  if (image.startsWith('http')) return image
-  // Local uploads — mawjudach f production
-  if (image.startsWith('/uploads')) return 'https://via.placeholder.com/400x400?text=No+Image'
-  return image
-}
+  const getImageUrl = function(image) {
+    if (!image) return 'https://via.placeholder.com/400x400?text=No+Image'
+    if (image.startsWith('http')) return image
+    return 'https://via.placeholder.com/400x400?text=No+Image'
+  }
 
   return (
     <main className="bg-[#f9f8f6] min-h-screen">
 
-      {/* Hero */}
       <div className="bg-[#f5f3f0] py-14 text-center">
         <p className="text-xs tracking-[0.5em] uppercase text-stone-400 mb-2">Notre boutique</p>
         <h1 className="text-4xl font-light tracking-[0.2em] uppercase text-stone-900 mb-4">Shop</h1>
@@ -94,7 +103,6 @@ export default function ShopPage() {
 
       <div className="max-w-7xl mx-auto px-4 py-10">
 
-        {/* Search + Sort */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1">
             <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
@@ -132,7 +140,6 @@ export default function ShopPage() {
 
         <div className="flex gap-8">
 
-          {/* Sidebar */}
           <aside className={'flex-shrink-0 w-56 ' + (showFilters ? 'block' : 'hidden sm:block')}>
             <div className="bg-white rounded-2xl border border-stone-100 p-6 sticky top-24">
 
@@ -186,7 +193,6 @@ export default function ShopPage() {
             </div>
           </aside>
 
-          {/* Products Grid */}
           <div className="flex-1">
 
             <div className="flex items-center justify-between mb-5">
@@ -195,7 +201,6 @@ export default function ShopPage() {
               </p>
             </div>
 
-            {/* Loading */}
             {loading && (
               <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
                 {Array(8).fill(null).map(function(_, i) {
@@ -212,7 +217,6 @@ export default function ShopPage() {
               </div>
             )}
 
-            {/* Empty */}
             {!loading && filtered.length === 0 && (
               <div className="text-center py-20">
                 <div className="text-5xl mb-4">🔍</div>
@@ -226,10 +230,9 @@ export default function ShopPage() {
               </div>
             )}
 
-            {/* Products */}
-            {!loading && filtered.length > 0 && (
+            {!loading && paginated.length > 0 && (
               <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-                {filtered.map(function(product) {
+                {paginated.map(function(product) {
                   return (
                     <div key={product._id} className="group bg-white rounded-2xl overflow-hidden border border-stone-100 hover:shadow-md transition duration-300 cursor-pointer">
 
@@ -288,6 +291,46 @@ export default function ShopPage() {
                 })}
               </div>
             )}
+
+            {/* Pagination */}
+            {!loading && totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-10">
+                <button
+                  onClick={function() { setCurrentPage(function(p) { return Math.max(1, p - 1) }) }}
+                  disabled={currentPage === 1}
+                  className="w-9 h-9 rounded-xl border border-stone-200 flex items-center justify-center text-stone-500 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition disabled:opacity-30 disabled:cursor-not-allowed text-sm"
+                >
+                  &#8249;
+                </button>
+
+                {Array.from({ length: totalPages }, function(_, i) { return i + 1 }).map(function(page) {
+                  return (
+                    <button
+                      key={page}
+                      onClick={function() { setCurrentPage(page) }}
+                      className={'w-9 h-9 rounded-xl text-sm transition ' + (currentPage === page ? 'bg-stone-900 text-white border border-stone-900' : 'border border-stone-200 text-stone-500 hover:bg-stone-100')}
+                    >
+                      {page}
+                    </button>
+                  )
+                })}
+
+                <button
+                  onClick={function() { setCurrentPage(function(p) { return Math.min(totalPages, p + 1) }) }}
+                  disabled={currentPage === totalPages}
+                  className="w-9 h-9 rounded-xl border border-stone-200 flex items-center justify-center text-stone-500 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition disabled:opacity-30 disabled:cursor-not-allowed text-sm"
+                >
+                  &#8250;
+                </button>
+              </div>
+            )}
+
+            {!loading && filtered.length > 0 && (
+              <p className="text-center text-xs text-stone-400 mt-4">
+                {(currentPage - 1) * productsPerPage + 1} — {Math.min(currentPage * productsPerPage, filtered.length)} sur {filtered.length} produits
+              </p>
+            )}
+
           </div>
         </div>
       </div>
