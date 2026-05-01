@@ -69,11 +69,14 @@ export default function ShopPage() {
     setTimeout(function() { setAddedId(null) }, 1500)
   }
 
-  const getImageUrl = function(image) {
-    if (!image) return 'https://via.placeholder.com/400x400?text=No+Image'
-    if (image.startsWith('/uploads')) return 'http://localhost:5000' + image
-    return image
-  }
+ const getImageUrl = function(image) {
+  if (!image) return 'https://via.placeholder.com/400x400?text=No+Image'
+  // Cloudinary URL — katban direct
+  if (image.startsWith('http')) return image
+  // Local uploads — mawjudach f production
+  if (image.startsWith('/uploads')) return 'https://via.placeholder.com/400x400?text=No+Image'
+  return image
+}
 
   return (
     <main className="bg-[#f9f8f6] min-h-screen">
