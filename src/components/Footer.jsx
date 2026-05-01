@@ -8,21 +8,21 @@ export default function Footer() {
         {/* Logo + Contact */}
         <div>
           <div className="mb-6">
-            <h3 className="text-2xl font-bold tracking-[0.15em] text-stone-900 uppercase">Elegance</h3>
-            <p className="text-[9px] tracking-[0.4em] uppercase text-stone-400">Accessoires</p>
+            <h3 className="text-2xl font-bold tracking-[0.15em] text-stone-900 uppercase">Brillante</h3>
+            <p className="text-[9px] tracking-[0.4em] uppercase text-stone-400">Elegance</p>
           </div>
           <div className="flex flex-col gap-3 text-sm text-stone-600">
             <div className="flex gap-2">
               <span className="font-semibold text-stone-900 min-w-[70px]">Email:</span>
-              <span>info@eleganceaccesoires.ma</span>
+              <span>brillanteelegance@gmail.com</span>
             </div>
             <div className="flex gap-2">
               <span className="font-semibold text-stone-900 min-w-[70px]">Phone:</span>
-              <span>07 14 31 86 46</span>
+              <span>06 38 29 86 30</span>
             </div>
             <div className="flex gap-2">
               <span className="font-semibold text-stone-900 min-w-[70px]">Address:</span>
-              <span>Morocco, Casablanca</span>
+              <span>Morocco, Safi</span>
             </div>
           </div>
         </div>
