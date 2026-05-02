@@ -299,15 +299,15 @@ export default function ShopPage() {
                         <button className="absolute top-2 right-2 w-7 h-7 bg-white rounded-full flex items-center justify-center shadow hover:scale-110 transition">
                           <span className="text-stone-400 text-xs">♡</span>
                         </button>
-                        <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                          <button
-                            onClick={function() { handleAdd(product) }}
-                            disabled={product.stock === 0}
-                            className={'w-full py-3 text-xs tracking-[0.2em] uppercase font-medium transition duration-300 disabled:opacity-50 ' + (addedId === product._id ? 'bg-stone-900 text-white' : 'bg-white text-stone-900 hover:bg-stone-900 hover:text-white')}
-                          >
-                            {product.stock === 0 ? 'Rupture' : addedId === product._id ? 'Ajoute !' : 'Add to Cart'}
-                          </button>
-                        </div>
+                        <div className="absolute bottom-0 left-0 right-0 md:translate-y-full md:group-hover:translate-y-0 transition-transform duration-300">
+  <button
+    onClick={function() { handleAdd(product) }}
+    disabled={product.stock === 0}
+    className={'w-full py-3 text-xs tracking-[0.2em] uppercase font-medium transition duration-300 disabled:opacity-50 ' + (addedId === product._id ? 'bg-stone-900 text-white' : 'bg-white text-stone-900 hover:bg-stone-900 hover:text-white')}
+  >
+    {product.stock === 0 ? 'Rupture' : addedId === product._id ? 'Ajoute !' : 'Add to Cart'}
+  </button>
+</div>
                       </div>
                       <div className="p-4">
                         <h3 className="text-xs font-medium text-stone-800 mb-2 leading-snug line-clamp-2">{product.name}</h3>

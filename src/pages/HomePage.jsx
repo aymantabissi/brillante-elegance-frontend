@@ -244,15 +244,16 @@ function TrendingProducts() {
                 <button className="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow hover:scale-110 transition">
                   <span className="text-stone-400 hover:text-red-400 transition text-sm">♡</span>
                 </button>
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <button
-                    onClick={() => handleAdd(product)}
-                    disabled={product.stock === 0}
-                    className={'text-xs tracking-[0.2em] uppercase px-7 py-3 rounded-full font-medium shadow-lg transition duration-300 disabled:opacity-50 ' + (addedId === product._id ? 'bg-stone-900 text-white' : 'bg-white text-stone-900 hover:bg-stone-900 hover:text-white')}
-                  >
-                    {product.stock === 0 ? 'Rupture' : addedId === product._id ? 'Ajoute !' : 'Add to Cart'}
-                  </button>
-                </div>
+                {/* Button yban dima f mobile — hover ghir f desktop */}
+<div className="absolute bottom-0 left-0 right-0 md:inset-0 md:flex md:items-center md:justify-center md:opacity-0 md:group-hover:opacity-100 md:transition-opacity md:duration-300">
+  <button
+    onClick={() => handleAdd(product)}
+    disabled={product.stock === 0}
+    className={'w-full md:w-auto text-xs tracking-[0.2em] uppercase md:px-7 py-3 md:rounded-full font-medium shadow-lg transition duration-300 disabled:opacity-50 ' + (addedId === product._id ? 'bg-stone-900 text-white' : 'bg-white text-stone-900 md:hover:bg-stone-900 md:hover:text-white')}
+  >
+    {product.stock === 0 ? 'Rupture' : addedId === product._id ? 'Ajoute !' : 'Add to Cart'}
+  </button>
+</div>
               </div>
               <div className="mt-3 px-1">
                 <h3 className="text-sm font-medium text-stone-800 tracking-wide line-clamp-1">{product.name}</h3>

@@ -31,7 +31,8 @@ const values = [
 ]
 
 const teamImages = [
-  'https://images.unsplash.com/photo-1573408301185-9519f94816b5?w=600&q=80',
+  'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400&q=80',
+
   'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&q=80',
   'https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=600&q=80',
 ]
