@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { logout } from '../store/slices/authSlice'
-import { ShoppingBag, Search, X, Menu } from 'lucide-react'
+import { ShoppingBag, Search, X, Menu, Heart } from 'lucide-react'
 
-export default function Navbar() {
+export default function Navbar({ wishlistCount = 0 }) {
   const [showBanner, setShowBanner] = useState(true)
   const [showMenu, setShowMenu] = useState(false)
   const { user } = useSelector((state) => state.auth)
@@ -78,6 +78,16 @@ export default function Navbar() {
               <Search size={20} />
             </button>
 
+            {/* Wishlist */}
+            <Link to="/wishlist" className="text-stone-700 hover:text-stone-900 transition relative">
+              <Heart size={20} className={wishlistCount > 0 ? 'fill-red-500 text-red-500' : ''} />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
+
             {/* Cart */}
             <Link to="/cart" className="text-stone-700 hover:text-stone-900 transition relative">
               <ShoppingBag size={20} />
@@ -101,7 +111,7 @@ export default function Navbar() {
                 )}
                 <button
                   onClick={handleLogout}
-                  className="text-xs tracking-widest uppercase text-stone-500 hover:text-stone-800 transition"
+                  className="text-xs tracking-widests uppercase text-stone-500 hover:text-stone-800 transition"
                 >
                   Logout
                 </button>
@@ -133,6 +143,7 @@ export default function Navbar() {
               { label: 'Shop',       to: '/shop' },
               { label: 'About Us',   to: '/about' },
               { label: 'Contact Us', to: '/contact' },
+              { label: 'Wishlist',   to: '/wishlist' },
             ].map((link) => (
               <Link
                 key={link.to}
@@ -141,6 +152,11 @@ export default function Navbar() {
                 className="text-sm tracking-widest uppercase text-stone-700"
               >
                 {link.label}
+                {link.to === '/wishlist' && wishlistCount > 0 && (
+                  <span className="ml-2 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
+                    {wishlistCount}
+                  </span>
+                )}
               </Link>
             ))}
             {user ? (

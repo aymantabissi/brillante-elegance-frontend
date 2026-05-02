@@ -168,7 +168,7 @@ function FeaturedCategories() {
   )
 }
 
-function TrendingProducts() {
+function TrendingProducts({ wishlist, toggleWishlist }) {
   const dispatch = useDispatch()
   const { items: products, loading } = useSelector((state) => state.products)
   const [addedId, setAddedId] = useState(null)
@@ -191,10 +191,7 @@ function TrendingProducts() {
     }))
     setAddedId(product._id)
     setTimeout(function() { setAddedId(null) }, 1500)
-    toast.success(product.name + ' ajoute au panier !', {
-      icon: '🛍️',
-      style: toastStyle,
-    })
+    toast.success(product.name + ' ajoute au panier !', { icon: '🛍️', style: toastStyle })
   }
 
   const getImageUrl = function(image) {
@@ -229,6 +226,7 @@ function TrendingProducts() {
         <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {displayed.map(function(product) {
             const pid = product._id
+            const isWished = wishlist.includes(pid)
             return (
               <div key={pid} className="group relative cursor-pointer">
                 <div className="relative overflow-hidden rounded-2xl">
@@ -237,6 +235,8 @@ function TrendingProducts() {
                     alt={product.name}
                     className="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-105"
                   />
+
+                  {/* Ticker */}
                   <div className="absolute bottom-0 left-0 right-0 bg-black py-1.5 overflow-hidden">
                     <div className="flex gap-4 animate-scroll-left whitespace-nowrap w-max">
                       {Array(10).fill(null).map(function(_, i) {
@@ -248,6 +248,8 @@ function TrendingProducts() {
                       })}
                     </div>
                   </div>
+
+                  {/* Badges */}
                   <div className="absolute top-3 left-3 flex flex-col gap-1.5">
                     {product.discount > 0 && (
                       <span className="bg-red-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">-{product.discount}%</span>
@@ -256,10 +258,22 @@ function TrendingProducts() {
                       <span className="bg-amber-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">HOT</span>
                     )}
                   </div>
-                  <button className="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow hover:scale-110 transition">
-                    <span className="text-stone-400 hover:text-red-400 transition text-sm">♡</span>
+
+                  {/* Wishlist button */}
+                  <button
+                    onClick={function(e) {
+                      e.stopPropagation()
+                      toggleWishlist(pid)
+                    }}
+                    className="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow hover:scale-110 transition z-10"
+                  >
+                    <span className={'text-sm transition ' + (isWished ? 'text-red-500' : 'text-stone-300')}>
+                      {isWished ? '❤️' : '♡'}
+                    </span>
                   </button>
-                  <div className="absolute bottom-0 left-0 right-0 md:inset-0 md:flex md:items-center md:justify-center md:opacity-0 md:group-hover:opacity-100 md:transition-opacity md:duration-300">
+
+                  {/* Add to cart — dima visible f mobile, hover f desktop */}
+                  <div className="absolute bottom-8 left-0 right-0 md:bottom-0 md:inset-0 md:flex md:items-center md:justify-center md:opacity-0 md:group-hover:opacity-100 md:transition-opacity md:duration-300">
                     <button
                       onClick={function() { handleAdd(product) }}
                       disabled={product.stock === 0}
@@ -269,6 +283,7 @@ function TrendingProducts() {
                     </button>
                   </div>
                 </div>
+
                 <div className="mt-3 px-1">
                   <h3 className="text-sm font-medium text-stone-800 tracking-wide line-clamp-1">{product.name}</h3>
                   <div className="flex items-center gap-2 mt-1">
@@ -311,10 +326,7 @@ function FeaturedProduct() {
     }))
     setAdded(true)
     setTimeout(function() { setAdded(false) }, 2000)
-    toast.success('Special Pack Silver ajoute au panier !', {
-      icon: '🛍️',
-      style: toastStyle,
-    })
+    toast.success('Special Pack Silver ajoute au panier !', { icon: '🛍️', style: toastStyle })
   }
 
   return (
@@ -355,10 +367,7 @@ function FeaturedProduct() {
               </div>
             </div>
             <div className="flex flex-col gap-3">
-              <button
-                onClick={handleAddToCart}
-                className={'w-full border-2 border-stone-900 text-xs tracking-[0.3em] uppercase py-4 rounded-2xl font-medium transition duration-300 ' + (added ? 'bg-stone-900 text-white' : 'text-stone-900 hover:bg-stone-900 hover:text-white')}
-              >
+              <button onClick={handleAddToCart} className={'w-full border-2 border-stone-900 text-xs tracking-[0.3em] uppercase py-4 rounded-2xl font-medium transition duration-300 ' + (added ? 'bg-stone-900 text-white' : 'text-stone-900 hover:bg-stone-900 hover:text-white')}>
                 {added ? 'Ajoute au panier !' : 'Add to Cart'}
               </button>
               <button className="w-full bg-stone-900 text-white text-xs tracking-[0.3em] uppercase py-4 rounded-2xl font-medium hover:bg-stone-700 transition duration-300">Buy It Now</button>
@@ -520,12 +529,7 @@ function InstagramSection() {
           }
         </div>
         <div className="text-center mt-8">
-          <a
-            href={INSTAGRAM_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block bg-red-500 hover:bg-red-600 text-white text-sm font-semibold px-10 py-3.5 rounded-full transition duration-300 shadow-md hover:shadow-lg"
-          >
+          <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="inline-block bg-red-500 hover:bg-red-600 text-white text-sm font-semibold px-10 py-3.5 rounded-full transition duration-300 shadow-md hover:shadow-lg">
             Visit Our Instagram
           </a>
         </div>
@@ -560,7 +564,7 @@ function Newsletter() {
   )
 }
 
-export default function HomePage() {
+export default function HomePage({ wishlist = [], toggleWishlist = function() {} }) {
   return (
     <main>
       <HeroSlider />
@@ -568,7 +572,7 @@ export default function HomePage() {
       <DealsBanner />
       <ProductsStrip />
       <FeaturedCategories />
-      <TrendingProducts />
+      <TrendingProducts wishlist={wishlist} toggleWishlist={toggleWishlist} />
       <FeaturedProduct />
       <Testimonials />
       <WhyUs />

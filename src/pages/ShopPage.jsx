@@ -63,7 +63,8 @@ function SkeletonSidebar() {
   )
 }
 
-export default function ShopPage() {
+// ← Bdelt: props wishlist o toggleWishlist mn App.jsx
+export default function ShopPage({ wishlist = [], toggleWishlist = function() {} }) {
   const dispatch = useDispatch()
   const { items: products, loading } = useSelector((state) => state.products)
   const [searchParams] = useSearchParams()
@@ -260,6 +261,11 @@ export default function ShopPage() {
                 <p className="text-sm text-stone-400">
                   <span className="font-medium text-stone-700">{filtered.length}</span> produits trouves
                 </p>
+                {wishlist.length > 0 && (
+                  <Link to="/wishlist" className="text-xs text-red-400 hover:text-red-600 transition">
+                    ❤️ {wishlist.length} favori{wishlist.length > 1 ? 's' : ''}
+                  </Link>
+                )}
               </div>
             )}
 
@@ -287,8 +293,10 @@ export default function ShopPage() {
             {!loading && paginated.length > 0 && (
               <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
                 {paginated.map(function(product) {
+                  const pid = product._id
+                  const isWished = wishlist.includes(pid)
                   return (
-                    <div key={product._id} className="group bg-white rounded-2xl overflow-hidden border border-stone-100 hover:shadow-md transition duration-300 cursor-pointer">
+                    <div key={pid} className="group bg-white rounded-2xl overflow-hidden border border-stone-100 hover:shadow-md transition duration-300 cursor-pointer">
                       <div className="relative overflow-hidden">
                         <img
                           src={getImageUrl(product.image)}
@@ -306,16 +314,26 @@ export default function ShopPage() {
                             <span className="bg-stone-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">Rupture</span>
                           )}
                         </div>
-                        <button className="absolute top-2 right-2 w-7 h-7 bg-white rounded-full flex items-center justify-center shadow hover:scale-110 transition">
-                          <span className="text-stone-400 text-xs">♡</span>
+
+                        <button
+                          onClick={function(e) {
+                            e.stopPropagation()
+                            toggleWishlist(pid)
+                          }}
+                          className="absolute top-2 right-2 w-7 h-7 bg-white rounded-full flex items-center justify-center shadow hover:scale-110 transition"
+                        >
+                          <span className={'text-xs transition ' + (isWished ? 'text-red-500' : 'text-stone-300')}>
+                            {isWished ? '❤️' : '♡'}
+                          </span>
                         </button>
+
                         <div className="absolute bottom-0 left-0 right-0 md:translate-y-full md:group-hover:translate-y-0 transition-transform duration-300">
                           <button
                             onClick={function() { handleAdd(product) }}
                             disabled={product.stock === 0}
-                            className={'w-full py-3 text-xs tracking-[0.2em] uppercase font-medium transition duration-300 disabled:opacity-50 ' + (addedId === product._id ? 'bg-stone-900 text-white' : 'bg-white text-stone-900 hover:bg-stone-900 hover:text-white')}
+                            className={'w-full py-3 text-xs tracking-[0.2em] uppercase font-medium transition duration-300 disabled:opacity-50 ' + (addedId === pid ? 'bg-stone-900 text-white' : 'bg-white text-stone-900 hover:bg-stone-900 hover:text-white')}
                           >
-                            {product.stock === 0 ? 'Rupture' : addedId === product._id ? 'Ajoute !' : 'Add to Cart'}
+                            {product.stock === 0 ? 'Rupture' : addedId === pid ? 'Ajoute !' : 'Add to Cart'}
                           </button>
                         </div>
                       </div>
