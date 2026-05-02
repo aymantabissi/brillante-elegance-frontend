@@ -4,6 +4,8 @@ import { addToCart } from '../store/slices/cartSlice'
 import { fetchProducts } from '../store/slices/productSlice'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Search, SlidersHorizontal, X } from 'lucide-react'
+import toast from 'react-hot-toast'
+
 
 const categories = [
   { value: 'all',       label: 'Tous' },
