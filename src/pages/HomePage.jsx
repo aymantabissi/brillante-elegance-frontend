@@ -1,10 +1,18 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { addToCart } from '../store/slices/cartSlice'
-import { useSelector } from 'react-redux'
 import { fetchProducts } from '../store/slices/productSlice'
+import toast from 'react-hot-toast'
+
+const toastStyle = {
+  background: '#1c1917',
+  color: '#fff',
+  fontSize: '13px',
+  borderRadius: '12px',
+  padding: '12px 16px',
+}
 
 const heroSlides = [
   { id: 1, image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1600&q=80', title: 'New Collection', subtitle: 'Summer 2025' },
@@ -30,8 +38,6 @@ const categories = [
   { label: 'Lunettes',  emoji: '🕶️', to: '/shop?cat=lunettes' },
   { label: 'Montres',   emoji: '⌚', to: '/shop?cat=montres' },
 ]
-
-
 
 const testimonials = [
   { id: 1, name: 'Salma B.',   location: 'Casablanca', avatar: 'S', rating: 5, text: 'Qualite exceptionnelle ! Mon bracelet Vancleef est absolument magnifique. Livraison rapide et emballage soigne. Je recommande vivement !', product: 'Bracelet Vancleef' },
@@ -171,7 +177,11 @@ function TrendingProducts() {
     dispatch(fetchProducts())
   }, [dispatch])
 
-  const handleAdd = (product) => {
+  const handleAdd = function(product) {
+    if (product.stock === 0) {
+      toast.error('Produit en rupture de stock', { style: toastStyle })
+      return
+    }
     dispatch(addToCart({
       _id: product._id,
       name: product.name,
@@ -180,16 +190,19 @@ function TrendingProducts() {
       qty: 1,
     }))
     setAddedId(product._id)
-    setTimeout(() => setAddedId(null), 1500)
+    setTimeout(function() { setAddedId(null) }, 1500)
+    toast.success(product.name + ' ajoute au panier !', {
+      icon: '🛍️',
+      style: toastStyle,
+    })
   }
 
-  const getImageUrl = (image) => {
+  const getImageUrl = function(image) {
     if (!image) return 'https://via.placeholder.com/400'
     if (image.startsWith('http')) return image
     return 'https://via.placeholder.com/400'
   }
 
-  // Show max 6 products
   const displayed = products.slice(0, 6)
 
   return (
@@ -198,7 +211,6 @@ function TrendingProducts() {
         <h2 className="text-2xl md:text-3xl font-bold tracking-wide">Trending Products</h2>
       </div>
 
-      {/* Skeleton */}
       {loading && (
         <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {Array(6).fill(null).map((_, i) => (
@@ -213,69 +225,68 @@ function TrendingProducts() {
         </div>
       )}
 
-      {/* Products */}
       {!loading && (
         <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {displayed.map((product) => (
-            <div key={product._id} className="group relative cursor-pointer">
-              <div className="relative overflow-hidden rounded-2xl">
-                <img
-                  src={getImageUrl(product.image)}
-                  alt={product.name}
-                  className="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute bottom-0 left-0 right-0 bg-black py-1.5 overflow-hidden">
-                  <div className="flex gap-4 animate-scroll-left whitespace-nowrap w-max">
-                    {Array(10).fill(null).map((_, i) => (
-                      <span key={i} className="text-white text-[10px] tracking-wider flex items-center gap-1">
-                        HOT SALE{product.discount}%OFF <span className="text-red-500">⚡</span>
-                      </span>
-                    ))}
+          {displayed.map(function(product) {
+            const pid = product._id
+            return (
+              <div key={pid} className="group relative cursor-pointer">
+                <div className="relative overflow-hidden rounded-2xl">
+                  <img
+                    src={getImageUrl(product.image)}
+                    alt={product.name}
+                    className="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 bg-black py-1.5 overflow-hidden">
+                    <div className="flex gap-4 animate-scroll-left whitespace-nowrap w-max">
+                      {Array(10).fill(null).map(function(_, i) {
+                        return (
+                          <span key={i} className="text-white text-[10px] tracking-wider flex items-center gap-1">
+                            HOT SALE{product.discount}%OFF <span className="text-red-500">⚡</span>
+                          </span>
+                        )
+                      })}
+                    </div>
+                  </div>
+                  <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+                    {product.discount > 0 && (
+                      <span className="bg-red-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">-{product.discount}%</span>
+                    )}
+                    {product.hot && (
+                      <span className="bg-amber-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">HOT</span>
+                    )}
+                  </div>
+                  <button className="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow hover:scale-110 transition">
+                    <span className="text-stone-400 hover:text-red-400 transition text-sm">♡</span>
+                  </button>
+                  <div className="absolute bottom-0 left-0 right-0 md:inset-0 md:flex md:items-center md:justify-center md:opacity-0 md:group-hover:opacity-100 md:transition-opacity md:duration-300">
+                    <button
+                      onClick={function() { handleAdd(product) }}
+                      disabled={product.stock === 0}
+                      className={'w-full md:w-auto text-xs tracking-[0.2em] uppercase md:px-7 py-3 md:rounded-full font-medium shadow-lg transition duration-300 disabled:opacity-50 ' + (addedId === pid ? 'bg-stone-900 text-white' : 'bg-white text-stone-900 md:hover:bg-stone-900 md:hover:text-white')}
+                    >
+                      {product.stock === 0 ? 'Rupture' : addedId === pid ? 'Ajoute !' : 'Add to Cart'}
+                    </button>
                   </div>
                 </div>
-                <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-                  {product.discount > 0 && (
-                    <span className="bg-red-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">-{product.discount}%</span>
-                  )}
-                  {product.hot && (
-                    <span className="bg-amber-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">HOT</span>
-                  )}
-                </div>
-                <button className="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow hover:scale-110 transition">
-                  <span className="text-stone-400 hover:text-red-400 transition text-sm">♡</span>
-                </button>
-                {/* Button yban dima f mobile — hover ghir f desktop */}
-<div className="absolute bottom-0 left-0 right-0 md:inset-0 md:flex md:items-center md:justify-center md:opacity-0 md:group-hover:opacity-100 md:transition-opacity md:duration-300">
-  <button
-    onClick={() => handleAdd(product)}
-    disabled={product.stock === 0}
-    className={'w-full md:w-auto text-xs tracking-[0.2em] uppercase md:px-7 py-3 md:rounded-full font-medium shadow-lg transition duration-300 disabled:opacity-50 ' + (addedId === product._id ? 'bg-stone-900 text-white' : 'bg-white text-stone-900 md:hover:bg-stone-900 md:hover:text-white')}
-  >
-    {product.stock === 0 ? 'Rupture' : addedId === product._id ? 'Ajoute !' : 'Add to Cart'}
-  </button>
-</div>
-              </div>
-              <div className="mt-3 px-1">
-                <h3 className="text-sm font-medium text-stone-800 tracking-wide line-clamp-1">{product.name}</h3>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-stone-900 font-semibold text-sm">{product.price}.00 MAD</span>
-                  {product.oldPrice > 0 && (
-                    <span className="text-stone-400 text-xs line-through">{product.oldPrice}.00 MAD</span>
-                  )}
+                <div className="mt-3 px-1">
+                  <h3 className="text-sm font-medium text-stone-800 tracking-wide line-clamp-1">{product.name}</h3>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-stone-900 font-semibold text-sm">{product.price}.00 MAD</span>
+                    {product.oldPrice > 0 && (
+                      <span className="text-stone-400 text-xs line-through">{product.oldPrice}.00 MAD</span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
 
-      {/* View All */}
       {!loading && products.length > 6 && (
         <div className="text-center mt-10">
-          <Link
-            to="/shop"
-            className="inline-block border border-stone-800 text-stone-800 text-xs tracking-[0.3em] uppercase px-10 py-3.5 hover:bg-stone-800 hover:text-white transition"
-          >
+          <Link to="/shop" className="inline-block border border-stone-800 text-stone-800 text-xs tracking-[0.3em] uppercase px-10 py-3.5 hover:bg-stone-800 hover:text-white transition">
             Voir tout — {products.length} produits
           </Link>
         </div>
@@ -290,7 +301,7 @@ function FeaturedProduct() {
   const [wished, setWished] = useState(false)
   const [added, setAdded] = useState(false)
 
-  const handleAddToCart = () => {
+  const handleAddToCart = function() {
     dispatch(addToCart({
       _id: 'featured-moonstone',
       name: 'Special Pack Silver Moonstone + Vancleef',
@@ -299,7 +310,11 @@ function FeaturedProduct() {
       qty,
     }))
     setAdded(true)
-    setTimeout(() => setAdded(false), 2000)
+    setTimeout(function() { setAdded(false) }, 2000)
+    toast.success('Special Pack Silver ajoute au panier !', {
+      icon: '🛍️',
+      style: toastStyle,
+    })
   }
 
   return (
@@ -319,7 +334,7 @@ function FeaturedProduct() {
               <h2 className="text-2xl md:text-3xl font-light text-stone-900 leading-snug">
                 Special Pack Silver<br /><span className="font-medium">Moonstone + Vancleef</span>
               </h2>
-              <button onClick={() => setWished(!wished)} className="text-2xl mt-1 transition-transform hover:scale-125">{wished ? '❤️' : '🤍'}</button>
+              <button onClick={function() { setWished(!wished) }} className="text-2xl mt-1 transition-transform hover:scale-125">{wished ? '❤️' : '🤍'}</button>
             </div>
             <div className="flex items-center gap-3 mb-5">
               <span className="text-2xl font-semibold text-stone-900">379.00 MAD</span>
@@ -334,13 +349,16 @@ function FeaturedProduct() {
             <div className="flex items-center gap-4 mb-6">
               <span className="text-sm tracking-widest uppercase text-stone-500">Quantity</span>
               <div className="flex items-center border border-stone-200 rounded-full overflow-hidden">
-                <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="w-10 h-10 flex items-center justify-center text-stone-500 hover:bg-stone-100 transition text-lg">-</button>
+                <button onClick={function() { setQty(function(q) { return Math.max(1, q - 1) }) }} className="w-10 h-10 flex items-center justify-center text-stone-500 hover:bg-stone-100 transition text-lg">-</button>
                 <span className="w-10 text-center text-sm font-medium text-stone-800">{qty}</span>
-                <button onClick={() => setQty((q) => q + 1)} className="w-10 h-10 flex items-center justify-center text-stone-500 hover:bg-stone-100 transition text-lg">+</button>
+                <button onClick={function() { setQty(function(q) { return q + 1 }) }} className="w-10 h-10 flex items-center justify-center text-stone-500 hover:bg-stone-100 transition text-lg">+</button>
               </div>
             </div>
             <div className="flex flex-col gap-3">
-              <button onClick={handleAddToCart} className={'w-full border-2 border-stone-900 text-xs tracking-[0.3em] uppercase py-4 rounded-2xl font-medium transition duration-300 ' + (added ? 'bg-stone-900 text-white' : 'text-stone-900 hover:bg-stone-900 hover:text-white')}>
+              <button
+                onClick={handleAddToCart}
+                className={'w-full border-2 border-stone-900 text-xs tracking-[0.3em] uppercase py-4 rounded-2xl font-medium transition duration-300 ' + (added ? 'bg-stone-900 text-white' : 'text-stone-900 hover:bg-stone-900 hover:text-white')}
+              >
                 {added ? 'Ajoute au panier !' : 'Add to Cart'}
               </button>
               <button className="w-full bg-stone-900 text-white text-xs tracking-[0.3em] uppercase py-4 rounded-2xl font-medium hover:bg-stone-700 transition duration-300">Buy It Now</button>
@@ -447,8 +465,6 @@ function WhyUs() {
   )
 }
 
-// Kopji had function o bdel InstagramSection f HomePage.jsx
-
 function InstagramSection() {
   const { items: products } = useSelector(function(state) { return state.products })
 
@@ -517,13 +533,15 @@ function InstagramSection() {
     </section>
   )
 }
+
 function Newsletter() {
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
-  const handleSubmit = (e) => {
+  const handleSubmit = function(e) {
     e.preventDefault()
     if (!email) return
     setSent(true)
+    toast.success('Merci ! Vous etes inscrit.', { icon: '📧', style: toastStyle })
   }
   return (
     <section className="bg-stone-900 text-white py-20 px-4 text-center">
@@ -534,7 +552,7 @@ function Newsletter() {
         <p className="text-stone-300 tracking-widest text-sm">Merci ! Vous etes inscrit.</p>
       ) : (
         <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-          <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="votre@email.com" className="flex-1 bg-stone-800 border border-stone-700 text-white text-sm px-5 py-3 rounded-lg focus:outline-none focus:border-stone-400 placeholder:text-stone-500" />
+          <input type="email" required value={email} onChange={function(e) { setEmail(e.target.value) }} placeholder="votre@email.com" className="flex-1 bg-stone-800 border border-stone-700 text-white text-sm px-5 py-3 rounded-lg focus:outline-none focus:border-stone-400 placeholder:text-stone-500" />
           <button type="submit" className="bg-white text-stone-900 text-xs tracking-[0.2em] uppercase px-8 py-3 rounded-lg hover:bg-stone-200 transition">S'inscrire</button>
         </form>
       )}
