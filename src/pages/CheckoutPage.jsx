@@ -12,9 +12,9 @@ export default function CheckoutPage() {
   const dispatch  = useDispatch()
   const location  = useLocation()
 
-  // Promo mn CartPage via state
   const promoFromCart = location.state?.promoApplied || null
-  const [promoApplied, setPromoApplied] = useState(promoFromCart)
+  const [promoApplied,  setPromoApplied]  = useState(promoFromCart)
+  const [promoLoading,  setPromoLoading]  = useState(false)
 
   const [form, setForm] = useState({
     firstName:  '',
@@ -28,15 +28,12 @@ export default function CheckoutPage() {
     showCoupon: false,
   })
 
-  const [errors,      setErrors]      = useState({})
-  const [sent,        setSent]        = useState(false)
-  const [promoLoading, setPromoLoading] = useState(false)
+  const [errors, setErrors] = useState({})
+  const [sent,   setSent]   = useState(false)
 
   const subtotal       = items.reduce((acc, i) => acc + i.price * i.qty, 0)
   const discountAmount = promoApplied ? Math.round(subtotal * promoApplied.discount / 100) : 0
-  const afterDiscount  = subtotal - discountAmount
-  const shipping       = afterDiscount > 300 ? 0 : 30
-  const total          = afterDiscount + shipping
+  const total          = subtotal - discountAmount
 
   const handleCoupon = async function() {
     if (!form.coupon.trim()) return
@@ -74,10 +71,6 @@ export default function CheckoutPage() {
       return '• ' + item.name + ' x' + item.qty + ' — ' + (item.price * item.qty).toFixed(2) + ' MAD'
     }).join('\n')
 
-    const promoLine = promoApplied
-      ? '\n🎟️ *Code promo:* ' + promoApplied.code + ' (-' + promoApplied.discount + '% = -' + discountAmount + ' MAD)'
-      : ''
-
     const message = [
       '🛍️ *NOUVELLE COMMANDE — Brillante Elegance*',
       '',
@@ -89,11 +82,10 @@ export default function CheckoutPage() {
       '',
       '*Produits:*',
       orderLines,
-      promoLine,
       '',
       '💰 *Sous-total:* ' + subtotal.toFixed(2) + ' MAD',
-      discountAmount > 0 ? '🎉 *Remise:* -' + discountAmount.toFixed(2) + ' MAD' : '',
-      '🚚 *Livraison:* ' + (shipping === 0 ? 'Gratuite' : shipping + ' MAD'),
+      discountAmount > 0 ? '🎉 *Code promo ' + promoApplied.code + ':* -' + discountAmount.toFixed(2) + ' MAD (-' + promoApplied.discount + '%)' : '',
+      '🚚 *Livraison:* Gratuite',
       '💵 *TOTAL: ' + total.toFixed(2) + ' MAD*',
       '',
       '💳 *Paiement:* Cash a la livraison',
@@ -104,7 +96,6 @@ export default function CheckoutPage() {
     const encoded = encodeURIComponent(message)
     const url = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encoded
 
-    // Use promo code
     if (promoApplied) {
       try {
         await api.post('/promos/use', { code: promoApplied.code })
@@ -168,7 +159,6 @@ export default function CheckoutPage() {
         {/* Form */}
         <div className="lg:col-span-2 flex flex-col gap-8">
 
-          {/* Contact */}
           <div>
             <h2 className="text-lg font-light text-stone-900 mb-5">Contact Information</h2>
             <div className="bg-white rounded-2xl border border-stone-100 px-5 py-4">
@@ -185,7 +175,6 @@ export default function CheckoutPage() {
             </p>
           </div>
 
-          {/* Billing */}
           <div>
             <h2 className="text-lg font-light text-stone-900 mb-5">Billing Address</h2>
             <div className="bg-white rounded-2xl border border-stone-100 p-6 flex flex-col gap-4">
@@ -254,7 +243,6 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          {/* Payment */}
           <div>
             <h2 className="text-lg font-light text-stone-900 mb-5">Payment Options</h2>
             <div className="bg-white rounded-2xl border-2 border-stone-900 px-6 py-5">
@@ -268,7 +256,6 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          {/* Note */}
           <div>
             <button
               onClick={function() { setForm({ ...form, showNote: !form.showNote }) }}
@@ -393,17 +380,10 @@ export default function CheckoutPage() {
                   <span className="font-medium">-{discountAmount.toFixed(2)} MAD</span>
                 </div>
               )}
-              <div className="flex justify-between text-sm text-stone-500">
+              <div className="flex justify-between text-sm text-green-600 font-medium">
                 <span>Livraison</span>
-                <span className={shipping === 0 ? 'text-green-600 font-medium' : ''}>
-                  {shipping === 0 ? 'Gratuite' : shipping + ' MAD'}
-                </span>
+                <span>Gratuite</span>
               </div>
-              {shipping > 0 && (
-                <p className="text-[11px] text-stone-400 bg-stone-50 rounded-lg px-3 py-2">
-                  Livraison gratuite a partir de 300 MAD
-                </p>
-              )}
               <div className="flex justify-between font-semibold text-stone-900 text-sm border-t border-stone-100 pt-3">
                 <span>Total</span>
                 <span>{total.toFixed(2)} MAD</span>
