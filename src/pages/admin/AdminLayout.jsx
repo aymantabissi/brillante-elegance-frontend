@@ -1,7 +1,8 @@
 import { useSelector, useDispatch } from 'react-redux'
 import { Navigate, Outlet, useLocation, Link } from 'react-router-dom'
 import { logout } from '../../store/slices/authSlice'
-import { LayoutDashboard, Package, ShoppingBag, LogOut, ExternalLink, BarChart2 } from 'lucide-react'
+import { LayoutDashboard, Package, ShoppingBag, BarChart2, Tag, LogOut, ExternalLink } from 'lucide-react'
+
 
 export default function AdminLayout() {
   const { user } = useSelector((state) => state.auth)
@@ -15,6 +16,8 @@ export default function AdminLayout() {
     { name: 'Produits',     to: '/admin/products',  icon: <Package size={16} /> },
     { name: 'Commandes',    to: '/admin/orders',    icon: <ShoppingBag size={16} /> },
     { name: 'Statistiques', to: '/admin/stats',     icon: <BarChart2 size={16} /> },
+    { name: 'Promos', to: '/admin/promos', icon: <Tag size={16} /> },
+
   ]
 
   const siteLinks = [

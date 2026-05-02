@@ -18,6 +18,7 @@ import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminProducts  from './pages/admin/AdminProducts'
 import AdminOrders    from './pages/admin/AdminOrders'
 import AdminStats     from './pages/admin/AdminStats'
+import AdminPromos from './pages/admin/AdminPromos'
 
 const toastStyle = {
   background: '#1c1917',
@@ -66,6 +67,8 @@ function App() {
             <Route path="products" element={<AdminProducts />} />
             <Route path="orders"   element={<AdminOrders />} />
             <Route path="stats"    element={<AdminStats />} />
+            <Route path="promos" element={<AdminPromos />} />
+
           </Route>
         </Routes>
       </main>
