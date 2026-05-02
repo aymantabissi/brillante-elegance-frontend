@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { addToCart } from '../store/slices/cartSlice'
 import { fetchProducts } from '../store/slices/productSlice'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams, useNavigate } from 'react-router-dom'
 import { Search, SlidersHorizontal, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -63,9 +63,9 @@ function SkeletonSidebar() {
   )
 }
 
-// ← Bdelt: props wishlist o toggleWishlist mn App.jsx
 export default function ShopPage({ wishlist = [], toggleWishlist = function() {} }) {
-  const dispatch = useDispatch()
+  const dispatch   = useDispatch()
+  const navigate   = useNavigate()
   const { items: products, loading } = useSelector((state) => state.products)
   const [searchParams] = useSearchParams()
   const catParam = searchParams.get('cat') || 'all'
@@ -100,7 +100,8 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
     return filtered.slice(start, start + productsPerPage)
   }, [filtered, currentPage])
 
-  const handleAdd = function(product) {
+  const handleAdd = function(e, product) {
+    e.stopPropagation()
     if (product.stock === 0) {
       toast.error('Produit en rupture de stock', { style: toastStyle })
       return
@@ -114,10 +115,7 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
     }))
     setAddedId(product._id)
     setTimeout(function() { setAddedId(null) }, 1500)
-    toast.success(product.name + ' ajoute au panier !', {
-      icon: '🛍️',
-      style: toastStyle,
-    })
+    toast.success(product.name + ' ajoute au panier !', { icon: '🛍️', style: toastStyle })
   }
 
   const getImageUrl = function(image) {
@@ -296,7 +294,11 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
                   const pid = product._id
                   const isWished = wishlist.includes(pid)
                   return (
-                    <div key={pid} className="group bg-white rounded-2xl overflow-hidden border border-stone-100 hover:shadow-md transition duration-300 cursor-pointer">
+                    <div
+                      key={pid}
+                      onClick={function() { navigate('/product/' + pid) }}
+                      className="group bg-white rounded-2xl overflow-hidden border border-stone-100 hover:shadow-md transition duration-300 cursor-pointer"
+                    >
                       <div className="relative overflow-hidden">
                         <img
                           src={getImageUrl(product.image)}
@@ -315,6 +317,7 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
                           )}
                         </div>
 
+                        {/* Wishlist */}
                         <button
                           onClick={function(e) {
                             e.stopPropagation()
@@ -327,9 +330,10 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
                           </span>
                         </button>
 
+                        {/* Add to cart */}
                         <div className="absolute bottom-0 left-0 right-0 md:translate-y-full md:group-hover:translate-y-0 transition-transform duration-300">
                           <button
-                            onClick={function() { handleAdd(product) }}
+                            onClick={function(e) { handleAdd(e, product) }}
                             disabled={product.stock === 0}
                             className={'w-full py-3 text-xs tracking-[0.2em] uppercase font-medium transition duration-300 disabled:opacity-50 ' + (addedId === pid ? 'bg-stone-900 text-white' : 'bg-white text-stone-900 hover:bg-stone-900 hover:text-white')}
                           >
@@ -337,8 +341,24 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
                           </button>
                         </div>
                       </div>
+
                       <div className="p-4">
-                        <h3 className="text-xs font-medium text-stone-800 mb-2 leading-snug line-clamp-2">{product.name}</h3>
+                        <h3 className="text-xs font-medium text-stone-800 mb-1 leading-snug line-clamp-2">{product.name}</h3>
+
+                        {/* Rating stars */}
+                        {product.numReviews > 0 && (
+                          <div className="flex items-center gap-1 mb-2">
+                            <div className="flex">
+                              {[1,2,3,4,5].map(function(s) {
+                                return (
+                                  <span key={s} className={'text-[10px] ' + (s <= Math.round(product.rating || 0) ? 'text-amber-400' : 'text-stone-200')}>★</span>
+                                )
+                              })}
+                            </div>
+                            <span className="text-[10px] text-stone-400">({product.numReviews})</span>
+                          </div>
+                        )}
+
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-semibold text-stone-900">{product.price} MAD</span>
                           {product.oldPrice > 0 && (

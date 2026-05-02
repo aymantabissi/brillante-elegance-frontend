@@ -33,8 +33,8 @@ export default function CheckoutPage() {
 
   const subtotal       = items.reduce((acc, i) => acc + i.price * i.qty, 0)
   const discountAmount = promoApplied ? Math.round(subtotal * promoApplied.discount / 100) : 0
-  const total          = subtotal - discountAmount
-
+// Khssohom haka
+const total = subtotal - discountAmount
   const handleCoupon = async function() {
     if (!form.coupon.trim()) return
     setPromoLoading(true)
@@ -381,9 +381,9 @@ export default function CheckoutPage() {
                 </div>
               )}
               <div className="flex justify-between text-sm text-green-600 font-medium">
-                <span>Livraison</span>
-                <span>Gratuite</span>
-              </div>
+  <span>Livraison</span>
+  <span>Gratuite</span>
+</div>
               <div className="flex justify-between font-semibold text-stone-900 text-sm border-t border-stone-100 pt-3">
                 <span>Total</span>
                 <span>{total.toFixed(2)} MAD</span>

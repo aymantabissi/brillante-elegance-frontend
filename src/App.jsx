@@ -19,6 +19,8 @@ import AdminProducts  from './pages/admin/AdminProducts'
 import AdminOrders    from './pages/admin/AdminOrders'
 import AdminStats     from './pages/admin/AdminStats'
 import AdminPromos from './pages/admin/AdminPromos'
+import ProductPage from './pages/ProductPage'
+
 
 const toastStyle = {
   background: '#1c1917',
@@ -57,6 +59,8 @@ function App() {
           <Route path="/wishlist" element={<WishlistPage wishlist={wishlist} toggleWishlist={toggleWishlist} products={products} />} />
           <Route path="/about"    element={<AboutPage />} />
           <Route path="/contact"  element={<ContactPage />} />
+          <Route path="/product/:id" element={<ProductPage />} />
+
           <Route path="/cart"     element={<CartPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/login"    element={!user ? <LoginPage /> : (user.role === 'admin' ? <Navigate to="/admin" /> : <Navigate to="/" />)} />
