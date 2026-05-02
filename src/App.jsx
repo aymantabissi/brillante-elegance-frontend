@@ -19,7 +19,7 @@ import AdminProducts  from './pages/admin/AdminProducts'
 import AdminOrders    from './pages/admin/AdminOrders'
 import AdminStats     from './pages/admin/AdminStats'
 import AdminPromos from './pages/admin/AdminPromos'
-import ProductPage from './pages/ProductPage'
+import ProductPage from './pages/Productpage'
 
 
 const toastStyle = {
