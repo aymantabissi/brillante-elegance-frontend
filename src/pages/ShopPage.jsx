@@ -6,7 +6,6 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { Search, SlidersHorizontal, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 
-
 const categories = [
   { value: 'all',       label: 'Tous' },
   { value: 'colliers',  label: 'Colliers' },
@@ -26,10 +25,18 @@ const sortOptions = [
 
 const productsPerPage = 8
 
+const toastStyle = {
+  background: '#1c1917',
+  color: '#fff',
+  fontSize: '13px',
+  borderRadius: '12px',
+  padding: '12px 16px',
+}
+
 function SkeletonCard() {
   return (
     <div className="bg-white rounded-2xl overflow-hidden border border-stone-100">
-      <div className="w-full h-52 bg-gradient-to-r from-stone-200 via-stone-100 to-stone-200 animate-pulse" style={{backgroundSize: '200% 100%', animation: 'shimmer 1.5s infinite'}} />
+      <div className="w-full h-52 bg-gradient-to-r from-stone-200 via-stone-100 to-stone-200 animate-pulse" />
       <div className="p-4 space-y-2">
         <div className="h-3 bg-stone-200 rounded-full animate-pulse w-full" />
         <div className="h-3 bg-stone-200 rounded-full animate-pulse w-3/4" />
@@ -93,6 +100,10 @@ export default function ShopPage() {
   }, [filtered, currentPage])
 
   const handleAdd = function(product) {
+    if (product.stock === 0) {
+      toast.error('Produit en rupture de stock', { style: toastStyle })
+      return
+    }
     dispatch(addToCart({
       _id: product._id,
       name: product.name,
@@ -102,6 +113,10 @@ export default function ShopPage() {
     }))
     setAddedId(product._id)
     setTimeout(function() { setAddedId(null) }, 1500)
+    toast.success(product.name + ' ajoute au panier !', {
+      icon: '🛍️',
+      style: toastStyle,
+    })
   }
 
   const getImageUrl = function(image) {
@@ -113,7 +128,6 @@ export default function ShopPage() {
   return (
     <main className="bg-[#f9f8f6] min-h-screen">
 
-      {/* Hero */}
       {loading ? (
         <div className="bg-[#f5f3f0] py-14 text-center">
           <div className="h-3 bg-stone-200 rounded-full animate-pulse w-24 mx-auto mb-4" />
@@ -134,7 +148,6 @@ export default function ShopPage() {
 
       <div className="max-w-7xl mx-auto px-4 py-10">
 
-        {/* Search + Sort */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1">
             {loading ? (
@@ -182,7 +195,6 @@ export default function ShopPage() {
 
         <div className="flex gap-8">
 
-          {/* Sidebar */}
           <aside className={'flex-shrink-0 w-56 ' + (showFilters ? 'block' : 'hidden sm:block')}>
             {loading ? (
               <SkeletonSidebar />
@@ -239,7 +251,6 @@ export default function ShopPage() {
             )}
           </aside>
 
-          {/* Products Grid */}
           <div className="flex-1">
 
             {loading ? (
@@ -252,7 +263,6 @@ export default function ShopPage() {
               </div>
             )}
 
-            {/* Skeleton */}
             {loading && (
               <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
                 {Array(8).fill(null).map(function(_, i) {
@@ -261,7 +271,6 @@ export default function ShopPage() {
               </div>
             )}
 
-            {/* Empty */}
             {!loading && filtered.length === 0 && (
               <div className="text-center py-20">
                 <div className="text-5xl mb-4">🔍</div>
@@ -275,7 +284,6 @@ export default function ShopPage() {
               </div>
             )}
 
-            {/* Products */}
             {!loading && paginated.length > 0 && (
               <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
                 {paginated.map(function(product) {
@@ -302,14 +310,14 @@ export default function ShopPage() {
                           <span className="text-stone-400 text-xs">♡</span>
                         </button>
                         <div className="absolute bottom-0 left-0 right-0 md:translate-y-full md:group-hover:translate-y-0 transition-transform duration-300">
-  <button
-    onClick={function() { handleAdd(product) }}
-    disabled={product.stock === 0}
-    className={'w-full py-3 text-xs tracking-[0.2em] uppercase font-medium transition duration-300 disabled:opacity-50 ' + (addedId === product._id ? 'bg-stone-900 text-white' : 'bg-white text-stone-900 hover:bg-stone-900 hover:text-white')}
-  >
-    {product.stock === 0 ? 'Rupture' : addedId === product._id ? 'Ajoute !' : 'Add to Cart'}
-  </button>
-</div>
+                          <button
+                            onClick={function() { handleAdd(product) }}
+                            disabled={product.stock === 0}
+                            className={'w-full py-3 text-xs tracking-[0.2em] uppercase font-medium transition duration-300 disabled:opacity-50 ' + (addedId === product._id ? 'bg-stone-900 text-white' : 'bg-white text-stone-900 hover:bg-stone-900 hover:text-white')}
+                          >
+                            {product.stock === 0 ? 'Rupture' : addedId === product._id ? 'Ajoute !' : 'Add to Cart'}
+                          </button>
+                        </div>
                       </div>
                       <div className="p-4">
                         <h3 className="text-xs font-medium text-stone-800 mb-2 leading-snug line-clamp-2">{product.name}</h3>
@@ -326,7 +334,6 @@ export default function ShopPage() {
               </div>
             )}
 
-            {/* Pagination */}
             {!loading && totalPages > 1 && (
               <div className="flex items-center justify-center gap-2 mt-10">
                 <button
