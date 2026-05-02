@@ -24,9 +24,7 @@ export default function CartPage() {
 
   const subtotal       = items.reduce((acc, i) => acc + i.price * i.qty, 0)
   const discountAmount = promoApplied ? Math.round(subtotal * promoApplied.discount / 100) : 0
-  const afterDiscount  = subtotal - discountAmount
-  const shipping       = afterDiscount > 300 ? 0 : 30
-  const total          = afterDiscount + shipping
+  const total          = subtotal - discountAmount
 
   const handlePromo = async function() {
     if (!promoCode.trim()) return
@@ -143,7 +141,6 @@ export default function CartPage() {
                   <span>{subtotal.toFixed(2)} MAD</span>
                 </div>
 
-                {/* Promo discount */}
                 {promoApplied && (
                   <div className="flex justify-between text-sm text-green-600">
                     <span className="flex items-center gap-1">
@@ -154,17 +151,6 @@ export default function CartPage() {
                   </div>
                 )}
 
-                <div className="flex justify-between text-sm text-stone-500">
-                  <span>Livraison</span>
-                  <span className={shipping === 0 ? 'text-green-600 font-medium' : ''}>
-                    {shipping === 0 ? 'Gratuite' : shipping + ' MAD'}
-                  </span>
-                </div>
-                {shipping > 0 && (
-                  <p className="text-[11px] text-stone-400 bg-stone-50 rounded-lg px-3 py-2">
-                    Livraison gratuite a partir de 300 MAD
-                  </p>
-                )}
                 <div className="border-t border-stone-100 pt-3 flex justify-between font-medium text-stone-900">
                   <span>Total</span>
                   <span>{total.toFixed(2)} MAD</span>
