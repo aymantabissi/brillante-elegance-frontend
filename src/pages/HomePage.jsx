@@ -461,9 +461,14 @@ function FeaturedProduct() {
               >
                 {added ? 'Ajouté au panier !' : 'Ajouter au panier'}
               </button>
-              <button className="w-full bg-stone-900 text-white text-xs tracking-[0.3em] uppercase py-4 rounded-2xl font-medium hover:bg-stone-700 transition duration-300">
-                Commander maintenant
-              </button>
+                            <Link
+                to="/checkout"
+                state={{ promoApplied }}
+                className="block w-full bg-stone-900 text-white text-xs tracking-[0.3em] uppercase text-center py-4 rounded-2xl hover:bg-stone-700 transition duration-300 mb-3"
+              >
+                   Commander maintenant
+              </Link>
+             
             </div>
 
             <div className="flex items-center gap-6 mt-8 pt-6 border-t border-stone-100">
