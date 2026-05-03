@@ -202,7 +202,6 @@ export default function ContactPage() {
                 {[
                   { q: 'Quel est le délai de livraison ?', r: '24 à 48h partout au Maroc.' },
                   { q: 'Comment passer une commande ?', r: 'Ajoutez au panier et validez votre commande. Nous vous contactons via WhatsApp.' },
-                  { q: 'Puis-je retourner un article ?', r: 'Oui, sous 7 jours après réception si le produit est en parfait état.' },
                   { q: 'Acceptez-vous les paiements en ligne ?', r: 'Nous acceptons le paiement cash à la livraison (CRBT).' },
                 ].map(function(item) {
                   return (
