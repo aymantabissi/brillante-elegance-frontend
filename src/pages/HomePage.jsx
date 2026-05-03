@@ -15,8 +15,8 @@ const toastStyle = {
 }
 
 const heroSlides = [
-  { id: 1, image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1600&q=80', title: 'New Collection', subtitle: 'Summer 2026' },
-  { id: 2, image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1600&q=80', title: 'Bijoux Exclusifs', subtitle: 'Elegance Intemporelle' },
+  { id: 1, image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1600&q=80', title: 'Nouvelle Collection', subtitle: 'Été 2026' },
+  { id: 2, image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1600&q=80', title: 'Bijoux Exclusifs', subtitle: 'Élégance Intemporelle' },
   { id: 3, image: 'https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=1600&q=80', title: 'Accessoires Premium', subtitle: 'Raffinement & Style' },
 ]
 
@@ -40,12 +40,12 @@ const categories = [
 ]
 
 const testimonials = [
-  { id: 1, name: 'Salma B.',   location: 'Casablanca', avatar: 'S', rating: 5, text: 'Qualite exceptionnelle ! Mon bracelet Vancleef est absolument magnifique. Livraison rapide et emballage soigne. Je recommande vivement !', product: 'Bracelet Vancleef' },
-  { id: 2, name: 'Yasmine R.', location: 'Rabat',      avatar: 'Y', rating: 5, text: 'Je suis tombee amoureuse du collier Moonstone. La pierre est vraiment belle et la chaine tres solide. Service client au top !',           product: 'Collier Moonstone' },
-  { id: 3, name: 'Nadia M.',   location: 'Marrakech',  avatar: 'N', rating: 5, text: "Commande recue en 2 jours, emballage luxueux. La bague est encore plus belle en vrai qu'en photo. Merci Brillante Elegance !",             product: 'Bague Elegante' },
-  { id: 4, name: 'Amira K.',   location: 'Fes',        avatar: 'A', rating: 5, text: "Deuxieme commande chez Brillante et toujours aussi satisfaite. Les bijoux sont de tres bonne qualite pour le prix. J'adore !",              product: 'Pack Gold White' },
-  { id: 5, name: 'Houda T.',   location: 'Agadir',     avatar: 'H', rating: 4, text: "Tres belle collection, j'ai commande les lunettes et le bracelet. Les deux sont parfaits. Livraison soignee et rapide.",                    product: 'Pack Lunettes + Bracelet' },
-  { id: 6, name: 'Rim L.',     location: 'Tanger',     avatar: 'R', rating: 5, text: 'Service irreprochable ! Le collier perles est exactement comme sur les photos. Je fais souvent des cadeaux ici, tout le monde est ravi.',    product: 'Collier Perles' },
+  { id: 1, name: 'Salma B.',   location: 'Casablanca', avatar: 'S', rating: 5, text: 'Qualité exceptionnelle ! Mon bracelet Vancleef est absolument magnifique. Livraison rapide et emballage soigné. Je recommande vivement !', product: 'Bracelet Vancleef' },
+  { id: 2, name: 'Yasmine R.', location: 'Rabat',      avatar: 'Y', rating: 5, text: 'Je suis tombée amoureuse du collier Moonstone. La pierre est vraiment belle et la chaîne très solide. Service client au top !',           product: 'Collier Moonstone' },
+  { id: 3, name: 'Nadia M.',   location: 'Marrakech',  avatar: 'N', rating: 5, text: "Commande reçue en 2 jours, emballage luxueux. La bague est encore plus belle en vrai qu'en photo. Merci Brillante Élégance !",             product: 'Bague Élégante' },
+  { id: 4, name: 'Amira K.',   location: 'Fès',        avatar: 'A', rating: 5, text: "Deuxième commande chez Brillante et toujours aussi satisfaite. Les bijoux sont de très bonne qualité pour le prix. J'adore !",              product: 'Pack Gold White' },
+  { id: 5, name: 'Houda T.',   location: 'Agadir',     avatar: 'H', rating: 4, text: "Très belle collection, j'ai commandé les lunettes et le bracelet. Les deux sont parfaits. Livraison soignée et rapide.",                    product: 'Pack Lunettes + Bracelet' },
+  { id: 6, name: 'Rim L.',     location: 'Tanger',     avatar: 'R', rating: 5, text: 'Service irréprochable ! Le collier perles est exactement comme sur les photos. Je fais souvent des cadeaux ici, tout le monde est ravi.',    product: 'Collier Perles' },
 ]
 
 const instaImages = [
@@ -75,7 +75,7 @@ function HeroSlider() {
           <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-4">
             <p className="text-xs tracking-[0.6em] uppercase mb-4 opacity-75">{slide.subtitle}</p>
             <h2 className="text-5xl md:text-7xl font-light tracking-[0.25em] uppercase mb-8">{slide.title}</h2>
-            <Link to="/shop" className="border border-white text-white text-xs tracking-[0.35em] uppercase px-10 py-3.5 hover:bg-white hover:text-stone-900 transition duration-500">Decouvrir</Link>
+            <Link to="/shop" className="border border-white text-white text-xs tracking-[0.35em] uppercase px-10 py-3.5 hover:bg-white hover:text-stone-900 transition duration-500">Découvrir</Link>
           </div>
         </div>
       ))}
@@ -108,7 +108,7 @@ function CategoriesBar() {
 function DealsBanner() {
   return (
     <div className="bg-black text-white py-5 text-center">
-      <h2 className="text-2xl md:text-3xl font-bold tracking-wide">Hot Summer Deals</h2>
+      <h2 className="text-2xl md:text-3xl font-bold tracking-wide">Soldes d'Été — Jusqu'à -15%</h2>
     </div>
   )
 }
@@ -140,10 +140,10 @@ function ProductsStrip() {
 
 function FeaturedCategories() {
   const cards = [
-    { label: 'Necklaces',  title: 'Top Notch\nNecklaces',  image: 'https://images.unsplash.com/photo-1635767798638-3e25273a8236?w=400&q=80', to: '/shop?cat=colliers' },
-    { label: 'Bracelets',  title: 'Top\nBracelets',         image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80', to: '/shop?cat=bracelets' },
-    { label: 'Rings',      title: 'Elegant\nRings',         image: 'https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=800&q=80', to: '/shop?cat=bagues' },
-    { label: 'Sunglasses', title: 'Premium\nSunglasses',    image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=800&q=80', to: '/shop?cat=lunettes' },
+    { label: 'Colliers',  title: 'Colliers\nRaffinés',    image: 'https://images.unsplash.com/photo-1635767798638-3e25273a8236?w=400&q=80', to: '/shop?cat=colliers' },
+    { label: 'Bracelets', title: 'Bracelets\nÉlégants',   image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80', to: '/shop?cat=bracelets' },
+    { label: 'Bagues',    title: 'Bagues\nPrecieuses',    image: 'https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=800&q=80', to: '/shop?cat=bagues' },
+    { label: 'Lunettes',  title: 'Lunettes\nPremium',     image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=800&q=80', to: '/shop?cat=lunettes' },
   ]
   return (
     <section className="bg-[#f9f8f6] py-16 px-4">
@@ -159,7 +159,7 @@ function FeaturedCategories() {
             <div className="absolute bottom-0 left-0 right-0 p-6">
               <p className="text-[10px] tracking-[0.4em] uppercase text-white/70 mb-2">{card.label}</p>
               <h3 className="text-2xl font-bold text-white leading-tight mb-5 whitespace-pre-line">{card.title}</h3>
-              <span className="inline-block bg-white text-stone-900 text-[10px] tracking-[0.3em] uppercase px-6 py-2.5 rounded-full font-medium group-hover:bg-stone-900 group-hover:text-white transition duration-300">Shop Now</span>
+              <span className="inline-block bg-white text-stone-900 text-[10px] tracking-[0.3em] uppercase px-6 py-2.5 rounded-full font-medium group-hover:bg-stone-900 group-hover:text-white transition duration-300">Découvrir</span>
             </div>
           </Link>
         ))}
@@ -191,7 +191,7 @@ function TrendingProducts({ wishlist, toggleWishlist }) {
     }))
     setAddedId(product._id)
     setTimeout(function() { setAddedId(null) }, 1500)
-    toast.success(product.name + ' ajoute au panier !', { icon: '🛍️', style: toastStyle })
+    toast.success(product.name + ' ajouté au panier !', { icon: '🛍️', style: toastStyle })
   }
 
   const getImageUrl = function(image) {
@@ -205,7 +205,7 @@ function TrendingProducts({ wishlist, toggleWishlist }) {
   return (
     <section className="bg-white py-16 px-4">
       <div className="bg-black text-white text-center py-5 mb-10 rounded-xl mx-auto max-w-6xl">
-        <h2 className="text-2xl md:text-3xl font-bold tracking-wide">Trending Products</h2>
+        <h2 className="text-2xl md:text-3xl font-bold tracking-wide">Produits Tendance</h2>
       </div>
 
       {loading && (
@@ -236,13 +236,13 @@ function TrendingProducts({ wishlist, toggleWishlist }) {
                     className="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-105"
                   />
 
-                  {/* Ticker */}
+                  {/* Bandeau défilant */}
                   <div className="absolute bottom-0 left-0 right-0 bg-black py-1.5 overflow-hidden">
                     <div className="flex gap-4 animate-scroll-left whitespace-nowrap w-max">
                       {Array(10).fill(null).map(function(_, i) {
                         return (
                           <span key={i} className="text-white text-[10px] tracking-wider flex items-center gap-1">
-                            HOT SALE{product.discount}%OFF <span className="text-red-500">⚡</span>
+                            PROMO -{product.discount}% <span className="text-red-500">⚡</span>
                           </span>
                         )
                       })}
@@ -255,11 +255,11 @@ function TrendingProducts({ wishlist, toggleWishlist }) {
                       <span className="bg-red-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">-{product.discount}%</span>
                     )}
                     {product.hot && (
-                      <span className="bg-amber-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">HOT</span>
+                      <span className="bg-amber-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">POPULAIRE</span>
                     )}
                   </div>
 
-                  {/* Wishlist button */}
+                  {/* Favoris */}
                   <button
                     onClick={function(e) {
                       e.stopPropagation()
@@ -272,14 +272,14 @@ function TrendingProducts({ wishlist, toggleWishlist }) {
                     </span>
                   </button>
 
-                  {/* Add to cart — dima visible f mobile, hover f desktop */}
+                  {/* Ajouter au panier — visible mobile, hover desktop */}
                   <div className="absolute bottom-8 left-0 right-0 md:bottom-0 md:inset-0 md:flex md:items-center md:justify-center md:opacity-0 md:group-hover:opacity-100 md:transition-opacity md:duration-300">
                     <button
                       onClick={function() { handleAdd(product) }}
                       disabled={product.stock === 0}
                       className={'w-full md:w-auto text-xs tracking-[0.2em] uppercase md:px-7 py-3 md:rounded-full font-medium shadow-lg transition duration-300 disabled:opacity-50 ' + (addedId === pid ? 'bg-stone-900 text-white' : 'bg-white text-stone-900 md:hover:bg-stone-900 md:hover:text-white')}
                     >
-                      {product.stock === 0 ? 'Rupture' : addedId === pid ? 'Ajoute !' : 'Add to Cart'}
+                      {product.stock === 0 ? 'Rupture de stock' : addedId === pid ? 'Ajouté !' : 'Ajouter au panier'}
                     </button>
                   </div>
                 </div>
@@ -319,32 +319,32 @@ function FeaturedProduct() {
   const handleAddToCart = function() {
     dispatch(addToCart({
       _id: 'featured-moonstone',
-      name: 'Special Pack Silver Moonstone + Vancleef',
+      name: 'Pack Spécial Silver Moonstone + Vancleef',
       price: 379,
       image: 'https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=900&q=80',
       qty,
     }))
     setAdded(true)
     setTimeout(function() { setAdded(false) }, 2000)
-    toast.success('Special Pack Silver ajoute au panier !', { icon: '🛍️', style: toastStyle })
+    toast.success('Pack Spécial Silver ajouté au panier !', { icon: '🛍️', style: toastStyle })
   }
 
   return (
     <section className="bg-[#f5f3f0] py-20 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
-          <p className="text-xs tracking-[0.5em] uppercase text-stone-400 mb-2">A ne pas manquer</p>
-          <h2 className="text-3xl font-light tracking-[0.2em] uppercase text-stone-800">Coup de Coeur</h2>
+          <p className="text-xs tracking-[0.5em] uppercase text-stone-400 mb-2">À ne pas manquer</p>
+          <h2 className="text-3xl font-light tracking-[0.2em] uppercase text-stone-800">Coup de Cœur</h2>
         </div>
         <div className="bg-white rounded-3xl overflow-hidden shadow-sm flex flex-col lg:flex-row">
           <div className="lg:w-1/2 relative overflow-hidden group">
-            <img src="https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=900&q=80" alt="Featured Product" className="w-full h-[500px] lg:h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <img src="https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=900&q=80" alt="Produit vedette" className="w-full h-[500px] lg:h-full object-cover transition-transform duration-700 group-hover:scale-105" />
             <span className="absolute top-5 left-5 bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-full">-16%</span>
           </div>
           <div className="lg:w-1/2 p-10 lg:p-14 flex flex-col justify-center">
             <div className="flex items-start justify-between gap-4 mb-5">
               <h2 className="text-2xl md:text-3xl font-light text-stone-900 leading-snug">
-                Special Pack Silver<br /><span className="font-medium">Moonstone + Vancleef</span>
+                Pack Spécial Silver<br /><span className="font-medium">Moonstone + Vancleef</span>
               </h2>
               <button onClick={function() { setWished(!wished) }} className="text-2xl mt-1 transition-transform hover:scale-125">{wished ? '❤️' : '🤍'}</button>
             </div>
@@ -354,12 +354,12 @@ function FeaturedProduct() {
               <span className="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full">-16%</span>
             </div>
             <p className="text-stone-500 text-sm leading-relaxed mb-6">
-              A delicate <strong className="text-stone-700">green moonstone</strong> pendant on a{' '}
-              <strong className="text-stone-700">stainless steel chain</strong>, blending ethereal beauty with timeless elegance.
+              Un délicat pendentif en <strong className="text-stone-700">pierre de lune verte</strong> sur une{' '}
+              <strong className="text-stone-700">chaîne en acier inoxydable</strong>, alliant beauté éthérée et élégance intemporelle.
             </p>
-            <p className="text-green-600 text-sm font-medium mb-6">In Stock</p>
+            <p className="text-green-600 text-sm font-medium mb-6">En stock</p>
             <div className="flex items-center gap-4 mb-6">
-              <span className="text-sm tracking-widest uppercase text-stone-500">Quantity</span>
+              <span className="text-sm tracking-widest uppercase text-stone-500">Quantité</span>
               <div className="flex items-center border border-stone-200 rounded-full overflow-hidden">
                 <button onClick={function() { setQty(function(q) { return Math.max(1, q - 1) }) }} className="w-10 h-10 flex items-center justify-center text-stone-500 hover:bg-stone-100 transition text-lg">-</button>
                 <span className="w-10 text-center text-sm font-medium text-stone-800">{qty}</span>
@@ -368,14 +368,14 @@ function FeaturedProduct() {
             </div>
             <div className="flex flex-col gap-3">
               <button onClick={handleAddToCart} className={'w-full border-2 border-stone-900 text-xs tracking-[0.3em] uppercase py-4 rounded-2xl font-medium transition duration-300 ' + (added ? 'bg-stone-900 text-white' : 'text-stone-900 hover:bg-stone-900 hover:text-white')}>
-                {added ? 'Ajoute au panier !' : 'Add to Cart'}
+                {added ? 'Ajouté au panier !' : 'Ajouter au panier'}
               </button>
-              <button className="w-full bg-stone-900 text-white text-xs tracking-[0.3em] uppercase py-4 rounded-2xl font-medium hover:bg-stone-700 transition duration-300">Buy It Now</button>
+              <button className="w-full bg-stone-900 text-white text-xs tracking-[0.3em] uppercase py-4 rounded-2xl font-medium hover:bg-stone-700 transition duration-300">Commander maintenant</button>
             </div>
             <div className="flex items-center gap-6 mt-8 pt-6 border-t border-stone-100">
               <div className="flex items-center gap-1.5 text-stone-400 text-xs"><span>🚚</span> Livraison gratuite</div>
-              <div className="flex items-center gap-1.5 text-stone-400 text-xs"><span>🔄</span> Retour 7 jours</div>
-              <div className="flex items-center gap-1.5 text-stone-400 text-xs"><span>🔒</span> Paiement securise</div>
+              <div className="flex items-center gap-1.5 text-stone-400 text-xs"><span>🔄</span> Retour sous 7 jours</div>
+              <div className="flex items-center gap-1.5 text-stone-400 text-xs"><span>🔒</span> Paiement sécurisé</div>
             </div>
           </div>
         </div>
@@ -416,7 +416,7 @@ function Testimonials() {
           <h2 className="text-3xl font-light tracking-[0.2em] uppercase text-stone-800 mb-3">Nos Clients</h2>
           <div className="flex items-center justify-center gap-2">
             <div className="flex gap-0.5">{Array(5).fill(null).map((_, i) => <span key={i} className="text-amber-400 text-lg">★</span>)}</div>
-            <span className="text-stone-500 text-sm">4.9 / 5 - base sur 200+ avis</span>
+            <span className="text-stone-500 text-sm">4.9 / 5 — basé sur 200+ avis</span>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
@@ -432,7 +432,7 @@ function Testimonials() {
                   <p className="text-sm font-medium text-stone-800">{t.name}</p>
                   <p className="text-xs text-stone-400">{t.location}</p>
                 </div>
-                <span className="ml-auto text-green-500 text-xs font-medium">Verifie</span>
+                <span className="ml-auto text-green-500 text-xs font-medium">Vérifié</span>
               </div>
             </div>
           ))}
@@ -451,15 +451,15 @@ function Testimonials() {
 
 function WhyUs() {
   const items = [
-    { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" className="w-12 h-12"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.12 1.18 2 2 0 012.11 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>, title: '24/7 Customer Service', desc: "We're here to help you with any questions or concerns you have, 24/7." },
-    { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" className="w-12 h-12"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><path d="M9.5 12H7l2.5 3L12 9l2.5 6L17 12h-2.5"/></svg>, title: '14-Day Money Back', desc: "If you're not satisfied with your purchase, simply return it within 14 days for a refund." },
-    { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" className="w-12 h-12"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>, title: 'Our Guarantee', desc: 'We stand behind our products and services and guarantee your satisfaction.' },
-    { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" className="w-12 h-12"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>, title: 'Shipping Worldwide', desc: 'We ship our products worldwide, making them accessible to customers everywhere.' },
+    { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" className="w-12 h-12"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.12 1.18 2 2 0 012.11 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>, title: 'Service Client 24/7', desc: 'Notre équipe est disponible à toute heure pour répondre à vos questions.' },
+    { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" className="w-12 h-12"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><path d="M9.5 12H7l2.5 3L12 9l2.5 6L17 12h-2.5"/></svg>, title: 'Remboursement 14 Jours', desc: 'Vous n\'êtes pas satisfait ? Retournez votre commande sous 14 jours.' },
+    { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" className="w-12 h-12"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>, title: 'Qualité Garantie', desc: 'Nous certifions la qualité de chaque produit vendu sur notre boutique.' },
+    { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" className="w-12 h-12"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>, title: 'Livraison Gratuite', desc: 'Profitez de la livraison offerte sur toutes vos commandes au Maroc.' },
   ]
   return (
     <section className="bg-white">
       <div className="bg-black text-white text-center py-5">
-        <h2 className="text-2xl md:text-3xl font-bold tracking-wide">Why Choose US</h2>
+        <h2 className="text-2xl md:text-3xl font-bold tracking-wide">Pourquoi Nous Choisir</h2>
       </div>
       <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-0 divide-x divide-stone-100">
         {items.map((item) => (
@@ -502,18 +502,15 @@ function InstagramSection() {
   return (
     <section className="bg-white py-0">
       <div className="bg-black text-white text-center py-5">
-        <h2 className="text-2xl md:text-3xl font-bold tracking-wide">Visit Our Instagram</h2>
+        <h2 className="text-2xl md:text-3xl font-bold tracking-wide">Suivez-nous sur Instagram</h2>
       </div>
       <div className="max-w-6xl mx-auto px-4 py-10">
         <div className="flex gap-4 justify-center flex-wrap md:flex-nowrap">
           {useReal
             ? realImages.map(function(product, i) {
-                const id = product._id
-                const src = product.image
-                const name = product.name
                 return (
-                  <a key={id} href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className={linkClass(i)}>
-                    <img src={src} alt={name} className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105" />
+                  <a key={product._id} href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className={linkClass(i)}>
+                    <img src={product.image} alt={product.name} className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105" />
                     {overlay}
                   </a>
                 )
@@ -530,7 +527,7 @@ function InstagramSection() {
         </div>
         <div className="text-center mt-8">
           <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="inline-block bg-red-500 hover:bg-red-600 text-white text-sm font-semibold px-10 py-3.5 rounded-full transition duration-300 shadow-md hover:shadow-lg">
-            Visit Our Instagram
+            Voir notre Instagram
           </a>
         </div>
       </div>
@@ -545,15 +542,15 @@ function Newsletter() {
     e.preventDefault()
     if (!email) return
     setSent(true)
-    toast.success('Merci ! Vous etes inscrit.', { icon: '📧', style: toastStyle })
+    toast.success('Merci ! Vous êtes bien inscrit.', { icon: '📧', style: toastStyle })
   }
   return (
     <section className="bg-stone-900 text-white py-20 px-4 text-center">
-      <p className="text-xs tracking-[0.5em] uppercase text-stone-400 mb-3">Restez informe</p>
+      <p className="text-xs tracking-[0.5em] uppercase text-stone-400 mb-3">Restez informé</p>
       <h2 className="text-3xl font-light tracking-widest uppercase mb-2">Newsletter</h2>
       <p className="text-stone-400 text-sm mb-8">Recevez nos nouvelles collections et offres exclusives</p>
       {sent ? (
-        <p className="text-stone-300 tracking-widest text-sm">Merci ! Vous etes inscrit.</p>
+        <p className="text-stone-300 tracking-widest text-sm">Merci ! Vous êtes bien inscrit.</p>
       ) : (
         <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
           <input type="email" required value={email} onChange={function(e) { setEmail(e.target.value) }} placeholder="votre@email.com" className="flex-1 bg-stone-800 border border-stone-700 text-white text-sm px-5 py-3 rounded-lg focus:outline-none focus:border-stone-400 placeholder:text-stone-500" />
