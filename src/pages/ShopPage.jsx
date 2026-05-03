@@ -3,24 +3,24 @@ import { useDispatch, useSelector } from 'react-redux'
 import { addToCart } from '../store/slices/cartSlice'
 import { fetchProducts } from '../store/slices/productSlice'
 import { Link, useSearchParams, useNavigate } from 'react-router-dom'
-import { Search, SlidersHorizontal, X } from 'lucide-react'
+import { Search, SlidersHorizontal, X, Heart, ShoppingBag, ChevronDown } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const categories = [
-  { value: 'all',       label: 'Tous' },
-  { value: 'colliers',  label: 'Colliers' },
-  { value: 'bracelets', label: 'Bracelets' },
-  { value: 'bagues',    label: 'Bagues' },
-  { value: 'lunettes',  label: 'Lunettes' },
-  { value: 'montres',   label: 'Montres' },
-  { value: 'Sacs',      label: 'Sacs' },
+  { value: 'all',       label: 'Tous',      emoji: '✦' },
+  { value: 'colliers',  label: 'Colliers',  emoji: '📿' },
+  { value: 'bracelets', label: 'Bracelets', emoji: '💎' },
+  { value: 'bagues',    label: 'Bagues',    emoji: '💍' },
+  { value: 'lunettes',  label: 'Lunettes',  emoji: '🕶️' },
+  { value: 'montres',   label: 'Montres',   emoji: '⌚' },
+  { value: 'Sacs',      label: 'Sacs',      emoji: '👜' },
 ]
 
 const sortOptions = [
   { value: 'default',    label: 'Par defaut' },
-  { value: 'price-asc',  label: 'Prix croissant' },
-  { value: 'price-desc', label: 'Prix decroissant' },
-  { value: 'discount',   label: 'Meilleures promos' },
+  { value: 'price-asc',  label: 'Prix ↑' },
+  { value: 'price-desc', label: 'Prix ↓' },
+  { value: 'discount',   label: 'Promos' },
 ]
 
 const productsPerPage = 8
@@ -35,37 +35,20 @@ const toastStyle = {
 
 function SkeletonCard() {
   return (
-    <div className="bg-white rounded-2xl overflow-hidden border border-stone-100">
-      <div className="w-full h-52 bg-gradient-to-r from-stone-200 via-stone-100 to-stone-200 animate-pulse" />
-      <div className="p-4 space-y-2">
-        <div className="h-3 bg-stone-200 rounded-full animate-pulse w-full" />
-        <div className="h-3 bg-stone-200 rounded-full animate-pulse w-3/4" />
-        <div className="h-4 bg-stone-200 rounded-full animate-pulse w-1/3 mt-3" />
-      </div>
-    </div>
-  )
-}
-
-function SkeletonSidebar() {
-  return (
-    <div className="bg-white rounded-2xl border border-stone-100 p-6 sticky top-24">
-      <div className="h-3 bg-stone-200 rounded-full animate-pulse w-1/2 mb-5" />
-      {Array(6).fill(null).map(function(_, i) {
-        return <div key={i} className="h-9 bg-stone-100 rounded-xl animate-pulse mb-2" />
-      })}
-      <div className="mt-8 h-3 bg-stone-200 rounded-full animate-pulse w-1/2 mb-4" />
-      <div className="h-2 bg-stone-200 rounded-full animate-pulse w-full" />
-      <div className="flex justify-between mt-3">
-        <div className="h-2 bg-stone-200 rounded-full animate-pulse w-12" />
-        <div className="h-2 bg-stone-200 rounded-full animate-pulse w-12" />
+    <div className="bg-white rounded-2xl overflow-hidden">
+      <div className="w-full aspect-square bg-stone-100 animate-pulse" />
+      <div className="p-3 space-y-2">
+        <div className="h-3 bg-stone-100 rounded-full animate-pulse w-full" />
+        <div className="h-3 bg-stone-100 rounded-full animate-pulse w-2/3" />
+        <div className="h-4 bg-stone-100 rounded-full animate-pulse w-1/3 mt-2" />
       </div>
     </div>
   )
 }
 
 export default function ShopPage({ wishlist = [], toggleWishlist = function() {} }) {
-  const dispatch   = useDispatch()
-  const navigate   = useNavigate()
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
   const { items: products, loading } = useSelector((state) => state.products)
   const [searchParams] = useSearchParams()
   const catParam = searchParams.get('cat') || 'all'
@@ -103,7 +86,7 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
   const handleAdd = function(e, product) {
     e.stopPropagation()
     if (product.stock === 0) {
-      toast.error('Produit en rupture de stock', { style: toastStyle })
+      toast.error('Rupture de stock', { style: toastStyle })
       return
     }
     dispatch(addToCart({
@@ -115,7 +98,7 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
     }))
     setAddedId(product._id)
     setTimeout(function() { setAddedId(null) }, 1500)
-    toast.success(product.name + ' ajoute au panier !', { icon: '🛍️', style: toastStyle })
+    toast.success(product.name + ' ajoute !', { icon: '🛍️', style: toastStyle })
   }
 
   const getImageUrl = function(image) {
@@ -125,291 +108,299 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
   }
 
   return (
-    <main className="bg-[#f9f8f6] min-h-screen">
+    <main className="min-h-screen" style={{ background: '#FAF9F7' }}>
 
-      {loading ? (
-        <div className="bg-[#f5f3f0] py-14 text-center">
-          <div className="h-3 bg-stone-200 rounded-full animate-pulse w-24 mx-auto mb-4" />
-          <div className="h-10 bg-stone-200 rounded-full animate-pulse w-32 mx-auto mb-4" />
-          <div className="h-3 bg-stone-200 rounded-full animate-pulse w-40 mx-auto" />
+      {/* Hero */}
+      <div style={{ background: 'linear-gradient(135deg, #1c1917 0%, #292524 50%, #1c1917 100%)' }} className="py-12 px-4 text-center relative overflow-hidden">
+        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, #d4a574 0%, transparent 50%), radial-gradient(circle at 80% 50%, #d4a574 0%, transparent 50%)' }} />
+        <p className="text-[10px] tracking-[0.5em] uppercase text-stone-400 mb-3 relative">Notre boutique</p>
+        <h1 className="text-4xl md:text-5xl font-light tracking-[0.3em] uppercase text-white mb-4 relative" style={{ fontFamily: 'Georgia, serif' }}>
+          Shop
+        </h1>
+        <div className="flex items-center justify-center gap-2 text-xs text-stone-500 relative">
+          <Link to="/" className="hover:text-stone-300 transition">Home</Link>
+          <span>✦</span>
+          <span className="text-stone-400">Shop</span>
         </div>
-      ) : (
-        <div className="bg-[#f5f3f0] py-14 text-center">
-          <p className="text-xs tracking-[0.5em] uppercase text-stone-400 mb-2">Notre boutique</p>
-          <h1 className="text-4xl font-light tracking-[0.2em] uppercase text-stone-900 mb-4">Shop</h1>
-          <div className="flex items-center justify-center gap-2 text-sm text-stone-400">
-            <Link to="/" className="hover:text-stone-700 transition">Home</Link>
-            <span>›</span>
-            <span className="text-stone-600">Shop</span>
-          </div>
+        {/* decorative line */}
+        <div className="flex items-center justify-center gap-3 mt-5 relative">
+          <div className="h-px w-16 bg-stone-600" />
+          <span className="text-stone-600 text-xs">✦</span>
+          <div className="h-px w-16 bg-stone-600" />
         </div>
-      )}
+      </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-10">
+      {/* Categories scroll — mobile */}
+      <div className="bg-white border-b border-stone-100 overflow-x-auto scrollbar-hide">
+        <div className="flex gap-1 px-4 py-3 w-max">
+          {categories.map(function(cat) {
+            const active = category === cat.value
+            return (
+              <button
+                key={cat.value}
+                onClick={function() { setCategory(cat.value) }}
+                className={'flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium transition-all duration-200 whitespace-nowrap ' + (active ? 'bg-stone-900 text-white shadow-sm' : 'bg-stone-50 text-stone-600 hover:bg-stone-100')}
+              >
+                <span>{cat.emoji}</span>
+                {cat.label}
+              </button>
+            )
+          })}
+        </div>
+      </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 mb-6">
+      <div className="max-w-7xl mx-auto px-4 py-6">
+
+        {/* Toolbar */}
+        <div className="flex items-center gap-3 mb-6">
+          {/* Search */}
           <div className="relative flex-1">
-            {loading ? (
-              <div className="w-full h-12 bg-white border border-stone-200 rounded-xl animate-pulse" />
-            ) : (
-              <>
-                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
-                <input
-                  type="text"
-                  value={search}
-                  onChange={function(e) { setSearch(e.target.value) }}
-                  placeholder="Rechercher un produit..."
-                  className="w-full pl-10 pr-4 py-3 bg-white border border-stone-200 rounded-xl text-sm text-stone-700 focus:outline-none focus:border-stone-400 transition"
-                />
-                {search && (
-                  <button onClick={function() { setSearch('') }} className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700">
-                    <X size={14} />
-                  </button>
-                )}
-              </>
+            <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
+            <input
+              type="text"
+              value={search}
+              onChange={function(e) { setSearch(e.target.value) }}
+              placeholder="Rechercher..."
+              className="w-full pl-9 pr-4 py-2.5 bg-white border border-stone-200 rounded-xl text-sm text-stone-700 focus:outline-none focus:border-stone-400 transition"
+            />
+            {search && (
+              <button onClick={function() { setSearch('') }} className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400">
+                <X size={13} />
+              </button>
             )}
           </div>
 
-          {loading ? (
-            <div className="w-44 h-12 bg-white border border-stone-200 rounded-xl animate-pulse" />
-          ) : (
+          {/* Sort */}
+          <div className="relative">
             <select
               value={sort}
               onChange={function(e) { setSort(e.target.value) }}
-              className="bg-white border border-stone-200 rounded-xl px-4 py-3 text-sm text-stone-700 focus:outline-none focus:border-stone-400"
+              className="appearance-none bg-white border border-stone-200 rounded-xl pl-4 pr-8 py-2.5 text-sm text-stone-700 focus:outline-none focus:border-stone-400 cursor-pointer"
             >
               {sortOptions.map(function(o) {
                 return <option key={o.value} value={o.value}>{o.label}</option>
               })}
             </select>
-          )}
+            <ChevronDown size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none" />
+          </div>
 
+          {/* Filter toggle */}
           <button
             onClick={function() { setShowFilters(!showFilters) }}
-            className="flex items-center gap-2 bg-white border border-stone-200 rounded-xl px-4 py-3 text-sm text-stone-700 hover:border-stone-400 transition sm:hidden"
+            className={'flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm border transition ' + (showFilters ? 'bg-stone-900 text-white border-stone-900' : 'bg-white text-stone-700 border-stone-200 hover:border-stone-400')}
           >
-            <SlidersHorizontal size={16} /> Filtres
+            <SlidersHorizontal size={14} />
+            <span className="hidden sm:inline">Filtres</span>
           </button>
         </div>
 
-        <div className="flex gap-8">
-
-          <aside className={'flex-shrink-0 w-56 ' + (showFilters ? 'block' : 'hidden sm:block')}>
-            {loading ? (
-              <SkeletonSidebar />
-            ) : (
-              <div className="bg-white rounded-2xl border border-stone-100 p-6 sticky top-24">
-                <div className="mb-7">
-                  <h3 className="text-xs tracking-[0.3em] uppercase font-medium text-stone-900 mb-4">Categories</h3>
-                  <div className="flex flex-col gap-2">
-                    {categories.map(function(cat) {
-                      return (
-                        <button
-                          key={cat.value}
-                          onClick={function() { setCategory(cat.value) }}
-                          className={'text-left text-sm px-3 py-2 rounded-xl transition ' + (category === cat.value ? 'bg-stone-900 text-white' : 'text-stone-500 hover:bg-stone-50 hover:text-stone-800')}
-                        >
-                          {cat.label}
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-
-                <div className="mb-7">
-                  <h3 className="text-xs tracking-[0.3em] uppercase font-medium text-stone-900 mb-4">Prix max</h3>
-                  <input
-                    type="range" min={100} max={1000} step={10}
-                    value={maxPrice}
-                    onChange={function(e) { setMaxPrice(Number(e.target.value)) }}
-                    className="w-full accent-stone-900"
-                  />
-                  <div className="flex justify-between text-xs text-stone-400 mt-2">
-                    <span>100 MAD</span>
-                    <span className="font-medium text-stone-700">{maxPrice} MAD</span>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-xs tracking-[0.3em] uppercase font-medium text-stone-900 mb-4">Promotions</h3>
-                  <button
-                    onClick={function() { setSort(sort === 'discount' ? 'default' : 'discount') }}
-                    className={'w-full text-sm px-3 py-2 rounded-xl transition text-left ' + (sort === 'discount' ? 'bg-amber-500 text-white' : 'bg-stone-50 text-stone-600 hover:bg-stone-100')}
-                  >
-                    Meilleures promos
-                  </button>
-                </div>
-
-                <button
-                  onClick={function() { setCategory('all'); setSort('default'); setMaxPrice(1000); setSearch('') }}
-                  className="w-full mt-6 text-xs tracking-widest uppercase text-stone-400 hover:text-stone-700 transition"
-                >
-                  Reinitialiser
-                </button>
+        {/* Filter panel */}
+        {showFilters && (
+          <div className="bg-white rounded-2xl border border-stone-100 p-5 mb-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-xs tracking-[0.3em] uppercase font-medium text-stone-500 mb-3">Prix maximum</h3>
+              <input
+                type="range" min={100} max={1000} step={10}
+                value={maxPrice}
+                onChange={function(e) { setMaxPrice(Number(e.target.value)) }}
+                className="w-full accent-stone-900 mb-2"
+              />
+              <div className="flex justify-between text-xs text-stone-400">
+                <span>100 MAD</span>
+                <span className="font-semibold text-stone-700">{maxPrice} MAD</span>
               </div>
-            )}
-          </aside>
-
-          <div className="flex-1">
-
-            {loading ? (
-              <div className="h-4 bg-stone-200 rounded-full animate-pulse w-32 mb-5" />
-            ) : (
-              <div className="flex items-center justify-between mb-5">
-                <p className="text-sm text-stone-400">
-                  <span className="font-medium text-stone-700">{filtered.length}</span> produits trouves
-                </p>
-                {wishlist.length > 0 && (
-                  <Link to="/wishlist" className="text-xs text-red-400 hover:text-red-600 transition">
-                    ❤️ {wishlist.length} favori{wishlist.length > 1 ? 's' : ''}
-                  </Link>
-                )}
-              </div>
-            )}
-
-            {loading && (
-              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-                {Array(8).fill(null).map(function(_, i) {
-                  return <SkeletonCard key={i} />
-                })}
-              </div>
-            )}
-
-            {!loading && filtered.length === 0 && (
-              <div className="text-center py-20">
-                <div className="text-5xl mb-4">🔍</div>
-                <p className="text-stone-400 text-sm">Aucun produit trouve</p>
-                <button
-                  onClick={function() { setSearch(''); setCategory('all'); setMaxPrice(1000) }}
-                  className="mt-4 text-xs text-stone-600 underline"
-                >
-                  Reinitialiser les filtres
-                </button>
-              </div>
-            )}
-
-            {!loading && paginated.length > 0 && (
-              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-                {paginated.map(function(product) {
-                  const pid = product._id
-                  const isWished = wishlist.includes(pid)
-                  return (
-                    <div
-                      key={pid}
-                      onClick={function() { navigate('/product/' + pid) }}
-                      className="group bg-white rounded-2xl overflow-hidden border border-stone-100 hover:shadow-md transition duration-300 cursor-pointer"
-                    >
-                      <div className="relative overflow-hidden">
-                        <img
-                          src={getImageUrl(product.image)}
-                          alt={product.name}
-                          className="w-full h-52 object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                        <div className="absolute top-2 left-2 flex flex-col gap-1">
-                          {product.discount > 0 && (
-                            <span className="bg-red-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">-{product.discount}%</span>
-                          )}
-                          {product.hot && (
-                            <span className="bg-amber-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">HOT</span>
-                          )}
-                          {product.stock === 0 && (
-                            <span className="bg-stone-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">Rupture</span>
-                          )}
-                        </div>
-
-                        {/* Wishlist */}
-                        <button
-                          onClick={function(e) {
-                            e.stopPropagation()
-                            toggleWishlist(pid)
-                          }}
-                          className="absolute top-2 right-2 w-7 h-7 bg-white rounded-full flex items-center justify-center shadow hover:scale-110 transition"
-                        >
-                          <span className={'text-xs transition ' + (isWished ? 'text-red-500' : 'text-stone-300')}>
-                            {isWished ? '❤️' : '♡'}
-                          </span>
-                        </button>
-
-                        {/* Add to cart */}
-                        <div className="absolute bottom-0 left-0 right-0 md:translate-y-full md:group-hover:translate-y-0 transition-transform duration-300">
-                          <button
-                            onClick={function(e) { handleAdd(e, product) }}
-                            disabled={product.stock === 0}
-                            className={'w-full py-3 text-xs tracking-[0.2em] uppercase font-medium transition duration-300 disabled:opacity-50 ' + (addedId === pid ? 'bg-stone-900 text-white' : 'bg-white text-stone-900 hover:bg-stone-900 hover:text-white')}
-                          >
-                            {product.stock === 0 ? 'Rupture' : addedId === pid ? 'Ajoute !' : 'Add to Cart'}
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="p-4">
-                        <h3 className="text-xs font-medium text-stone-800 mb-1 leading-snug line-clamp-2">{product.name}</h3>
-
-                        {/* Rating stars */}
-                        {product.numReviews > 0 && (
-                          <div className="flex items-center gap-1 mb-2">
-                            <div className="flex">
-                              {[1,2,3,4,5].map(function(s) {
-                                return (
-                                  <span key={s} className={'text-[10px] ' + (s <= Math.round(product.rating || 0) ? 'text-amber-400' : 'text-stone-200')}>★</span>
-                                )
-                              })}
-                            </div>
-                            <span className="text-[10px] text-stone-400">({product.numReviews})</span>
-                          </div>
-                        )}
-
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-semibold text-stone-900">{product.price} MAD</span>
-                          {product.oldPrice > 0 && (
-                            <span className="text-xs text-stone-400 line-through">{product.oldPrice} MAD</span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-
-            {!loading && totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 mt-10">
-                <button
-                  onClick={function() { setCurrentPage(function(p) { return Math.max(1, p - 1) }) }}
-                  disabled={currentPage === 1}
-                  className="w-9 h-9 rounded-xl border border-stone-200 flex items-center justify-center text-stone-500 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition disabled:opacity-30 disabled:cursor-not-allowed text-sm"
-                >
-                  &#8249;
-                </button>
-                {Array.from({ length: totalPages }, function(_, i) { return i + 1 }).map(function(page) {
-                  return (
-                    <button
-                      key={page}
-                      onClick={function() { setCurrentPage(page) }}
-                      className={'w-9 h-9 rounded-xl text-sm transition ' + (currentPage === page ? 'bg-stone-900 text-white border border-stone-900' : 'border border-stone-200 text-stone-500 hover:bg-stone-100')}
-                    >
-                      {page}
-                    </button>
-                  )
-                })}
-                <button
-                  onClick={function() { setCurrentPage(function(p) { return Math.min(totalPages, p + 1) }) }}
-                  disabled={currentPage === totalPages}
-                  className="w-9 h-9 rounded-xl border border-stone-200 flex items-center justify-center text-stone-500 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition disabled:opacity-30 disabled:cursor-not-allowed text-sm"
-                >
-                  &#8250;
-                </button>
-              </div>
-            )}
-
-            {!loading && filtered.length > 0 && (
-              <p className="text-center text-xs text-stone-400 mt-4">
-                {(currentPage - 1) * productsPerPage + 1} — {Math.min(currentPage * productsPerPage, filtered.length)} sur {filtered.length} produits
-              </p>
-            )}
-
+            </div>
+            <div className="flex items-end">
+              <button
+                onClick={function() { setCategory('all'); setSort('default'); setMaxPrice(1000); setSearch(''); setShowFilters(false) }}
+                className="w-full py-2.5 text-xs tracking-widest uppercase text-stone-500 border border-stone-200 rounded-xl hover:bg-stone-50 transition"
+              >
+                Reinitialiser
+              </button>
+            </div>
           </div>
+        )}
+
+        {/* Results bar */}
+        <div className="flex items-center justify-between mb-5">
+          {loading ? (
+            <div className="h-3 bg-stone-200 rounded-full animate-pulse w-28" />
+          ) : (
+            <p className="text-xs text-stone-400">
+              <span className="font-semibold text-stone-700">{filtered.length}</span> produits
+            </p>
+          )}
+          {wishlist.length > 0 && (
+            <Link to="/wishlist" className="flex items-center gap-1.5 text-xs text-red-400 hover:text-red-600 transition">
+              <Heart size={12} className="fill-red-400" />
+              {wishlist.length} favori{wishlist.length > 1 ? 's' : ''}
+            </Link>
+          )}
         </div>
+
+        {/* Skeleton */}
+        {loading && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+            {Array(8).fill(null).map(function(_, i) {
+              return <SkeletonCard key={i} />
+            })}
+          </div>
+        )}
+
+        {/* Empty */}
+        {!loading && filtered.length === 0 && (
+          <div className="text-center py-24">
+            <div className="text-5xl mb-4">🔍</div>
+            <p className="text-stone-400 text-sm mb-4">Aucun produit trouve</p>
+            <button
+              onClick={function() { setSearch(''); setCategory('all'); setMaxPrice(1000) }}
+              className="text-xs tracking-widest uppercase text-stone-600 border border-stone-300 px-6 py-2.5 rounded-full hover:bg-stone-50 transition"
+            >
+              Reinitialiser
+            </button>
+          </div>
+        )}
+
+        {/* Products grid */}
+        {!loading && paginated.length > 0 && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+            {paginated.map(function(product) {
+              const pid = product._id
+              const isWished = wishlist.includes(pid)
+              const isAdded = addedId === pid
+              return (
+                <div
+                  key={pid}
+                  onClick={function() { navigate('/product/' + pid) }}
+                  className="group bg-white rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+                >
+                  {/* Image */}
+                  <div className="relative overflow-hidden aspect-square bg-stone-50">
+                    <img
+                      src={getImageUrl(product.image)}
+                      alt={product.name}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+
+                    {/* Badges */}
+                    <div className="absolute top-2 left-2 flex flex-col gap-1">
+                      {product.discount > 0 && (
+                        <span className="bg-red-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">-{product.discount}%</span>
+                      )}
+                      {product.hot && (
+                        <span className="bg-amber-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">HOT</span>
+                      )}
+                      {product.stock === 0 && (
+                        <span className="bg-stone-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">Rupture</span>
+                      )}
+                    </div>
+
+                    {/* Wishlist */}
+                    <button
+                      onClick={function(e) { e.stopPropagation(); toggleWishlist(pid) }}
+                      className="absolute top-2 right-2 w-7 h-7 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform"
+                    >
+                      <Heart
+                        size={13}
+                        className={'transition ' + (isWished ? 'fill-red-500 text-red-500' : 'text-stone-400')}
+                      />
+                    </button>
+
+                    {/* Add to cart overlay */}
+                    <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                      <button
+                        onClick={function(e) { handleAdd(e, product) }}
+                        disabled={product.stock === 0}
+                        className={'w-full py-3 text-[11px] tracking-[0.2em] uppercase font-medium transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-50 ' + (isAdded ? 'bg-green-600 text-white' : 'bg-stone-900/95 text-white hover:bg-stone-800')}
+                      >
+                        {isAdded ? (
+                          <>✓ Ajoute</>
+                        ) : (
+                          <><ShoppingBag size={12} /> Ajouter</>
+                        )}
+                      </button>
+                    </div>
+
+                    {/* Mobile add button — always visible */}
+                    <div className="md:hidden absolute bottom-0 left-0 right-0">
+                      <button
+                        onClick={function(e) { handleAdd(e, product) }}
+                        disabled={product.stock === 0}
+                        className={'w-full py-2.5 text-[10px] tracking-[0.15em] uppercase font-medium transition-colors disabled:opacity-50 ' + (isAdded ? 'bg-green-600 text-white' : 'bg-stone-900/90 text-white')}
+                      >
+                        {isAdded ? '✓ Ajoute' : 'Ajouter'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Info */}
+                  <div className="p-3">
+                    <h3 className="text-xs font-medium text-stone-800 mb-1 leading-snug line-clamp-2">{product.name}</h3>
+
+                    {/* Rating */}
+                    {product.numReviews > 0 && (
+                      <div className="flex items-center gap-1 mb-1.5">
+                        <div className="flex">
+                          {[1,2,3,4,5].map(function(s) {
+                            return (
+                              <span key={s} className={'text-[9px] ' + (s <= Math.round(product.rating || 0) ? 'text-amber-400' : 'text-stone-200')}>★</span>
+                            )
+                          })}
+                        </div>
+                        <span className="text-[9px] text-stone-400">({product.numReviews})</span>
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-semibold text-stone-900">{product.price} MAD</span>
+                      {product.oldPrice > 0 && (
+                        <span className="text-[11px] text-stone-400 line-through">{product.oldPrice}</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {!loading && totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 mt-10">
+            <button
+              onClick={function() { setCurrentPage(function(p) { return Math.max(1, p - 1) }) }}
+              disabled={currentPage === 1}
+              className="w-9 h-9 rounded-xl border border-stone-200 flex items-center justify-center text-stone-500 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition disabled:opacity-30 disabled:cursor-not-allowed text-sm"
+            >
+              &#8249;
+            </button>
+            {Array.from({ length: totalPages }, function(_, i) { return i + 1 }).map(function(page) {
+              return (
+                <button
+                  key={page}
+                  onClick={function() { setCurrentPage(page) }}
+                  className={'w-9 h-9 rounded-xl text-sm transition ' + (currentPage === page ? 'bg-stone-900 text-white' : 'border border-stone-200 text-stone-500 hover:bg-stone-100')}
+                >
+                  {page}
+                </button>
+              )
+            })}
+            <button
+              onClick={function() { setCurrentPage(function(p) { return Math.min(totalPages, p + 1) }) }}
+              disabled={currentPage === totalPages}
+              className="w-9 h-9 rounded-xl border border-stone-200 flex items-center justify-center text-stone-500 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition disabled:opacity-30 disabled:cursor-not-allowed text-sm"
+            >
+              &#8250;
+            </button>
+          </div>
+        )}
+
+        {!loading && filtered.length > 0 && (
+          <p className="text-center text-xs text-stone-400 mt-4">
+            {(currentPage - 1) * productsPerPage + 1}–{Math.min(currentPage * productsPerPage, filtered.length)} sur {filtered.length} produits
+          </p>
+        )}
+
       </div>
     </main>
   )
