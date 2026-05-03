@@ -16,7 +16,7 @@ const toastStyle = {
 
 function StarPicker({ value, onChange }) {
   const [hovered, setHovered] = useState(0)
-  const labels = ['', 'Mauvais', 'Passable', 'Correct', 'Bien', 'Excellent']
+  const labels = ['', 'Très mauvais', 'Mauvais', 'Correct', 'Bien', 'Excellent']
   return (
     <div>
       <div className="flex gap-1">
@@ -43,13 +43,12 @@ function StarPicker({ value, onChange }) {
   )
 }
 
-function StarDisplay({ value, count, size = 'sm' }) {
-  const sz = size === 'lg' ? 'text-lg' : size === 'md' ? 'text-sm' : 'text-xs'
+function StarDisplay({ value, count }) {
   return (
     <div className="flex items-center gap-1.5">
       <div className="flex">
         {[1,2,3,4,5].map(function(s) {
-          return <span key={s} className={sz + ' ' + (s <= Math.round(value) ? 'text-amber-400' : 'text-stone-200')}>★</span>
+          return <span key={s} className={'text-sm ' + (s <= Math.round(value) ? 'text-amber-400' : 'text-stone-200')}>★</span>
         })}
       </div>
       {count !== undefined && (
@@ -87,7 +86,7 @@ export default function ProductPage() {
   const [qty,        setQty]        = useState(1)
   const [added,      setAdded]      = useState(false)
   const [wished,     setWished]     = useState(false)
-  const [activeTab,  setActiveTab]  = useState('reviews')
+  const [activeTab,  setActiveTab]  = useState('avis')
 
   const [form,       setForm]       = useState({ name: '', rating: 0, comment: '' })
   const [submitting, setSubmitting] = useState(false)
@@ -113,32 +112,32 @@ export default function ProductPage() {
     dispatch(addToCart({ _id: product._id, name: product.name, price: product.price, image: product.image, qty }))
     setAdded(true)
     setTimeout(function() { setAdded(false) }, 2000)
-    toast.success(product.name + ' ajoute au panier !', { icon: '🛍️', style: toastStyle })
+    toast.success(product.name + ' ajouté au panier !', { icon: '🛍️', style: toastStyle })
   }
 
   const handleSubmitReview = async function(e) {
     e.preventDefault()
     if (!form.name.trim())    return setFormError('Votre nom est requis')
-    if (!form.rating)         return setFormError('Selectionnez une note')
-    if (!form.comment.trim()) return setFormError('Ecrivez un commentaire')
+    if (!form.rating)         return setFormError('Veuillez sélectionner une note')
+    if (!form.comment.trim()) return setFormError('Veuillez écrire un commentaire')
     setSubmitting(true)
     setFormError('')
     try {
       await api.post('/reviews', { productId: id, ...form })
-      toast.success('Avis publie !', { icon: '⭐', style: toastStyle })
+      toast.success('Votre avis a été publié !', { icon: '⭐', style: toastStyle })
       setForm({ name: '', rating: 0, comment: '' })
       fetchAll()
-      setActiveTab('reviews')
+      setActiveTab('avis')
     } catch(e) {
-      setFormError(e.response?.data?.message || 'Erreur')
+      setFormError(e.response?.data?.message || 'Une erreur est survenue')
     }
     setSubmitting(false)
   }
 
   const getImageUrl = function(image) {
-    if (!image) return 'https://via.placeholder.com/600x600?text=No+Image'
+    if (!image) return 'https://via.placeholder.com/600x600?text=Aucune+image'
     if (image.startsWith('http')) return image
-    return 'https://via.placeholder.com/600x600?text=No+Image'
+    return 'https://via.placeholder.com/600x600?text=Aucune+image'
   }
 
   const avgRating  = product?.rating     || 0
@@ -152,7 +151,7 @@ export default function ProductPage() {
         <div className="text-6xl mb-4">😕</div>
         <p className="text-stone-500 mb-4">Produit introuvable</p>
         <Link to="/shop" className="text-xs tracking-widest uppercase border border-stone-300 px-6 py-2.5 rounded-full text-stone-600 hover:bg-stone-50 transition">
-          Retour au shop
+          Retour à la boutique
         </Link>
       </div>
     </main>
@@ -161,20 +160,21 @@ export default function ProductPage() {
   return (
     <main className="min-h-screen" style={{ background: '#FAF9F7' }}>
 
-      {/* Top nav */}
+      {/* Barre de navigation */}
       <div className="bg-white border-b border-stone-100 sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 h-12 flex items-center justify-between">
           <Link to="/shop" className="flex items-center gap-1 text-stone-500 hover:text-stone-800 transition">
             <ChevronLeft size={16} />
-            <span className="text-sm">Shop</span>
+            <span className="text-sm">Boutique</span>
           </Link>
           <p className="text-xs text-stone-400 capitalize">{product.category}</p>
           <button
             onClick={function() {
               navigator.clipboard.writeText(window.location.href)
-              toast.success('Lien copie !', { style: toastStyle })
+              toast.success('Lien copié !', { style: toastStyle })
             }}
             className="text-stone-400 hover:text-stone-700 transition"
+            title="Partager"
           >
             <Share2 size={16} />
           </button>
@@ -183,7 +183,7 @@ export default function ProductPage() {
 
       <div className="max-w-5xl mx-auto px-4 py-6">
 
-        {/* Product */}
+        {/* Fiche produit */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
 
           {/* Image */}
@@ -200,12 +200,12 @@ export default function ProductPage() {
                 <span className="bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-sm">-{product.discount}%</span>
               )}
               {product.hot && (
-                <span className="bg-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-sm">HOT</span>
+                <span className="bg-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-sm">POPULAIRE</span>
               )}
             </div>
           </div>
 
-          {/* Details */}
+          {/* Détails */}
           <div className="flex flex-col">
 
             <p className="text-[10px] tracking-[0.4em] uppercase text-stone-400 mb-2 capitalize">{product.category}</p>
@@ -213,16 +213,16 @@ export default function ProductPage() {
               {product.name}
             </h1>
 
-            {/* Rating */}
+            {/* Note moyenne */}
             <div className="mb-4">
               {numReviews > 0 ? (
-                <StarDisplay value={avgRating} count={numReviews} size="md" />
+                <StarDisplay value={avgRating} count={numReviews} />
               ) : (
-                <p className="text-xs text-stone-400">Aucun avis — soyez le premier !</p>
+                <p className="text-xs text-stone-400">Aucun avis pour le moment — soyez le premier !</p>
               )}
             </div>
 
-            {/* Price */}
+            {/* Prix */}
             <div className="flex items-baseline gap-3 mb-5">
               <span className="text-3xl font-semibold text-stone-900">{product.price} <span className="text-lg font-normal">MAD</span></span>
               {product.oldPrice > 0 && (
@@ -237,51 +237,52 @@ export default function ProductPage() {
               </p>
             )}
 
-            {/* Stock */}
+            {/* Disponibilité */}
             <div className={'inline-flex items-center gap-1.5 text-xs font-medium mb-6 px-3 py-1.5 rounded-full w-fit ' + (product.stock > 0 ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600')}>
               <span className={'w-1.5 h-1.5 rounded-full ' + (product.stock > 0 ? 'bg-green-500' : 'bg-red-500')} />
-              {product.stock > 0 ? 'En stock (' + product.stock + ')' : 'Rupture de stock'}
+              {product.stock > 0 ? 'En stock (' + product.stock + ' disponibles)' : 'Rupture de stock'}
             </div>
 
-            {/* Qty + Add */}
+            {/* Quantité + Favoris */}
             {product.stock > 0 && (
               <div className="flex items-center gap-3 mb-4">
                 <div className="flex items-center border border-stone-200 rounded-xl overflow-hidden bg-white">
                   <button
                     onClick={function() { setQty(function(q) { return Math.max(1, q - 1) }) }}
                     className="w-10 h-11 flex items-center justify-center text-stone-500 hover:bg-stone-50 transition text-lg"
-                  >-</button>
+                  >−</button>
                   <span className="w-10 text-center text-sm font-semibold text-stone-800">{qty}</span>
                   <button
                     onClick={function() { setQty(function(q) { return Math.min(product.stock, q + 1) }) }}
                     className="w-10 h-11 flex items-center justify-center text-stone-500 hover:bg-stone-50 transition text-lg"
                   >+</button>
                 </div>
-
                 <button
                   onClick={function() { setWished(!wished) }}
                   className={'w-11 h-11 rounded-xl border flex items-center justify-center transition ' + (wished ? 'bg-red-50 border-red-200 text-red-500' : 'bg-white border-stone-200 text-stone-400 hover:border-stone-300')}
+                  title={wished ? 'Retirer des favoris' : 'Ajouter aux favoris'}
                 >
                   <Heart size={16} className={wished ? 'fill-red-500' : ''} />
                 </button>
               </div>
             )}
 
+            {/* Bouton ajouter au panier */}
             <button
               onClick={handleAdd}
               disabled={product.stock === 0}
               className={'w-full py-4 text-sm tracking-[0.2em] uppercase font-medium rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed ' + (added ? 'bg-green-600 text-white' : 'bg-stone-900 text-white hover:bg-stone-700')}
             >
               <ShoppingBag size={16} />
-              {product.stock === 0 ? 'Rupture de stock' : added ? '✓ Ajoute au panier !' : 'Ajouter au panier'}
+              {product.stock === 0 ? 'Rupture de stock' : added ? '✓ Ajouté au panier !' : 'Ajouter au panier'}
             </button>
 
-            {/* Trust badges */}
+            {/* Garanties */}
             <div className="grid grid-cols-3 gap-2 mt-5 pt-5 border-t border-stone-100">
               {[
                 { icon: '🚚', label: 'Livraison gratuite' },
-                { icon: '🔄', label: 'Retour 7 jours' },
-                { icon: '🔒', label: 'Paiement securise' },
+                { icon: '🔄', label: 'Retour sous 7 jours' },
+                { icon: '🔒', label: 'Paiement sécurisé' },
               ].map(function(b) {
                 return (
                   <div key={b.label} className="flex flex-col items-center text-center gap-1">
@@ -294,14 +295,14 @@ export default function ProductPage() {
           </div>
         </div>
 
-        {/* Reviews section */}
+        {/* Section avis */}
         <div className="bg-white rounded-2xl border border-stone-100 overflow-hidden">
 
-          {/* Tabs */}
+          {/* Onglets */}
           <div className="flex border-b border-stone-100">
             {[
-              { key: 'reviews', label: 'Avis (' + numReviews + ')' },
-              { key: 'write',   label: 'Ecrire un avis' },
+              { key: 'avis',   label: 'Avis clients (' + numReviews + ')' },
+              { key: 'ecrire', label: 'Laisser un avis' },
             ].map(function(tab) {
               return (
                 <button
@@ -315,18 +316,18 @@ export default function ProductPage() {
             })}
           </div>
 
-          {/* Reviews list */}
-          {activeTab === 'reviews' && (
+          {/* Liste des avis */}
+          {activeTab === 'avis' && (
             <div className="p-5">
               {reviews.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="text-4xl mb-3">⭐</div>
                   <p className="text-stone-400 text-sm mb-4">Aucun avis pour le moment</p>
                   <button
-                    onClick={function() { setActiveTab('write') }}
+                    onClick={function() { setActiveTab('ecrire') }}
                     className="text-xs tracking-widest uppercase border border-stone-300 px-6 py-2.5 rounded-full text-stone-600 hover:bg-stone-50 transition"
                   >
-                    Etre le premier
+                    Soyez le premier à donner votre avis
                   </button>
                 </div>
               ) : (
@@ -343,7 +344,11 @@ export default function ProductPage() {
                             <p className="text-sm font-medium text-stone-800">{review.name}</p>
                             <p className="text-[10px] text-stone-400 flex-shrink-0">{date}</p>
                           </div>
-                          <StarDisplay value={review.rating} size="sm" />
+                          <div className="flex">
+                            {[1,2,3,4,5].map(function(s) {
+                              return <span key={s} className={'text-xs ' + (s <= review.rating ? 'text-amber-400' : 'text-stone-200')}>★</span>
+                            })}
+                          </div>
                           <p className="text-sm text-stone-600 mt-1.5 leading-relaxed">{review.comment}</p>
                         </div>
                       </div>
@@ -354,8 +359,8 @@ export default function ProductPage() {
             </div>
           )}
 
-          {/* Write review */}
-          {activeTab === 'write' && (
+          {/* Formulaire d'avis */}
+          {activeTab === 'ecrire' && (
             <div className="p-5">
               <form onSubmit={handleSubmitReview} className="flex flex-col gap-4">
 
@@ -365,13 +370,13 @@ export default function ProductPage() {
                     type="text"
                     value={form.name}
                     onChange={function(e) { setForm({ ...form, name: e.target.value }) }}
-                    placeholder="Ex: Salma B."
+                    placeholder="Ex : Salma B."
                     className="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-stone-400 bg-stone-50"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs text-stone-400 block mb-2">Note *</label>
+                  <label className="text-xs text-stone-400 block mb-2">Votre note *</label>
                   <StarPicker
                     value={form.rating}
                     onChange={function(r) { setForm({ ...form, rating: r }) }}
@@ -379,12 +384,12 @@ export default function ProductPage() {
                 </div>
 
                 <div>
-                  <label className="text-xs text-stone-400 block mb-1.5">Commentaire *</label>
+                  <label className="text-xs text-stone-400 block mb-1.5">Votre commentaire *</label>
                   <textarea
                     rows={4}
                     value={form.comment}
                     onChange={function(e) { setForm({ ...form, comment: e.target.value }) }}
-                    placeholder="Decrivez votre experience..."
+                    placeholder="Décrivez votre expérience avec ce produit..."
                     className="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-stone-400 bg-stone-50 resize-none"
                   />
                 </div>
@@ -398,7 +403,7 @@ export default function ProductPage() {
                   disabled={submitting}
                   className="w-full bg-stone-900 text-white text-xs tracking-[0.3em] uppercase py-4 rounded-2xl hover:bg-stone-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {submitting ? 'Publication...' : 'Publier mon avis'}
+                  {submitting ? 'Publication en cours...' : 'Publier mon avis'}
                 </button>
               </form>
             </div>

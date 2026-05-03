@@ -17,10 +17,10 @@ const categories = [
 ]
 
 const sortOptions = [
-  { value: 'default',    label: 'Par defaut' },
-  { value: 'price-asc',  label: 'Prix ↑' },
-  { value: 'price-desc', label: 'Prix ↓' },
-  { value: 'discount',   label: 'Promos' },
+  { value: 'default',    label: 'Par défaut' },
+  { value: 'price-asc',  label: 'Prix croissant' },
+  { value: 'price-desc', label: 'Prix décroissant' },
+  { value: 'discount',   label: 'Meilleures promos' },
 ]
 
 const productsPerPage = 8
@@ -86,7 +86,7 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
   const handleAdd = function(e, product) {
     e.stopPropagation()
     if (product.stock === 0) {
-      toast.error('Rupture de stock', { style: toastStyle })
+      toast.error('Produit en rupture de stock', { style: toastStyle })
       return
     }
     dispatch(addToCart({
@@ -98,13 +98,13 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
     }))
     setAddedId(product._id)
     setTimeout(function() { setAddedId(null) }, 1500)
-    toast.success(product.name + ' ajoute !', { icon: '🛍️', style: toastStyle })
+    toast.success(product.name + ' ajouté au panier !', { icon: '🛍️', style: toastStyle })
   }
 
   const getImageUrl = function(image) {
-    if (!image) return 'https://via.placeholder.com/400x400?text=No+Image'
+    if (!image) return 'https://via.placeholder.com/400x400?text=Aucune+image'
     if (image.startsWith('http')) return image
-    return 'https://via.placeholder.com/400x400?text=No+Image'
+    return 'https://via.placeholder.com/400x400?text=Aucune+image'
   }
 
   return (
@@ -115,14 +115,13 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, #d4a574 0%, transparent 50%), radial-gradient(circle at 80% 50%, #d4a574 0%, transparent 50%)' }} />
         <p className="text-[10px] tracking-[0.5em] uppercase text-stone-400 mb-3 relative">Notre boutique</p>
         <h1 className="text-4xl md:text-5xl font-light tracking-[0.3em] uppercase text-white mb-4 relative" style={{ fontFamily: 'Georgia, serif' }}>
-          Shop
+          Boutique
         </h1>
         <div className="flex items-center justify-center gap-2 text-xs text-stone-500 relative">
-          <Link to="/" className="hover:text-stone-300 transition">Home</Link>
+          <Link to="/" className="hover:text-stone-300 transition">Accueil</Link>
           <span>✦</span>
-          <span className="text-stone-400">Shop</span>
+          <span className="text-stone-400">Boutique</span>
         </div>
-        {/* decorative line */}
         <div className="flex items-center justify-center gap-3 mt-5 relative">
           <div className="h-px w-16 bg-stone-600" />
           <span className="text-stone-600 text-xs">✦</span>
@@ -130,8 +129,8 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
         </div>
       </div>
 
-      {/* Categories scroll — mobile */}
-      <div className="bg-white border-b border-stone-100 overflow-x-auto scrollbar-hide">
+      {/* Catégories scroll */}
+      <div className="bg-white border-b border-stone-100 overflow-x-auto">
         <div className="flex gap-1 px-4 py-3 w-max">
           {categories.map(function(cat) {
             const active = category === cat.value
@@ -151,16 +150,15 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
 
       <div className="max-w-7xl mx-auto px-4 py-6">
 
-        {/* Toolbar */}
+        {/* Barre de recherche et tri */}
         <div className="flex items-center gap-3 mb-6">
-          {/* Search */}
           <div className="relative flex-1">
             <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
             <input
               type="text"
               value={search}
               onChange={function(e) { setSearch(e.target.value) }}
-              placeholder="Rechercher..."
+              placeholder="Rechercher un produit..."
               className="w-full pl-9 pr-4 py-2.5 bg-white border border-stone-200 rounded-xl text-sm text-stone-700 focus:outline-none focus:border-stone-400 transition"
             />
             {search && (
@@ -170,7 +168,6 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
             )}
           </div>
 
-          {/* Sort */}
           <div className="relative">
             <select
               value={sort}
@@ -184,7 +181,6 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
             <ChevronDown size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none" />
           </div>
 
-          {/* Filter toggle */}
           <button
             onClick={function() { setShowFilters(!showFilters) }}
             className={'flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm border transition ' + (showFilters ? 'bg-stone-900 text-white border-stone-900' : 'bg-white text-stone-700 border-stone-200 hover:border-stone-400')}
@@ -194,7 +190,7 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
           </button>
         </div>
 
-        {/* Filter panel */}
+        {/* Panneau de filtres */}
         {showFilters && (
           <div className="bg-white rounded-2xl border border-stone-100 p-5 mb-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
@@ -215,19 +211,19 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
                 onClick={function() { setCategory('all'); setSort('default'); setMaxPrice(1000); setSearch(''); setShowFilters(false) }}
                 className="w-full py-2.5 text-xs tracking-widest uppercase text-stone-500 border border-stone-200 rounded-xl hover:bg-stone-50 transition"
               >
-                Reinitialiser
+                Réinitialiser les filtres
               </button>
             </div>
           </div>
         )}
 
-        {/* Results bar */}
+        {/* Barre de résultats */}
         <div className="flex items-center justify-between mb-5">
           {loading ? (
             <div className="h-3 bg-stone-200 rounded-full animate-pulse w-28" />
           ) : (
             <p className="text-xs text-stone-400">
-              <span className="font-semibold text-stone-700">{filtered.length}</span> produits
+              <span className="font-semibold text-stone-700">{filtered.length}</span> produit{filtered.length > 1 ? 's' : ''} trouvé{filtered.length > 1 ? 's' : ''}
             </p>
           )}
           {wishlist.length > 0 && (
@@ -238,7 +234,7 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
           )}
         </div>
 
-        {/* Skeleton */}
+        {/* Squelettes de chargement */}
         {loading && (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
             {Array(8).fill(null).map(function(_, i) {
@@ -247,27 +243,27 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
           </div>
         )}
 
-        {/* Empty */}
+        {/* Aucun résultat */}
         {!loading && filtered.length === 0 && (
           <div className="text-center py-24">
             <div className="text-5xl mb-4">🔍</div>
-            <p className="text-stone-400 text-sm mb-4">Aucun produit trouve</p>
+            <p className="text-stone-400 text-sm mb-4">Aucun produit trouvé</p>
             <button
               onClick={function() { setSearch(''); setCategory('all'); setMaxPrice(1000) }}
               className="text-xs tracking-widest uppercase text-stone-600 border border-stone-300 px-6 py-2.5 rounded-full hover:bg-stone-50 transition"
             >
-              Reinitialiser
+              Réinitialiser les filtres
             </button>
           </div>
         )}
 
-        {/* Products grid */}
+        {/* Grille des produits */}
         {!loading && paginated.length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
             {paginated.map(function(product) {
               const pid = product._id
               const isWished = wishlist.includes(pid)
-              const isAdded = addedId === pid
+              const isAdded  = addedId === pid
               return (
                 <div
                   key={pid}
@@ -288,14 +284,14 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
                         <span className="bg-red-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">-{product.discount}%</span>
                       )}
                       {product.hot && (
-                        <span className="bg-amber-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">HOT</span>
+                        <span className="bg-amber-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">POPULAIRE</span>
                       )}
                       {product.stock === 0 && (
-                        <span className="bg-stone-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">Rupture</span>
+                        <span className="bg-stone-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">Épuisé</span>
                       )}
                     </div>
 
-                    {/* Wishlist */}
+                    {/* Favoris */}
                     <button
                       onClick={function(e) { e.stopPropagation(); toggleWishlist(pid) }}
                       className="absolute top-2 right-2 w-7 h-7 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform"
@@ -306,38 +302,34 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
                       />
                     </button>
 
-                    {/* Add to cart overlay */}
-                    <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                    {/* Bouton panier — hover desktop */}
+                    <div className="hidden md:block absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
                       <button
                         onClick={function(e) { handleAdd(e, product) }}
                         disabled={product.stock === 0}
                         className={'w-full py-3 text-[11px] tracking-[0.2em] uppercase font-medium transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-50 ' + (isAdded ? 'bg-green-600 text-white' : 'bg-stone-900/95 text-white hover:bg-stone-800')}
                       >
-                        {isAdded ? (
-                          <>✓ Ajoute</>
-                        ) : (
-                          <><ShoppingBag size={12} /> Ajouter</>
-                        )}
+                        {isAdded ? <>✓ Ajouté</> : <><ShoppingBag size={12} /> Ajouter au panier</>}
                       </button>
                     </div>
 
-                    {/* Mobile add button — always visible */}
+                    {/* Bouton panier — toujours visible mobile */}
                     <div className="md:hidden absolute bottom-0 left-0 right-0">
                       <button
                         onClick={function(e) { handleAdd(e, product) }}
                         disabled={product.stock === 0}
                         className={'w-full py-2.5 text-[10px] tracking-[0.15em] uppercase font-medium transition-colors disabled:opacity-50 ' + (isAdded ? 'bg-green-600 text-white' : 'bg-stone-900/90 text-white')}
                       >
-                        {isAdded ? '✓ Ajoute' : 'Ajouter'}
+                        {isAdded ? '✓ Ajouté' : 'Ajouter au panier'}
                       </button>
                     </div>
                   </div>
 
-                  {/* Info */}
+                  {/* Informations */}
                   <div className="p-3">
                     <h3 className="text-xs font-medium text-stone-800 mb-1 leading-snug line-clamp-2">{product.name}</h3>
 
-                    {/* Rating */}
+                    {/* Étoiles */}
                     {product.numReviews > 0 && (
                       <div className="flex items-center gap-1 mb-1.5">
                         <div className="flex">
@@ -347,14 +339,14 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
                             )
                           })}
                         </div>
-                        <span className="text-[9px] text-stone-400">({product.numReviews})</span>
+                        <span className="text-[9px] text-stone-400">({product.numReviews} avis)</span>
                       </div>
                     )}
 
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-semibold text-stone-900">{product.price} MAD</span>
                       {product.oldPrice > 0 && (
-                        <span className="text-[11px] text-stone-400 line-through">{product.oldPrice}</span>
+                        <span className="text-[11px] text-stone-400 line-through">{product.oldPrice} MAD</span>
                       )}
                     </div>
                   </div>
@@ -397,7 +389,7 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
 
         {!loading && filtered.length > 0 && (
           <p className="text-center text-xs text-stone-400 mt-4">
-            {(currentPage - 1) * productsPerPage + 1}–{Math.min(currentPage * productsPerPage, filtered.length)} sur {filtered.length} produits
+            Affichage {(currentPage - 1) * productsPerPage + 1}–{Math.min(currentPage * productsPerPage, filtered.length)} sur {filtered.length} produit{filtered.length > 1 ? 's' : ''}
           </p>
         )}
 
