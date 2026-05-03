@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { addToCart } from '../store/slices/cartSlice'
 import { fetchProducts } from '../store/slices/productSlice'
-import { Link } from 'react-router-dom'
 import toast from 'react-hot-toast'
 
 const toastStyle = {
@@ -464,7 +463,6 @@ function FeaturedProduct() {
               </button>
                             <Link
                 to="/checkout"
-                state={{ promoApplied }}
                 className="block w-full bg-stone-900 text-white text-xs tracking-[0.3em] uppercase text-center py-4 rounded-2xl hover:bg-stone-700 transition duration-300 mb-3"
               >
                    Commander maintenant
