@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { MapPin, Phone, Clock, Instagram } from 'lucide-react'
+import { MapPin, Phone, Clock } from 'lucide-react'
 
 const WHATSAPP_NUMBER = '212638298630'
 const INSTAGRAM_URL   = 'https://www.instagram.com/brillante_elegance'
@@ -52,7 +52,7 @@ export default function ContactPage() {
       link: null,
     },
     {
-      icon: <Instagram size={18} />,
+      icon: <span className="text-lg">📸</span>,
       title: 'Instagram',
       value: '@brillante_elegance',
       link: INSTAGRAM_URL,
