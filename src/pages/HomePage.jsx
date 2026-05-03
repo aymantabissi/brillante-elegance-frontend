@@ -19,7 +19,6 @@ const heroSlides = [
   { id: 2, image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1600&q=80', title: 'Bijoux Exclusifs', subtitle: 'Élégance Intemporelle' },
   { id: 3, image: 'https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=1600&q=80', title: 'Accessoires Premium', subtitle: 'Raffinement & Style' },
 ]
-  const [promoApplied, setPromoApplied] = useState(null)
 
 const stripImages = [
   'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=400&q=80',
