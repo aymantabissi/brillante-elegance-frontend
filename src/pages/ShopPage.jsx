@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { addToCart } from '../store/slices/cartSlice'
 import { fetchProducts } from '../store/slices/productSlice'
 import { Link, useSearchParams, useNavigate } from 'react-router-dom'
-import { Search, SlidersHorizontal, X, Heart, ShoppingBag, ChevronDown } from 'lucide-react'
+import { Search, SlidersHorizontal, X, Heart, ShoppingBag, ChevronDown, Share2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const categories = [
@@ -60,6 +60,7 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
   const [showFilters, setShowFilters] = useState(false)
   const [addedId,     setAddedId]     = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
+  const [sharedId,    setSharedId]    = useState(null)
 
   useEffect(function() { dispatch(fetchProducts()) }, [dispatch])
   useEffect(function() { if (catParam) setCategory(catParam) }, [catParam])
@@ -99,6 +100,19 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
     setAddedId(product._id)
     setTimeout(function() { setAddedId(null) }, 1500)
     toast.success(product.name + ' ajouté au panier !', { icon: '🛍️', style: toastStyle })
+  }
+
+  const handleShare = function(e, product) {
+    e.stopPropagation()
+    const url = window.location.origin + '/product/' + product._id
+    navigator.clipboard.writeText(url).then(function() {
+      setSharedId(product._id)
+      setTimeout(function() { setSharedId(null) }, 2000)
+      toast.success('Lien copié !', { icon: '🔗', style: toastStyle })
+    }).catch(function() {
+      // fallback
+      toast.success('Lien copié !', { icon: '🔗', style: toastStyle })
+    })
   }
 
   const getImageUrl = function(image) {
@@ -234,7 +248,7 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
           )}
         </div>
 
-        {/* Squelettes de chargement */}
+        {/* Squelettes */}
         {loading && (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
             {Array(8).fill(null).map(function(_, i) {
@@ -261,9 +275,10 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
         {!loading && paginated.length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
             {paginated.map(function(product) {
-              const pid = product._id
+              const pid     = product._id
               const isWished = wishlist.includes(pid)
               const isAdded  = addedId === pid
+              const isShared = sharedId === pid
               return (
                 <div
                   key={pid}
@@ -291,16 +306,32 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
                       )}
                     </div>
 
-                    {/* Favoris */}
-                    <button
-                      onClick={function(e) { e.stopPropagation(); toggleWishlist(pid) }}
-                      className="absolute top-2 right-2 w-7 h-7 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform"
-                    >
-                      <Heart
-                        size={13}
-                        className={'transition ' + (isWished ? 'fill-red-500 text-red-500' : 'text-stone-400')}
-                      />
-                    </button>
+                    {/* Boutons top-right — favoris + share */}
+                    <div className="absolute top-2 right-2 flex flex-col gap-1.5">
+                      {/* Favoris */}
+                      <button
+                        onClick={function(e) { e.stopPropagation(); toggleWishlist(pid) }}
+                        className="w-7 h-7 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform"
+                        title="Ajouter aux favoris"
+                      >
+                        <Heart
+                          size={13}
+                          className={'transition ' + (isWished ? 'fill-red-500 text-red-500' : 'text-stone-400')}
+                        />
+                      </button>
+
+                      {/* Share */}
+                      <button
+                        onClick={function(e) { handleShare(e, product) }}
+                        className={'w-7 h-7 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-all ' + (isShared ? 'bg-green-500' : 'bg-white/90')}
+                        title="Copier le lien"
+                      >
+                        <Share2
+                          size={12}
+                          className={isShared ? 'text-white' : 'text-stone-400'}
+                        />
+                      </button>
+                    </div>
 
                     {/* Bouton panier — hover desktop */}
                     <div className="hidden md:block absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
