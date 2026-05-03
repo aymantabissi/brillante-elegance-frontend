@@ -22,7 +22,7 @@ export default function Footer() {
             </div>
             <div className="flex gap-2">
               <span className="font-semibold text-stone-900 min-w-[70px]">Adresse :</span>
-              <span>Maroc, Safi</span>
+              <span>Maroc, Casablanca</span>
             </div>
           </div>
         </div>
