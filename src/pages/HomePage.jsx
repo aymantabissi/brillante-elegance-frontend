@@ -310,24 +310,51 @@ function TrendingProducts({ wishlist, toggleWishlist }) {
   )
 }
 
+// ============================================================
+// REMPLACE la fonction FeaturedProduct() dans HomePage.jsx
+// par ce code complet
+// ============================================================
+
 function FeaturedProduct() {
   const dispatch = useDispatch()
-  const [qty, setQty] = useState(1)
+  const { items: products } = useSelector((state) => state.products)
+  const [qty,    setQty]    = useState(1)
   const [wished, setWished] = useState(false)
-  const [added, setAdded] = useState(false)
+  const [added,  setAdded]  = useState(false)
+
+  useEffect(function() {
+    dispatch(fetchProducts())
+  }, [dispatch])
+
+  // Cherche le produit avec featured: true
+  const product = products.find(function(p) { return p.featured })
 
   const handleAddToCart = function() {
+    if (!product) return
     dispatch(addToCart({
-      _id: 'featured-moonstone',
-      name: 'Pack Spécial Silver Moonstone + Vancleef',
-      price: 379,
-      image: 'https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=900&q=80',
+      _id:   product._id,
+      name:  product.name,
+      price: product.price,
+      image: product.image,
       qty,
     }))
     setAdded(true)
     setTimeout(function() { setAdded(false) }, 2000)
-    toast.success('Pack Spécial Silver ajouté au panier !', { icon: '🛍️', style: toastStyle })
+    toast.success(product.name + ' ajouté au panier !', { icon: '🛍️', style: toastStyle })
   }
+
+  // Aucun produit vedette
+  if (!product) return null
+
+  const getImageUrl = function(image) {
+    if (!image) return 'https://via.placeholder.com/900'
+    if (image.startsWith('http')) return image
+    return 'https://via.placeholder.com/900'
+  }
+
+  const discountPercent = product.oldPrice > 0
+    ? Math.round((1 - product.price / product.oldPrice) * 100)
+    : product.discount || 0
 
   return (
     <section className="bg-[#f5f3f0] py-20 px-4">
@@ -338,40 +365,81 @@ function FeaturedProduct() {
         </div>
         <div className="bg-white rounded-3xl overflow-hidden shadow-sm flex flex-col lg:flex-row">
           <div className="lg:w-1/2 relative overflow-hidden group">
-            <img src="https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=900&q=80" alt="Produit vedette" className="w-full h-[500px] lg:h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-            <span className="absolute top-5 left-5 bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-full">-16%</span>
+            <img
+              src={getImageUrl(product.image)}
+              alt={product.name}
+              className="w-full h-[500px] lg:h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+            {discountPercent > 0 && (
+              <span className="absolute top-5 left-5 bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-full">
+                -{discountPercent}%
+              </span>
+            )}
           </div>
           <div className="lg:w-1/2 p-10 lg:p-14 flex flex-col justify-center">
             <div className="flex items-start justify-between gap-4 mb-5">
-              <h2 className="text-2xl md:text-3xl font-light text-stone-900 leading-snug">
-                Pack Spécial Silver<br /><span className="font-medium">Moonstone + Vancleef</span>
-              </h2>
-              <button onClick={function() { setWished(!wished) }} className="text-2xl mt-1 transition-transform hover:scale-125">{wished ? '❤️' : '🤍'}</button>
+              <div>
+                <p className="text-[10px] tracking-[0.4em] uppercase text-stone-400 mb-2 capitalize">{product.category}</p>
+                <h2 className="text-2xl md:text-3xl font-light text-stone-900 leading-snug">
+                  {product.name}
+                </h2>
+              </div>
+              <button
+                onClick={function() { setWished(!wished) }}
+                className="text-2xl mt-1 transition-transform hover:scale-125 flex-shrink-0"
+              >
+                {wished ? '❤️' : '🤍'}
+              </button>
             </div>
+
             <div className="flex items-center gap-3 mb-5">
-              <span className="text-2xl font-semibold text-stone-900">379.00 MAD</span>
-              <span className="text-stone-400 text-sm line-through">450.00 MAD</span>
-              <span className="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full">-16%</span>
+              <span className="text-2xl font-semibold text-stone-900">{product.price}.00 MAD</span>
+              {product.oldPrice > 0 && (
+                <span className="text-stone-400 text-sm line-through">{product.oldPrice}.00 MAD</span>
+              )}
+              {discountPercent > 0 && (
+                <span className="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full">-{discountPercent}%</span>
+              )}
             </div>
-            <p className="text-stone-500 text-sm leading-relaxed mb-6">
-              Un délicat pendentif en <strong className="text-stone-700">pierre de lune verte</strong> sur une{' '}
-              <strong className="text-stone-700">chaîne en acier inoxydable</strong>, alliant beauté éthérée et élégance intemporelle.
+
+            {product.description && (
+              <p className="text-stone-500 text-sm leading-relaxed mb-6 border-l-2 border-stone-200 pl-4">
+                {product.description}
+              </p>
+            )}
+
+            <p className={'text-sm font-medium mb-6 ' + (product.stock > 0 ? 'text-green-600' : 'text-red-500')}>
+              {product.stock > 0 ? 'En stock' : 'Rupture de stock'}
             </p>
-            <p className="text-green-600 text-sm font-medium mb-6">En stock</p>
+
             <div className="flex items-center gap-4 mb-6">
               <span className="text-sm tracking-widest uppercase text-stone-500">Quantité</span>
               <div className="flex items-center border border-stone-200 rounded-full overflow-hidden">
-                <button onClick={function() { setQty(function(q) { return Math.max(1, q - 1) }) }} className="w-10 h-10 flex items-center justify-center text-stone-500 hover:bg-stone-100 transition text-lg">-</button>
+                <button
+                  onClick={function() { setQty(function(q) { return Math.max(1, q - 1) }) }}
+                  className="w-10 h-10 flex items-center justify-center text-stone-500 hover:bg-stone-100 transition text-lg"
+                >-</button>
                 <span className="w-10 text-center text-sm font-medium text-stone-800">{qty}</span>
-                <button onClick={function() { setQty(function(q) { return q + 1 }) }} className="w-10 h-10 flex items-center justify-center text-stone-500 hover:bg-stone-100 transition text-lg">+</button>
+                <button
+                  onClick={function() { setQty(function(q) { return Math.min(product.stock, q + 1) }) }}
+                  className="w-10 h-10 flex items-center justify-center text-stone-500 hover:bg-stone-100 transition text-lg"
+                >+</button>
               </div>
             </div>
+
             <div className="flex flex-col gap-3">
-              <button onClick={handleAddToCart} className={'w-full border-2 border-stone-900 text-xs tracking-[0.3em] uppercase py-4 rounded-2xl font-medium transition duration-300 ' + (added ? 'bg-stone-900 text-white' : 'text-stone-900 hover:bg-stone-900 hover:text-white')}>
+              <button
+                onClick={handleAddToCart}
+                disabled={product.stock === 0}
+                className={'w-full border-2 border-stone-900 text-xs tracking-[0.3em] uppercase py-4 rounded-2xl font-medium transition duration-300 disabled:opacity-40 ' + (added ? 'bg-stone-900 text-white' : 'text-stone-900 hover:bg-stone-900 hover:text-white')}
+              >
                 {added ? 'Ajouté au panier !' : 'Ajouter au panier'}
               </button>
-              <button className="w-full bg-stone-900 text-white text-xs tracking-[0.3em] uppercase py-4 rounded-2xl font-medium hover:bg-stone-700 transition duration-300">Commander maintenant</button>
+              <button className="w-full bg-stone-900 text-white text-xs tracking-[0.3em] uppercase py-4 rounded-2xl font-medium hover:bg-stone-700 transition duration-300">
+                Commander maintenant
+              </button>
             </div>
+
             <div className="flex items-center gap-6 mt-8 pt-6 border-t border-stone-100">
               <div className="flex items-center gap-1.5 text-stone-400 text-xs"><span>🚚</span> Livraison gratuite</div>
               <div className="flex items-center gap-1.5 text-stone-400 text-xs"><span>🔄</span> Retour sous 7 jours</div>
