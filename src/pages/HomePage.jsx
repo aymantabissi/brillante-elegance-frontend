@@ -15,7 +15,7 @@ const toastStyle = {
 }
 
 const heroSlides = [
-  { id: 1, image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1600&q=80', title: 'New Collection', subtitle: 'Summer 2025' },
+  { id: 1, image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1600&q=80', title: 'New Collection', subtitle: 'Summer 2026' },
   { id: 2, image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1600&q=80', title: 'Bijoux Exclusifs', subtitle: 'Elegance Intemporelle' },
   { id: 3, image: 'https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=1600&q=80', title: 'Accessoires Premium', subtitle: 'Raffinement & Style' },
 ]
