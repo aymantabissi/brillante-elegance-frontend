@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { addToCart } from '../store/slices/cartSlice'
 import { fetchProducts } from '../store/slices/productSlice'
+import { Link } from 'react-router-dom'
 import toast from 'react-hot-toast'
 
 const toastStyle = {
