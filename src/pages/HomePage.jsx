@@ -321,12 +321,12 @@ function FeaturedProduct() {
   const [qty,    setQty]    = useState(1)
   const [wished, setWished] = useState(false)
   const [added,  setAdded]  = useState(false)
+  const [shared, setShared] = useState(false)
 
   useEffect(function() {
     dispatch(fetchProducts())
   }, [dispatch])
 
-  // Cherche le produit avec featured: true
   const product = products.find(function(p) { return p.featured })
 
   const handleAddToCart = function() {
@@ -343,7 +343,15 @@ function FeaturedProduct() {
     toast.success(product.name + ' ajouté au panier !', { icon: '🛍️', style: toastStyle })
   }
 
-  // Aucun produit vedette
+  const handleShare = function() {
+    const url = window.location.origin + '/product/' + product._id
+    navigator.clipboard.writeText(url).then(function() {
+      setShared(true)
+      setTimeout(function() { setShared(false) }, 2000)
+      toast.success('Lien copié !', { icon: '🔗', style: toastStyle })
+    })
+  }
+
   if (!product) return null
 
   const getImageUrl = function(image) {
@@ -384,12 +392,30 @@ function FeaturedProduct() {
                   {product.name}
                 </h2>
               </div>
-              <button
-                onClick={function() { setWished(!wished) }}
-                className="text-2xl mt-1 transition-transform hover:scale-125 flex-shrink-0"
-              >
-                {wished ? '❤️' : '🤍'}
-              </button>
+              {/* Favoris + Share */}
+              <div className="flex items-center gap-2 flex-shrink-0 mt-1">
+                <button
+                  onClick={function() { setWished(!wished) }}
+                  className="text-2xl transition-transform hover:scale-125"
+                  title="Ajouter aux favoris"
+                >
+                  {wished ? '❤️' : '🤍'}
+                </button>
+                <button
+                  onClick={handleShare}
+                  className={'w-9 h-9 rounded-full flex items-center justify-center border transition-all duration-200 ' + (shared ? 'bg-green-500 border-green-500 text-white' : 'bg-white border-stone-200 text-stone-500 hover:border-stone-400 hover:text-stone-800')}
+                  title="Copier le lien"
+                >
+                  {shared ? (
+                    <span className="text-xs">✓</span>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
 
             <div className="flex items-center gap-3 mb-5">
