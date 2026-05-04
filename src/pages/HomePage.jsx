@@ -32,7 +32,6 @@ const stripImages = [
   'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&q=80',
   'https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=400&q=80',
 ]
-const navigate = useNavigate()
 
 
 const categories = [
@@ -326,6 +325,8 @@ function FeaturedProduct() {
   const [wished, setWished] = useState(false)
   const [added,  setAdded]  = useState(false)
   const [shared, setShared] = useState(false)
+  const navigate = useNavigate()
+
 
   useEffect(function() {
     dispatch(fetchProducts())
