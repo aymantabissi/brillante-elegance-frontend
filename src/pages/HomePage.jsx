@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { addToCart } from '../store/slices/cartSlice'
+import { useNavigate } from 'react-router-dom'
+// zid useNavigate f imports dyal HomePage
 import { fetchProducts } from '../store/slices/productSlice'
 import toast from 'react-hot-toast'
 
@@ -30,6 +32,8 @@ const stripImages = [
   'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&q=80',
   'https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=400&q=80',
 ]
+const navigate = useNavigate()
+
 
 const categories = [
   { label: 'Colliers',  emoji: '📿', to: '/shop?cat=colliers' },
@@ -461,12 +465,27 @@ function FeaturedProduct() {
               >
                 {added ? 'Ajouté au panier !' : 'Ajouter au panier'}
               </button>
-                            <Link
-                to="/checkout"
-                className="block w-full bg-stone-900 text-white text-xs tracking-[0.3em] uppercase text-center py-4 rounded-2xl hover:bg-stone-700 transition duration-300 mb-3"
-              >
-                   Commander maintenant
-              </Link>
+          // bouton Commander maintenant
+<button
+  onClick={function() {
+    dispatch(addToCart({
+      _id:   product._id,
+      name:  product.name,
+      price: product.price,
+      image: product.image,
+      qty,
+    }))
+    navigate('/checkout')
+  }}
+  disabled={product.stock === 0}
+  className="w-full bg-stone-900 text-white text-xs tracking-[0.3em] uppercase py-4 rounded-2xl font-medium hover:bg-stone-700 transition duration-300 disabled:opacity-40"
+>
+  Commander maintenant
+</button>
+
+
+
+
              
             </div>
 
