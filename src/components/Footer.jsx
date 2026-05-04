@@ -35,7 +35,8 @@ export default function Footer() {
               { label: 'Contactez-nous',      to: '/contact' },
               { label: 'À propos',            to: '/about' },
               { label: 'Commandes & Retours', to: '/contact' },
-              { label: 'FAQ',                 to: '/contact' },
+              { label: 'FAQ', to: '/faq' },
+
             ].map(function(item) {
               return (
                 <li key={item.label}>

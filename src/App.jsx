@@ -20,6 +20,7 @@ import AdminOrders    from './pages/admin/AdminOrders'
 import AdminStats     from './pages/admin/AdminStats'
 import AdminPromos from './pages/admin/AdminPromos'
 import ProductPage from './pages/Productpage'
+import FAQPage from './pages/FAQPage'
 
 
 const toastStyle = {
@@ -59,6 +60,8 @@ function App() {
           <Route path="/wishlist" element={<WishlistPage wishlist={wishlist} toggleWishlist={toggleWishlist} products={products} />} />
           <Route path="/about"    element={<AboutPage />} />
           <Route path="/contact"  element={<ContactPage />} />
+          <Route path="/faq" element={<FAQPage />} />
+
           <Route path="/product/:id" element={<ProductPage />} />
 
           <Route path="/cart"     element={<CartPage />} />
