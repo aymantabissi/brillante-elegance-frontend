@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { addToCart } from '../store/slices/cartSlice'
 import { fetchProducts } from '../store/slices/productSlice'
 import { Link, useSearchParams, useNavigate } from 'react-router-dom'
-import { Search, SlidersHorizontal, X, Heart, ShoppingBag, ChevronDown, Share2 } from 'lucide-react'
+import { Search, SlidersHorizontal, X, Heart, ShoppingBag, ChevronDown, Share2, Zap } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const categories = [
@@ -102,6 +102,22 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
     toast.success(product.name + ' ajouté au panier !', { icon: '🛍️', style: toastStyle })
   }
 
+  const handleBuyNow = function(e, product) {
+    e.stopPropagation()
+    if (product.stock === 0) {
+      toast.error('Produit en rupture de stock', { style: toastStyle })
+      return
+    }
+    dispatch(addToCart({
+      _id: product._id,
+      name: product.name,
+      price: product.price,
+      image: product.image && product.image.startsWith('http') ? product.image : 'https://via.placeholder.com/400',
+      qty: 1,
+    }))
+    navigate('/checkout')
+  }
+
   const handleShare = function(e, product) {
     e.stopPropagation()
     const url = window.location.origin + '/product/' + product._id
@@ -110,7 +126,6 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
       setTimeout(function() { setSharedId(null) }, 2000)
       toast.success('Lien copié !', { icon: '🔗', style: toastStyle })
     }).catch(function() {
-      // fallback
       toast.success('Lien copié !', { icon: '🔗', style: toastStyle })
     })
   }
@@ -164,7 +179,7 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
 
       <div className="max-w-7xl mx-auto px-4 py-6">
 
-        {/* Barre de recherche et tri */}
+        {/* Barre recherche + tri */}
         <div className="flex items-center gap-3 mb-6">
           <div className="relative flex-1">
             <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
@@ -204,7 +219,7 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
           </button>
         </div>
 
-        {/* Panneau de filtres */}
+        {/* Filtres */}
         {showFilters && (
           <div className="bg-white rounded-2xl border border-stone-100 p-5 mb-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
@@ -231,7 +246,7 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
           </div>
         )}
 
-        {/* Barre de résultats */}
+        {/* Résultats */}
         <div className="flex items-center justify-between mb-5">
           {loading ? (
             <div className="h-3 bg-stone-200 rounded-full animate-pulse w-28" />
@@ -271,14 +286,16 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
           </div>
         )}
 
-        {/* Grille des produits */}
+        {/* Grille */}
         {!loading && paginated.length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
             {paginated.map(function(product) {
-              const pid     = product._id
+              const pid      = product._id
               const isWished = wishlist.includes(pid)
               const isAdded  = addedId === pid
               const isShared = sharedId === pid
+              const outOfStock = product.stock === 0
+
               return (
                 <div
                   key={pid}
@@ -301,79 +318,81 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
                       {product.hot && (
                         <span className="bg-amber-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">POPULAIRE</span>
                       )}
-                      {product.stock === 0 && (
+                      {outOfStock && (
                         <span className="bg-stone-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">Épuisé</span>
                       )}
                     </div>
 
-                    {/* Boutons top-right — favoris + share */}
+                    {/* Boutons top-right */}
                     <div className="absolute top-2 right-2 flex flex-col gap-1.5">
-                      {/* Favoris */}
                       <button
                         onClick={function(e) { e.stopPropagation(); toggleWishlist(pid) }}
                         className="w-7 h-7 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform"
-                        title="Ajouter aux favoris"
+                        title="Favoris"
                       >
-                        <Heart
-                          size={13}
-                          className={'transition ' + (isWished ? 'fill-red-500 text-red-500' : 'text-stone-400')}
-                        />
+                        <Heart size={13} className={'transition ' + (isWished ? 'fill-red-500 text-red-500' : 'text-stone-400')} />
                       </button>
-
-                      {/* Share */}
                       <button
                         onClick={function(e) { handleShare(e, product) }}
                         className={'w-7 h-7 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-all ' + (isShared ? 'bg-green-500' : 'bg-white/90')}
-                        title="Copier le lien"
+                        title="Partager"
                       >
-                        <Share2
-                          size={12}
-                          className={isShared ? 'text-white' : 'text-stone-400'}
-                        />
+                        <Share2 size={12} className={isShared ? 'text-white' : 'text-stone-400'} />
                       </button>
                     </div>
 
-                    {/* Bouton panier — hover desktop */}
-                    <div className="hidden md:block absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                    {/* Boutons panier + commander — desktop hover */}
+                    <div className="hidden md:flex flex-col absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
                       <button
                         onClick={function(e) { handleAdd(e, product) }}
-                        disabled={product.stock === 0}
-                        className={'w-full py-3 text-[11px] tracking-[0.2em] uppercase font-medium transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-50 ' + (isAdded ? 'bg-green-600 text-white' : 'bg-stone-900/95 text-white hover:bg-stone-800')}
+                        disabled={outOfStock}
+                        className={'w-full py-2.5 text-[11px] tracking-[0.15em] uppercase font-medium transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50 ' + (isAdded ? 'bg-green-600 text-white' : 'bg-white text-stone-900 hover:bg-stone-100')}
                       >
-                        {isAdded ? <>✓ Ajouté</> : <><ShoppingBag size={12} /> Ajouter au panier</>}
+                        <ShoppingBag size={11} />
+                        {isAdded ? 'Ajouté !' : 'Ajouter au panier'}
+                      </button>
+                      <button
+                        onClick={function(e) { handleBuyNow(e, product) }}
+                        disabled={outOfStock}
+                        className="w-full py-2.5 text-[11px] tracking-[0.15em] uppercase font-medium bg-stone-900 text-white hover:bg-stone-800 transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
+                      >
+                        <Zap size={11} />
+                        Commander
                       </button>
                     </div>
 
-                    {/* Bouton panier — toujours visible mobile */}
-                    <div className="md:hidden absolute bottom-0 left-0 right-0">
+                    {/* Boutons mobile — toujours visibles */}
+                    <div className="md:hidden absolute bottom-0 left-0 right-0 flex">
                       <button
                         onClick={function(e) { handleAdd(e, product) }}
-                        disabled={product.stock === 0}
-                        className={'w-full py-2.5 text-[10px] tracking-[0.15em] uppercase font-medium transition-colors disabled:opacity-50 ' + (isAdded ? 'bg-green-600 text-white' : 'bg-stone-900/90 text-white')}
+                        disabled={outOfStock}
+                        className={'flex-1 py-2.5 text-[9px] tracking-wide uppercase font-medium transition-colors disabled:opacity-50 ' + (isAdded ? 'bg-green-600 text-white' : 'bg-white/95 text-stone-900')}
                       >
-                        {isAdded ? '✓ Ajouté' : 'Ajouter au panier'}
+                        {isAdded ? '✓' : '🛍️'}
+                      </button>
+                      <button
+                        onClick={function(e) { handleBuyNow(e, product) }}
+                        disabled={outOfStock}
+                        className="flex-1 py-2.5 text-[9px] tracking-wide uppercase font-medium bg-stone-900/95 text-white transition-colors disabled:opacity-50 border-l border-stone-700"
+                      >
+                        ⚡
                       </button>
                     </div>
                   </div>
 
-                  {/* Informations */}
+                  {/* Infos */}
                   <div className="p-3">
                     <h3 className="text-xs font-medium text-stone-800 mb-1 leading-snug line-clamp-2">{product.name}</h3>
-
-                    {/* Étoiles */}
                     {product.numReviews > 0 && (
                       <div className="flex items-center gap-1 mb-1.5">
                         <div className="flex">
                           {[1,2,3,4,5].map(function(s) {
-                            return (
-                              <span key={s} className={'text-[9px] ' + (s <= Math.round(product.rating || 0) ? 'text-amber-400' : 'text-stone-200')}>★</span>
-                            )
+                            return <span key={s} className={'text-[9px] ' + (s <= Math.round(product.rating || 0) ? 'text-amber-400' : 'text-stone-200')}>★</span>
                           })}
                         </div>
                         <span className="text-[9px] text-stone-400">({product.numReviews} avis)</span>
                       </div>
                     )}
-
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-semibold text-stone-900">{product.price} MAD</span>
                       {product.oldPrice > 0 && (
@@ -394,9 +413,7 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
               onClick={function() { setCurrentPage(function(p) { return Math.max(1, p - 1) }) }}
               disabled={currentPage === 1}
               className="w-9 h-9 rounded-xl border border-stone-200 flex items-center justify-center text-stone-500 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition disabled:opacity-30 disabled:cursor-not-allowed text-sm"
-            >
-              &#8249;
-            </button>
+            >&#8249;</button>
             {Array.from({ length: totalPages }, function(_, i) { return i + 1 }).map(function(page) {
               return (
                 <button
@@ -412,9 +429,7 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
               onClick={function() { setCurrentPage(function(p) { return Math.min(totalPages, p + 1) }) }}
               disabled={currentPage === totalPages}
               className="w-9 h-9 rounded-xl border border-stone-200 flex items-center justify-center text-stone-500 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition disabled:opacity-30 disabled:cursor-not-allowed text-sm"
-            >
-              &#8250;
-            </button>
+            >&#8250;</button>
           </div>
         )}
 
