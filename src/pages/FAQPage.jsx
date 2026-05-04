@@ -71,7 +71,7 @@ const faqs = [
     items: [
       {
         q: 'Puis-je retourner un article ?',
-        a: 'Oui, nous acceptons les retours dans les 7 jours suivant la réception de votre commande, à condition que le produit soit en parfait état, non porté et dans son emballage d\'origine.',
+        a: 'Oui, nous acceptons les retours dans 24h suivant la réception de votre commande, à condition que le produit soit en parfait état, non porté et dans son emballage d\'origine.',
       },
       {
         q: 'Comment effectuer un retour ?',
