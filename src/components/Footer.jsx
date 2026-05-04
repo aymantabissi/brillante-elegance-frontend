@@ -31,11 +31,18 @@ export default function Footer() {
         <div>
           <h4 className="text-xs font-bold tracking-[0.2em] uppercase text-stone-900 mb-5">Informations</h4>
           <ul className="flex flex-col gap-3">
-            {['Contactez-nous', 'À propos', 'Commandes & Retours', 'FAQ'].map((item) => (
-              <li key={item}>
-                <Link to="/" className="text-sm text-stone-500 hover:text-stone-900 transition">{item}</Link>
-              </li>
-            ))}
+            {[
+              { label: 'Contactez-nous',      to: '/contact' },
+              { label: 'À propos',            to: '/about' },
+              { label: 'Commandes & Retours', to: '/contact' },
+              { label: 'FAQ',                 to: '/contact' },
+            ].map(function(item) {
+              return (
+                <li key={item.label}>
+                  <Link to={item.to} className="text-sm text-stone-500 hover:text-stone-900 transition">{item.label}</Link>
+                </li>
+              )
+            })}
           </ul>
         </div>
 
@@ -44,15 +51,17 @@ export default function Footer() {
           <h4 className="text-xs font-bold tracking-[0.2em] uppercase text-stone-900 mb-5">Boutique rapide</h4>
           <ul className="flex flex-col gap-3">
             {[
-              { label: 'Colliers', to: '/shop?cat=colliers' },
-              { label: 'Bracelets', to: '/shop?cat=bracelets' },
-              { label: 'Lunettes', to: '/shop?cat=lunettes' },
-              { label: 'Promotions', to: '/shop?promo=true' },
-            ].map((item) => (
-              <li key={item.label}>
-                <Link to={item.to} className="text-sm text-stone-500 hover:text-stone-900 transition">{item.label}</Link>
-              </li>
-            ))}
+              { label: 'Colliers',    to: '/shop?cat=colliers' },
+              { label: 'Bracelets',   to: '/shop?cat=bracelets' },
+              { label: 'Lunettes',    to: '/shop?cat=lunettes' },
+              { label: 'Promotions',  to: '/shop?promo=true' },
+            ].map(function(item) {
+              return (
+                <li key={item.label}>
+                  <Link to={item.to} className="text-sm text-stone-500 hover:text-stone-900 transition">{item.label}</Link>
+                </li>
+              )
+            })}
           </ul>
         </div>
 
@@ -60,11 +69,18 @@ export default function Footer() {
         <div>
           <h4 className="text-xs font-bold tracking-[0.2em] uppercase text-stone-900 mb-5">Service client</h4>
           <ul className="flex flex-col gap-3">
-            {['FAQ Commandes', 'Livraison', 'Politique de confidentialité', 'Retour & Remboursement'].map((item) => (
-              <li key={item}>
-                <Link to="/" className="text-sm text-stone-500 hover:text-stone-900 transition">{item}</Link>
-              </li>
-            ))}
+            {[
+              { label: 'FAQ Commandes',                to: '/contact' },
+              { label: 'Livraison',                    to: '/contact' },
+              { label: 'Politique de confidentialité', to: '/contact' },
+              { label: 'Retour & Remboursement',       to: '/contact' },
+            ].map(function(item) {
+              return (
+                <li key={item.label}>
+                  <Link to={item.to} className="text-sm text-stone-500 hover:text-stone-900 transition">{item.label}</Link>
+                </li>
+              )
+            })}
           </ul>
         </div>
       </div>
@@ -72,7 +88,7 @@ export default function Footer() {
       {/* Bottom bar */}
       <div className="border-t border-stone-100 px-6 py-5">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-stone-400">2026 Brillante Élégance. Tous droits réservés.</p>
+          <p className="text-xs text-stone-400">© 2026 Brillante Élégance. Tous droits réservés.</p>
           <div className="flex items-center gap-2">
             <div className="w-10 h-6 bg-stone-100 rounded flex items-center justify-center">
               <span className="text-[10px] font-bold text-blue-700">VISA</span>
