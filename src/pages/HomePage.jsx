@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { addToCart } from '../store/slices/cartSlice'
-import { useNavigate } from 'react-router-dom'
-// zid useNavigate f imports dyal HomePage
 import { fetchProducts } from '../store/slices/productSlice'
 import toast from 'react-hot-toast'
 
@@ -32,7 +30,6 @@ const stripImages = [
   'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&q=80',
   'https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=400&q=80',
 ]
-
 
 const categories = [
   { label: 'Colliers',  emoji: '📿', to: '/shop?cat=colliers' },
@@ -143,10 +140,10 @@ function ProductsStrip() {
 
 function FeaturedCategories() {
   const cards = [
-    { label: 'Colliers',  title: 'Colliers\nRaffinés',    image: 'https://images.unsplash.com/photo-1635767798638-3e25273a8236?w=400&q=80', to: '/shop?cat=colliers' },
-    { label: 'Bracelets', title: 'Bracelets\nÉlégants',   image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80', to: '/shop?cat=bracelets' },
-    { label: 'Bagues',    title: 'Bagues\nPrecieuses',    image: 'https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=800&q=80', to: '/shop?cat=bagues' },
-    { label: 'Lunettes',  title: 'Lunettes\nPremium',     image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=800&q=80', to: '/shop?cat=lunettes' },
+    { label: 'Colliers',  title: 'Colliers\nRaffinés',  image: 'https://images.unsplash.com/photo-1635767798638-3e25273a8236?w=400&q=80', to: '/shop?cat=colliers' },
+    { label: 'Bracelets', title: 'Bracelets\nÉlégants', image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80', to: '/shop?cat=bracelets' },
+    { label: 'Bagues',    title: 'Bagues\nPrecieuses',  image: 'https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=800&q=80', to: '/shop?cat=bagues' },
+    { label: 'Lunettes',  title: 'Lunettes\nPremium',   image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=800&q=80', to: '/shop?cat=lunettes' },
   ]
   return (
     <section className="bg-[#f9f8f6] py-16 px-4">
@@ -172,13 +169,12 @@ function FeaturedCategories() {
 }
 
 function TrendingProducts({ wishlist, toggleWishlist }) {
-  const dispatch = useDispatch()
+  const dispatch   = useDispatch()
+  const navigate   = useNavigate()
   const { items: products, loading } = useSelector((state) => state.products)
-  const [addedId, setAddedId] = useState(null)
+  const [addedId,  setAddedId]  = useState(null)
 
-  useEffect(function() {
-    dispatch(fetchProducts())
-  }, [dispatch])
+  useEffect(function() { dispatch(fetchProducts()) }, [dispatch])
 
   const handleAdd = function(product) {
     if (product.stock === 0) {
@@ -186,8 +182,7 @@ function TrendingProducts({ wishlist, toggleWishlist }) {
       return
     }
     dispatch(addToCart({
-      _id: product._id,
-      name: product.name,
+      _id: product._id, name: product.name,
       price: product.price,
       image: product.image && product.image.startsWith('http') ? product.image : 'https://via.placeholder.com/400',
       qty: 1,
@@ -195,6 +190,20 @@ function TrendingProducts({ wishlist, toggleWishlist }) {
     setAddedId(product._id)
     setTimeout(function() { setAddedId(null) }, 1500)
     toast.success(product.name + ' ajouté au panier !', { icon: '🛍️', style: toastStyle })
+  }
+
+  const handleBuyNow = function(product) {
+    if (product.stock === 0) {
+      toast.error('Produit en rupture de stock', { style: toastStyle })
+      return
+    }
+    dispatch(addToCart({
+      _id: product._id, name: product.name,
+      price: product.price,
+      image: product.image && product.image.startsWith('http') ? product.image : 'https://via.placeholder.com/400',
+      qty: 1,
+    }))
+    navigate('/checkout')
   }
 
   const getImageUrl = function(image) {
@@ -228,8 +237,9 @@ function TrendingProducts({ wishlist, toggleWishlist }) {
       {!loading && (
         <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {displayed.map(function(product) {
-            const pid = product._id
+            const pid      = product._id
             const isWished = wishlist.includes(pid)
+            const isAdded  = addedId === pid
             return (
               <div key={pid} className="group relative cursor-pointer">
                 <div className="relative overflow-hidden rounded-2xl">
@@ -264,10 +274,7 @@ function TrendingProducts({ wishlist, toggleWishlist }) {
 
                   {/* Favoris */}
                   <button
-                    onClick={function(e) {
-                      e.stopPropagation()
-                      toggleWishlist(pid)
-                    }}
+                    onClick={function(e) { e.stopPropagation(); toggleWishlist(pid) }}
                     className="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow hover:scale-110 transition z-10"
                   >
                     <span className={'text-sm transition ' + (isWished ? 'text-red-500' : 'text-stone-300')}>
@@ -275,14 +282,39 @@ function TrendingProducts({ wishlist, toggleWishlist }) {
                     </span>
                   </button>
 
-                  {/* Ajouter au panier — visible mobile, hover desktop */}
-                  <div className="absolute bottom-8 left-0 right-0 md:bottom-0 md:inset-0 md:flex md:items-center md:justify-center md:opacity-0 md:group-hover:opacity-100 md:transition-opacity md:duration-300">
+                  {/* Boutons — desktop hover */}
+                  <div className="hidden md:flex flex-col absolute bottom-8 left-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <button
                       onClick={function() { handleAdd(product) }}
                       disabled={product.stock === 0}
-                      className={'w-full md:w-auto text-xs tracking-[0.2em] uppercase md:px-7 py-3 md:rounded-full font-medium shadow-lg transition duration-300 disabled:opacity-50 ' + (addedId === pid ? 'bg-stone-900 text-white' : 'bg-white text-stone-900 md:hover:bg-stone-900 md:hover:text-white')}
+                      className={'w-full py-3 text-xs tracking-[0.2em] uppercase font-medium transition duration-300 disabled:opacity-50 ' + (isAdded ? 'bg-stone-900 text-white' : 'bg-white text-stone-900 hover:bg-stone-100')}
                     >
-                      {product.stock === 0 ? 'Rupture de stock' : addedId === pid ? 'Ajouté !' : 'Ajouter au panier'}
+                      {product.stock === 0 ? 'Rupture de stock' : isAdded ? 'Ajouté !' : 'Ajouter au panier'}
+                    </button>
+                    <button
+                      onClick={function() { handleBuyNow(product) }}
+                      disabled={product.stock === 0}
+                      className="w-full py-3 text-xs tracking-[0.2em] uppercase font-medium bg-stone-900 text-white hover:bg-stone-800 transition duration-300 disabled:opacity-50"
+                    >
+                      ⚡ Commander maintenant
+                    </button>
+                  </div>
+
+                  {/* Boutons — mobile toujours visibles */}
+                  <div className="md:hidden absolute bottom-0 left-0 right-0 flex">
+                    <button
+                      onClick={function() { handleAdd(product) }}
+                      disabled={product.stock === 0}
+                      className={'flex-1 py-2.5 text-[10px] tracking-wide uppercase font-medium transition disabled:opacity-50 border-r border-stone-700 ' + (isAdded ? 'bg-green-600 text-white' : 'bg-white/95 text-stone-900')}
+                    >
+                      {isAdded ? '✓' : '🛍️'}
+                    </button>
+                    <button
+                      onClick={function() { handleBuyNow(product) }}
+                      disabled={product.stock === 0}
+                      className="flex-1 py-2.5 text-[10px] tracking-wide uppercase font-medium bg-stone-900/95 text-white transition disabled:opacity-50"
+                    >
+                      ⚡
                     </button>
                   </div>
                 </div>
@@ -313,36 +345,22 @@ function TrendingProducts({ wishlist, toggleWishlist }) {
   )
 }
 
-// ============================================================
-// REMPLACE la fonction FeaturedProduct() dans HomePage.jsx
-// par ce code complet
-// ============================================================
-
 function FeaturedProduct() {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const { items: products } = useSelector((state) => state.products)
   const [qty,    setQty]    = useState(1)
   const [wished, setWished] = useState(false)
   const [added,  setAdded]  = useState(false)
   const [shared, setShared] = useState(false)
-  const navigate = useNavigate()
 
-
-  useEffect(function() {
-    dispatch(fetchProducts())
-  }, [dispatch])
+  useEffect(function() { dispatch(fetchProducts()) }, [dispatch])
 
   const product = products.find(function(p) { return p.featured })
 
   const handleAddToCart = function() {
     if (!product) return
-    dispatch(addToCart({
-      _id:   product._id,
-      name:  product.name,
-      price: product.price,
-      image: product.image,
-      qty,
-    }))
+    dispatch(addToCart({ _id: product._id, name: product.name, price: product.price, image: product.image, qty }))
     setAdded(true)
     setTimeout(function() { setAdded(false) }, 2000)
     toast.success(product.name + ' ajouté au panier !', { icon: '🛍️', style: toastStyle })
@@ -378,42 +396,26 @@ function FeaturedProduct() {
         </div>
         <div className="bg-white rounded-3xl overflow-hidden shadow-sm flex flex-col lg:flex-row">
           <div className="lg:w-1/2 relative overflow-hidden group">
-            <img
-              src={getImageUrl(product.image)}
-              alt={product.name}
-              className="w-full h-[500px] lg:h-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
+            <img src={getImageUrl(product.image)} alt={product.name} className="w-full h-[500px] lg:h-full object-cover transition-transform duration-700 group-hover:scale-105" />
             {discountPercent > 0 && (
-              <span className="absolute top-5 left-5 bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-full">
-                -{discountPercent}%
-              </span>
+              <span className="absolute top-5 left-5 bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-full">-{discountPercent}%</span>
             )}
           </div>
           <div className="lg:w-1/2 p-10 lg:p-14 flex flex-col justify-center">
             <div className="flex items-start justify-between gap-4 mb-5">
               <div>
                 <p className="text-[10px] tracking-[0.4em] uppercase text-stone-400 mb-2 capitalize">{product.category}</p>
-                <h2 className="text-2xl md:text-3xl font-light text-stone-900 leading-snug">
-                  {product.name}
-                </h2>
+                <h2 className="text-2xl md:text-3xl font-light text-stone-900 leading-snug">{product.name}</h2>
               </div>
-              {/* Favoris + Share */}
               <div className="flex items-center gap-2 flex-shrink-0 mt-1">
-                <button
-                  onClick={function() { setWished(!wished) }}
-                  className="text-2xl transition-transform hover:scale-125"
-                  title="Ajouter aux favoris"
-                >
+                <button onClick={function() { setWished(!wished) }} className="text-2xl transition-transform hover:scale-125">
                   {wished ? '❤️' : '🤍'}
                 </button>
                 <button
                   onClick={handleShare}
-                  className={'w-9 h-9 rounded-full flex items-center justify-center border transition-all duration-200 ' + (shared ? 'bg-green-500 border-green-500 text-white' : 'bg-white border-stone-200 text-stone-500 hover:border-stone-400 hover:text-stone-800')}
-                  title="Copier le lien"
+                  className={'w-9 h-9 rounded-full flex items-center justify-center border transition-all duration-200 ' + (shared ? 'bg-green-500 border-green-500 text-white' : 'bg-white border-stone-200 text-stone-500 hover:border-stone-400')}
                 >
-                  {shared ? (
-                    <span className="text-xs">✓</span>
-                  ) : (
+                  {shared ? <span className="text-xs">✓</span> : (
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
                       <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
@@ -425,18 +427,12 @@ function FeaturedProduct() {
 
             <div className="flex items-center gap-3 mb-5">
               <span className="text-2xl font-semibold text-stone-900">{product.price}.00 MAD</span>
-              {product.oldPrice > 0 && (
-                <span className="text-stone-400 text-sm line-through">{product.oldPrice}.00 MAD</span>
-              )}
-              {discountPercent > 0 && (
-                <span className="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full">-{discountPercent}%</span>
-              )}
+              {product.oldPrice > 0 && <span className="text-stone-400 text-sm line-through">{product.oldPrice}.00 MAD</span>}
+              {discountPercent > 0 && <span className="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full">-{discountPercent}%</span>}
             </div>
 
             {product.description && (
-              <p className="text-stone-500 text-sm leading-relaxed mb-6 border-l-2 border-stone-200 pl-4">
-                {product.description}
-              </p>
+              <p className="text-stone-500 text-sm leading-relaxed mb-6 border-l-2 border-stone-200 pl-4">{product.description}</p>
             )}
 
             <p className={'text-sm font-medium mb-6 ' + (product.stock > 0 ? 'text-green-600' : 'text-red-500')}>
@@ -446,15 +442,9 @@ function FeaturedProduct() {
             <div className="flex items-center gap-4 mb-6">
               <span className="text-sm tracking-widest uppercase text-stone-500">Quantité</span>
               <div className="flex items-center border border-stone-200 rounded-full overflow-hidden">
-                <button
-                  onClick={function() { setQty(function(q) { return Math.max(1, q - 1) }) }}
-                  className="w-10 h-10 flex items-center justify-center text-stone-500 hover:bg-stone-100 transition text-lg"
-                >-</button>
+                <button onClick={function() { setQty(function(q) { return Math.max(1, q - 1) }) }} className="w-10 h-10 flex items-center justify-center text-stone-500 hover:bg-stone-100 transition text-lg">-</button>
                 <span className="w-10 text-center text-sm font-medium text-stone-800">{qty}</span>
-                <button
-                  onClick={function() { setQty(function(q) { return Math.min(product.stock, q + 1) }) }}
-                  className="w-10 h-10 flex items-center justify-center text-stone-500 hover:bg-stone-100 transition text-lg"
-                >+</button>
+                <button onClick={function() { setQty(function(q) { return Math.min(product.stock, q + 1) }) }} className="w-10 h-10 flex items-center justify-center text-stone-500 hover:bg-stone-100 transition text-lg">+</button>
               </div>
             </div>
 
@@ -466,28 +456,16 @@ function FeaturedProduct() {
               >
                 {added ? 'Ajouté au panier !' : 'Ajouter au panier'}
               </button>
-        
-<button
-  onClick={function() {
-    dispatch(addToCart({
-      _id:   product._id,
-      name:  product.name,
-      price: product.price,
-      image: product.image,
-      qty,
-    }))
-    navigate('/checkout')
-  }}
-  disabled={product.stock === 0}
-  className="w-full bg-stone-900 text-white text-xs tracking-[0.3em] uppercase py-4 rounded-2xl font-medium hover:bg-stone-700 transition duration-300 disabled:opacity-40"
->
-  Commander maintenant
-</button>
-
-
-
-
-             
+              <button
+                onClick={function() {
+                  dispatch(addToCart({ _id: product._id, name: product.name, price: product.price, image: product.image, qty }))
+                  navigate('/checkout')
+                }}
+                disabled={product.stock === 0}
+                className="w-full bg-stone-900 text-white text-xs tracking-[0.3em] uppercase py-4 rounded-2xl font-medium hover:bg-stone-700 transition duration-300 disabled:opacity-40"
+              >
+                Commander maintenant
+              </button>
             </div>
 
             <div className="flex items-center gap-6 mt-8 pt-6 border-t border-stone-100">
@@ -570,7 +548,7 @@ function Testimonials() {
 function WhyUs() {
   const items = [
     { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" className="w-12 h-12"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.12 1.18 2 2 0 012.11 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>, title: 'Service Client 24/7', desc: 'Notre équipe est disponible à toute heure pour répondre à vos questions.' },
-    { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" className="w-12 h-12"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><path d="M9.5 12H7l2.5 3L12 9l2.5 6L17 12h-2.5"/></svg>, title: 'Remboursement 14 Jours', desc: 'Vous n\'êtes pas satisfait ? Retournez votre commande sous 14 jours.' },
+    { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" className="w-12 h-12"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><path d="M9.5 12H7l2.5 3L12 9l2.5 6L17 12h-2.5"/></svg>, title: 'Remboursement 14 Jours', desc: "Vous n'êtes pas satisfait ? Retournez votre commande sous 14 jours." },
     { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" className="w-12 h-12"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>, title: 'Qualité Garantie', desc: 'Nous certifions la qualité de chaque produit vendu sur notre boutique.' },
     { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" className="w-12 h-12"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>, title: 'Livraison Gratuite', desc: 'Profitez de la livraison offerte sur toutes vos commandes au Maroc.' },
   ]
@@ -594,29 +572,19 @@ function WhyUs() {
 
 function InstagramSection() {
   const { items: products } = useSelector(function(state) { return state.products })
-
-  const realImages = products
-    .filter(function(p) { return p.image && p.image.startsWith('http') })
-    .slice(0, 5)
-
+  const realImages = products.filter(function(p) { return p.image && p.image.startsWith('http') }).slice(0, 5)
   const useReal = realImages.length >= 3
-
   const igSvg = (
     <svg className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition duration-300" fill="currentColor" viewBox="0 0 24 24">
       <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
     </svg>
   )
-
   const linkClass = function(i) {
     return 'relative overflow-hidden group flex-shrink-0 cursor-pointer ' + (i === 2 ? 'w-48 md:w-56 rounded-3xl' : 'w-44 md:w-48 rounded-2xl')
   }
-
   const overlay = (
-    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition duration-300 flex items-center justify-center">
-      {igSvg}
-    </div>
+    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition duration-300 flex items-center justify-center">{igSvg}</div>
   )
-
   return (
     <section className="bg-white py-0">
       <div className="bg-black text-white text-center py-5">
@@ -655,7 +623,7 @@ function InstagramSection() {
 
 function Newsletter() {
   const [email, setEmail] = useState('')
-  const [sent, setSent] = useState(false)
+  const [sent,  setSent]  = useState(false)
   const handleSubmit = function(e) {
     e.preventDefault()
     if (!email) return
