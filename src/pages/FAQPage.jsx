@@ -50,12 +50,12 @@ const faqs = [
     items: [
       {
         q: 'Quels modes de paiement acceptez-vous ?',
-        a: 'Nous acceptons uniquement le paiement en espèces à la livraison (CRBT). Vous payez uniquement lorsque vous recevez et vérifiez votre commande.',
-      },
-      {
-        q: 'Le paiement est-il sécurisé ?',
-        a: 'Oui, le paiement à la livraison est le mode le plus sécurisé. Vous inspectez votre commande avant de payer. Aucune information bancaire n\'est requise.',
-      },
+  a: 'Nous proposons deux modes de paiement : le paiement en espèces à la livraison (Cash on Delivery) et le virement bancaire via notre RIB. Pour le virement, contactez-nous sur WhatsApp afin de recevoir notre RIB et confirmer votre paiement avant expédition.',
+},
+     {
+  q: 'Le paiement est-il sécurisé ?',
+  a: 'Oui, les deux modes de paiement sont sécurisés. Le paiement à la livraison vous permet de vérifier votre commande avant de payer. Le virement bancaire est traité via un RIB officiel. Aucune information sensible n\'est partagée en ligne.',
+},
       {
         q: 'Puis-je utiliser un code promo ?',
         a: 'Oui ! Entrez votre code promo dans le champ prévu à cet effet sur la page panier ou checkout. La remise sera automatiquement appliquée sur le montant total.',
