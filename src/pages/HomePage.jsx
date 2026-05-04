@@ -466,7 +466,7 @@ function FeaturedProduct() {
               >
                 {added ? 'Ajouté au panier !' : 'Ajouter au panier'}
               </button>
-          // bouton Commander maintenant
+        
 <button
   onClick={function() {
     dispatch(addToCart({
