@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { addToCart } from '../store/slices/cartSlice'
-import { ChevronLeft, ShoppingBag, Heart, Share2 } from 'lucide-react'
+import { ChevronLeft, ShoppingBag, Heart, Share2, Zap } from 'lucide-react'
 import api from '../services/api'
 import toast from 'react-hot-toast'
 
@@ -77,8 +77,9 @@ function SkeletonProduct() {
 }
 
 export default function ProductPage() {
-  const { id } = useParams()
-  const dispatch = useDispatch()
+  const { id }    = useParams()
+  const dispatch  = useDispatch()
+  const navigate  = useNavigate()
 
   const [product,    setProduct]    = useState(null)
   const [reviews,    setReviews]    = useState([])
@@ -113,6 +114,12 @@ export default function ProductPage() {
     setAdded(true)
     setTimeout(function() { setAdded(false) }, 2000)
     toast.success(product.name + ' ajouté au panier !', { icon: '🛍️', style: toastStyle })
+  }
+
+  const handleBuyNow = function() {
+    if (!product || product.stock === 0) return
+    dispatch(addToCart({ _id: product._id, name: product.name, price: product.price, image: product.image, qty }))
+    navigate('/checkout')
   }
 
   const handleSubmitReview = async function(e) {
@@ -213,7 +220,7 @@ export default function ProductPage() {
               {product.name}
             </h1>
 
-            {/* Note moyenne */}
+            {/* Note */}
             <div className="mb-4">
               {numReviews > 0 ? (
                 <StarDisplay value={avgRating} count={numReviews} />
@@ -247,15 +254,9 @@ export default function ProductPage() {
             {product.stock > 0 && (
               <div className="flex items-center gap-3 mb-4">
                 <div className="flex items-center border border-stone-200 rounded-xl overflow-hidden bg-white">
-                  <button
-                    onClick={function() { setQty(function(q) { return Math.max(1, q - 1) }) }}
-                    className="w-10 h-11 flex items-center justify-center text-stone-500 hover:bg-stone-50 transition text-lg"
-                  >−</button>
+                  <button onClick={function() { setQty(function(q) { return Math.max(1, q - 1) }) }} className="w-10 h-11 flex items-center justify-center text-stone-500 hover:bg-stone-50 transition text-lg">−</button>
                   <span className="w-10 text-center text-sm font-semibold text-stone-800">{qty}</span>
-                  <button
-                    onClick={function() { setQty(function(q) { return Math.min(product.stock, q + 1) }) }}
-                    className="w-10 h-11 flex items-center justify-center text-stone-500 hover:bg-stone-50 transition text-lg"
-                  >+</button>
+                  <button onClick={function() { setQty(function(q) { return Math.min(product.stock, q + 1) }) }} className="w-10 h-11 flex items-center justify-center text-stone-500 hover:bg-stone-50 transition text-lg">+</button>
                 </div>
                 <button
                   onClick={function() { setWished(!wished) }}
@@ -267,15 +268,28 @@ export default function ProductPage() {
               </div>
             )}
 
-            {/* Bouton ajouter au panier */}
-            <button
-              onClick={handleAdd}
-              disabled={product.stock === 0}
-              className={'w-full py-4 text-sm tracking-[0.2em] uppercase font-medium rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed ' + (added ? 'bg-green-600 text-white' : 'bg-stone-900 text-white hover:bg-stone-700')}
-            >
-              <ShoppingBag size={16} />
-              {product.stock === 0 ? 'Rupture de stock' : added ? '✓ Ajouté au panier !' : 'Ajouter au panier'}
-            </button>
+            {/* Boutons */}
+            <div className="flex flex-col gap-3">
+              {/* Ajouter au panier */}
+              <button
+                onClick={handleAdd}
+                disabled={product.stock === 0}
+                className={'w-full py-4 text-sm tracking-[0.2em] uppercase font-medium rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed border-2 border-stone-900 ' + (added ? 'bg-stone-900 text-white' : 'text-stone-900 hover:bg-stone-900 hover:text-white')}
+              >
+                <ShoppingBag size={16} />
+                {product.stock === 0 ? 'Rupture de stock' : added ? '✓ Ajouté au panier !' : 'Ajouter au panier'}
+              </button>
+
+              {/* Commander maintenant */}
+              <button
+                onClick={handleBuyNow}
+                disabled={product.stock === 0}
+                className="w-full py-4 text-sm tracking-[0.2em] uppercase font-medium rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed bg-stone-900 text-white hover:bg-stone-700"
+              >
+                <Zap size={16} />
+                Commander maintenant
+              </button>
+            </div>
 
             {/* Garanties */}
             <div className="grid grid-cols-3 gap-2 mt-5 pt-5 border-t border-stone-100">
@@ -363,7 +377,6 @@ export default function ProductPage() {
           {activeTab === 'ecrire' && (
             <div className="p-5">
               <form onSubmit={handleSubmitReview} className="flex flex-col gap-4">
-
                 <div>
                   <label className="text-xs text-stone-400 block mb-1.5">Votre nom *</label>
                   <input
@@ -374,15 +387,10 @@ export default function ProductPage() {
                     className="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-stone-400 bg-stone-50"
                   />
                 </div>
-
                 <div>
                   <label className="text-xs text-stone-400 block mb-2">Votre note *</label>
-                  <StarPicker
-                    value={form.rating}
-                    onChange={function(r) { setForm({ ...form, rating: r }) }}
-                  />
+                  <StarPicker value={form.rating} onChange={function(r) { setForm({ ...form, rating: r }) }} />
                 </div>
-
                 <div>
                   <label className="text-xs text-stone-400 block mb-1.5">Votre commentaire *</label>
                   <textarea
@@ -393,11 +401,9 @@ export default function ProductPage() {
                     className="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-stone-400 bg-stone-50 resize-none"
                   />
                 </div>
-
                 {formError && (
                   <p className="text-red-500 text-xs bg-red-50 px-3 py-2 rounded-lg">{formError}</p>
                 )}
-
                 <button
                   type="submit"
                   disabled={submitting}
