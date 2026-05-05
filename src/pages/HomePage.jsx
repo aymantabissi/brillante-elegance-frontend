@@ -5,6 +5,8 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { addToCart } from '../store/slices/cartSlice'
 import { fetchProducts } from '../store/slices/productSlice'
 import toast from 'react-hot-toast'
+import img1 from '../assets/image1.jpeg'
+import img2 from '../assets/image2.jpeg'
 
 const toastStyle = {
   background: '#1c1917',
@@ -21,8 +23,8 @@ const heroSlides = [
 ]
 
 const stripImages = [
-  'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=400&q=80',
-  'https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=400&q=80',
+ img1,
+ img2,
   'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400&q=80',
   'https://images.unsplash.com/photo-1617038220319-276d3cfab638?w=400&q=80',
   'https://images.unsplash.com/photo-1584302179602-e4c3d3fd629d?w=400&q=80',
