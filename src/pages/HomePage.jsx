@@ -7,6 +7,17 @@ import { fetchProducts } from '../store/slices/productSlice'
 import toast from 'react-hot-toast'
 import img1 from '../assets/image1.jpeg'
 import img2 from '../assets/image2.jpeg'
+import img3 from '../assets/image3.jpeg'
+import img4 from '../assets/image4.jpeg'
+import img5 from '../assets/image5.jpeg'
+import img6 from '../assets/image6.jpeg'
+import img7 from '../assets/image7.jpeg'
+import img8 from '../assets/image8.jpeg'
+
+
+
+
+
 
 const toastStyle = {
   background: '#1c1917',
@@ -25,12 +36,12 @@ const heroSlides = [
 const stripImages = [
  img1,
  img2,
-  'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400&q=80',
-  'https://images.unsplash.com/photo-1617038220319-276d3cfab638?w=400&q=80',
-  'https://images.unsplash.com/photo-1584302179602-e4c3d3fd629d?w=400&q=80',
-  'https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?w=400&q=80',
-  'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&q=80',
-  'https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=400&q=80',
+  img3,
+ img4,
+  img5,
+ img6,
+ img7,
+  img8,
 ]
 
 const categories = [
