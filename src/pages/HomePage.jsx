@@ -33,16 +33,7 @@ const heroSlides = [
   { id: 3, image: 'https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=1600&q=80', title: 'Accessoires Premium', subtitle: 'Raffinement & Style' },
 ]
 
-const stripImages = [
- img1,
- img2,
-  img3,
- img4,
-  img5,
- img6,
- img7,
-  img8,
-]
+const stripImages = [img1,img2, img3,img4, img5,img6,img7, img8]
 
 const categories = [
   { label: 'Colliers',  emoji: '📿', to: '/shop?cat=colliers' },
