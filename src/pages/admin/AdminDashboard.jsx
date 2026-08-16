@@ -22,35 +22,35 @@ export default function AdminDashboard() {
 
   return (
     <div>
-      <h2 className="text-2xl font-light tracking-widest uppercase text-stone-800 mb-8">Dashboard</h2>
+      <h2 className="text-2xl font-light tracking-widest uppercase text-stone-800 dark:text-stone-100 mb-8">Dashboard</h2>
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
         {[
-          { label: 'Total Commandes', value: stats?.totalOrders ?? '...', icon: '📦', color: 'bg-blue-50 border-blue-100' },
-          { label: 'Revenue Total',   value: stats ? stats.totalRevenue.toFixed(0) + ' MAD' : '...', icon: '💰', color: 'bg-green-50 border-green-100' },
-          { label: 'En attente',      value: stats?.pending ?? '...',   icon: '⏳', color: 'bg-amber-50 border-amber-100' },
-          { label: 'Livrees',         value: stats?.delivered ?? '...', icon: '✅', color: 'bg-stone-50 border-stone-100' },
+          { label: 'Total Commandes', value: stats?.totalOrders ?? '...', icon: '📦', color: 'bg-blue-50 border-blue-100 dark:bg-blue-900/20 dark:border-blue-800/40' },
+          { label: 'Revenue Total',   value: stats ? stats.totalRevenue.toFixed(0) + ' MAD' : '...', icon: '💰', color: 'bg-green-50 border-green-100 dark:bg-green-900/20 dark:border-green-800/40' },
+          { label: 'En attente',      value: stats?.pending ?? '...',   icon: '⏳', color: 'bg-amber-50 border-amber-100 dark:bg-amber-900/20 dark:border-amber-800/40' },
+          { label: 'Livrees',         value: stats?.delivered ?? '...', icon: '✅', color: 'bg-stone-50 border-stone-100 dark:bg-stone-800/50 dark:border-stone-700' },
         ].map((s) => (
           <div key={s.label} className={'rounded-2xl border p-6 ' + s.color}>
             <div className="text-3xl mb-3">{s.icon}</div>
-            <p className="text-2xl font-light text-stone-900 mb-1">{s.value}</p>
-            <p className="text-xs tracking-widest uppercase text-stone-400">{s.label}</p>
+            <p className="text-2xl font-light text-stone-900 dark:text-stone-100 mb-1">{s.value}</p>
+            <p className="text-xs tracking-widest uppercase text-stone-400 dark:text-stone-500">{s.label}</p>
           </div>
         ))}
       </div>
 
       {/* Recent Orders */}
-      <div className="bg-white rounded-2xl border border-stone-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-stone-100 flex justify-between items-center">
-          <h3 className="text-sm font-medium tracking-widest uppercase text-stone-700">Commandes recentes</h3>
-          <button onClick={() => navigate('/admin/orders')} className="text-xs text-stone-400 hover:text-stone-700">
+      <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-100 dark:border-stone-800 overflow-hidden">
+        <div className="px-6 py-4 border-b border-stone-100 dark:border-stone-800 flex justify-between items-center">
+          <h3 className="text-sm font-medium tracking-widest uppercase text-stone-700 dark:text-stone-300">Commandes recentes</h3>
+          <button onClick={() => navigate('/admin/orders')} className="text-xs text-stone-400 dark:text-stone-500 hover:text-stone-700 dark:hover:text-stone-200">
             Voir tout →
           </button>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-stone-50 text-xs tracking-widest uppercase text-stone-400">
+            <thead className="bg-stone-50 dark:bg-stone-800/50 text-xs tracking-widest uppercase text-stone-400 dark:text-stone-500">
               <tr>
                 <th className="px-6 py-3 text-left">Client</th>
                 <th className="px-6 py-3 text-left">Total</th>
@@ -60,21 +60,21 @@ export default function AdminDashboard() {
             </thead>
             <tbody>
               {orders.slice(0, 5).map((order) => (
-                <tr key={order._id} className="border-t border-stone-50 hover:bg-stone-50 transition">
-                  <td className="px-6 py-4 font-medium text-stone-800">{order.client?.name}</td>
-                  <td className="px-6 py-4 text-stone-600">{order.total} MAD</td>
+                <tr key={order._id} className="border-t border-stone-50 dark:border-stone-800 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition">
+                  <td className="px-6 py-4 font-medium text-stone-800 dark:text-stone-200">{order.client?.name}</td>
+                  <td className="px-6 py-4 text-stone-600 dark:text-stone-400">{order.total} MAD</td>
                   <td className="px-6 py-4">
                     <span className={'text-[11px] font-medium px-2.5 py-1 rounded-full ' + statusColors[order.status]}>
                       {order.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-stone-400 text-xs">
+                  <td className="px-6 py-4 text-stone-400 dark:text-stone-500 text-xs">
                     {new Date(order.createdAt).toLocaleDateString('fr-FR')}
                   </td>
                 </tr>
               ))}
               {orders.length === 0 && (
-                <tr><td colSpan={4} className="px-6 py-10 text-center text-stone-400 text-sm">Aucune commande</td></tr>
+                <tr><td colSpan={4} className="px-6 py-10 text-center text-stone-400 dark:text-stone-500 text-sm">Aucune commande</td></tr>
               )}
             </tbody>
           </table>

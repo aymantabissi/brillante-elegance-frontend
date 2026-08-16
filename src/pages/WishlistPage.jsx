@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { addToCart } from '../store/slices/cartSlice'
 import toast from 'react-hot-toast'
+import { PLACEHOLDER_IMAGE, onImgError } from '../utils/imageFallback'
 
 const toastStyle = {
   background: '#1c1917',
@@ -28,16 +29,16 @@ export default function WishlistPage({ wishlist, toggleWishlist, products }) {
       _id: product._id,
       name: product.name,
       price: product.price,
-      image: product.image && product.image.startsWith('http') ? product.image : 'https://via.placeholder.com/400',
+      image: product.image && product.image.startsWith('http') ? product.image : PLACEHOLDER_IMAGE,
       qty: 1,
     }))
     toast.success(product.name + ' ajoute au panier !', { icon: '🛍️', style: toastStyle })
   }
 
   const getImageUrl = function(image) {
-    if (!image) return 'https://via.placeholder.com/400x400?text=No+Image'
+    if (!image) return PLACEHOLDER_IMAGE
     if (image.startsWith('http')) return image
-    return 'https://via.placeholder.com/400x400?text=No+Image'
+    return PLACEHOLDER_IMAGE
   }
 
   return (
@@ -93,6 +94,7 @@ export default function WishlistPage({ wishlist, toggleWishlist, products }) {
                         src={getImageUrl(product.image)}
                         alt={product.name}
                         className="w-full h-52 object-cover transition-transform duration-500 group-hover:scale-105"
+                        onError={onImgError}
                       />
 
                       {/* Badges */}

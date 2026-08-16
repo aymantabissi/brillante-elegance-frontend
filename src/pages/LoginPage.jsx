@@ -24,10 +24,13 @@ export default function LoginPage() {
     if (error) toast.error(error)
   }, [error])
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    dispatch(loginUser(form))
-  }
+ const handleSubmit = async (e) => {
+  e.preventDefault()
+
+  const result = await dispatch(loginUser(form))
+
+  console.log('LOGIN RESULT:', result)
+}
 
   return (
     <div className="min-h-screen bg-[#faf9f7] flex items-center justify-center px-4">

@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { addToCart } from '../store/slices/cartSlice'
 import { fetchProducts } from '../store/slices/productSlice'
 import toast from 'react-hot-toast'
+import { PLACEHOLDER_IMAGE, onImgError } from '../utils/imageFallback'
 import img1 from '../assets/image1.jpeg'
 import img2 from '../assets/image2.jpeg'
 import img3 from '../assets/image3.jpeg'
@@ -188,7 +189,7 @@ function TrendingProducts({ wishlist, toggleWishlist }) {
     dispatch(addToCart({
       _id: product._id, name: product.name,
       price: product.price,
-      image: product.image && product.image.startsWith('http') ? product.image : 'https://via.placeholder.com/400',
+      image: product.image && product.image.startsWith('http') ? product.image : PLACEHOLDER_IMAGE,
       qty: 1,
     }))
     setAddedId(product._id)
@@ -204,16 +205,16 @@ function TrendingProducts({ wishlist, toggleWishlist }) {
     dispatch(addToCart({
       _id: product._id, name: product.name,
       price: product.price,
-      image: product.image && product.image.startsWith('http') ? product.image : 'https://via.placeholder.com/400',
+      image: product.image && product.image.startsWith('http') ? product.image : PLACEHOLDER_IMAGE,
       qty: 1,
     }))
     navigate('/checkout')
   }
 
   const getImageUrl = function(image) {
-    if (!image) return 'https://via.placeholder.com/400'
+    if (!image) return PLACEHOLDER_IMAGE
     if (image.startsWith('http')) return image
-    return 'https://via.placeholder.com/400'
+    return PLACEHOLDER_IMAGE
   }
 
   const displayed = products.slice(0, 6)
@@ -251,6 +252,7 @@ function TrendingProducts({ wishlist, toggleWishlist }) {
                     src={getImageUrl(product.image)}
                     alt={product.name}
                     className="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-105"
+                    onError={onImgError}
                   />
 
                   {/* Bandeau défilant */}
@@ -382,9 +384,9 @@ function FeaturedProduct() {
   if (!product) return null
 
   const getImageUrl = function(image) {
-    if (!image) return 'https://via.placeholder.com/900'
+    if (!image) return PLACEHOLDER_IMAGE
     if (image.startsWith('http')) return image
-    return 'https://via.placeholder.com/900'
+    return PLACEHOLDER_IMAGE
   }
 
   const discountPercent = product.oldPrice > 0
@@ -400,7 +402,7 @@ function FeaturedProduct() {
         </div>
         <div className="bg-white rounded-3xl overflow-hidden shadow-sm flex flex-col lg:flex-row">
           <div className="lg:w-1/2 relative overflow-hidden group">
-            <img src={getImageUrl(product.image)} alt={product.name} className="w-full h-[500px] lg:h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <img src={getImageUrl(product.image)} alt={product.name} className="w-full h-[500px] lg:h-full object-cover transition-transform duration-700 group-hover:scale-105" onError={onImgError} />
             {discountPercent > 0 && (
               <span className="absolute top-5 left-5 bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-full">-{discountPercent}%</span>
             )}
@@ -600,7 +602,7 @@ function InstagramSection() {
             ? realImages.map(function(product, i) {
                 return (
                   <a key={product._id} href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className={linkClass(i)}>
-                    <img src={product.image} alt={product.name} className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105" />
+                    <img src={product.image} alt={product.name} className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105" onError={onImgError} />
                     {overlay}
                   </a>
                 )

@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import toast from 'react-hot-toast'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import AdminUsers from './pages/admin/AdminUsers'
 import HomePage from './pages/HomePage'
 import AboutPage from './pages/AboutPage'
 import ContactPage from './pages/ContactPage'
@@ -21,6 +22,12 @@ import AdminProducts  from './pages/admin/AdminProducts'
 import AdminOrders    from './pages/admin/AdminOrders'
 import AdminStats     from './pages/admin/AdminStats'
 import AdminPromos    from './pages/admin/AdminPromos'
+import AdminProfile   from './pages/admin/AdminProfile'
+import AdminChat      from './pages/admin/AdminChat'
+import CreatorLayout    from './pages/creator/CreatorLayout'
+import CreatorDashboard from './pages/creator/CreatorDashboard'
+import CreatorChat      from './pages/creator/CreatorChat'
+import CreatorPayment   from './pages/creator/CreatorPayment'
 
 const toastStyle = {
   background: '#1c1917',
@@ -35,8 +42,21 @@ function App() {
   const { items: products } = useSelector((state) => state.products)
   const location     = useLocation()
   const isAdmin      = location.pathname.startsWith('/admin')
+  const isCreatorArea = location.pathname.startsWith('/creator')
+  const hideChrome   = isAdmin || isCreatorArea
 
   const [wishlist, setWishlist] = useState([])
+
+  // =====================================================
+  // META PIXEL — PageView à chaque changement de route
+  // (le PageView initial est déjà envoyé par index.html,
+  // ici on couvre la navigation interne du SPA)
+  // =====================================================
+  useEffect(function() {
+    if (window.fbq) {
+      window.fbq('track', 'PageView')
+    }
+  }, [location.pathname])
 
   const toggleWishlist = function(productId) {
     setWishlist(function(prev) {
@@ -52,10 +72,10 @@ function App() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {!isAdmin && <Navbar wishlistCount={wishlist.length} />}
+      {!hideChrome && <Navbar wishlistCount={wishlist.length} />}
 
       {/* Padding top pour compenser la navbar fixe */}
-      <main className={'flex-1 ' + (!isAdmin ? 'pt-[72px]' : '')}>
+      <main className={'flex-1 ' + (!hideChrome ? 'pt-[72px]' : '')}>
         <Routes>
           <Route path="/"            element={<HomePage wishlist={wishlist} toggleWishlist={toggleWishlist} />} />
           <Route path="/shop"        element={<ShopPage wishlist={wishlist} toggleWishlist={toggleWishlist} />} />
@@ -66,7 +86,7 @@ function App() {
           <Route path="/product/:id" element={<ProductPage />} />
           <Route path="/cart"        element={<CartPage />} />
           <Route path="/checkout"    element={<CheckoutPage />} />
-          <Route path="/login"       element={!user ? <LoginPage /> : (user.role === 'admin' ? <Navigate to="/admin" /> : <Navigate to="/" />)} />
+          <Route path="/login"       element={!user ? <LoginPage /> : (user.role === 'admin' ? <Navigate to="/admin" /> : user.role === 'creator' ? <Navigate to="/creator" /> : <Navigate to="/" />)} />
           <Route path="/register"    element={!user ? <RegisterPage /> : <Navigate to="/" />} />
 
           <Route path="/admin" element={<AdminLayout />}>
@@ -75,11 +95,25 @@ function App() {
             <Route path="orders"   element={<AdminOrders />} />
             <Route path="stats"    element={<AdminStats />} />
             <Route path="promos"   element={<AdminPromos />} />
+            <Route path="profile"  element={<AdminProfile />} />
+            <Route path="chat"     element={<AdminChat />} />
+            <Route
+  path="/admin/users"
+  element={
+    <AdminUsers />
+  }
+/>
+          </Route>
+
+          <Route path="/creator" element={<CreatorLayout />}>
+            <Route index      element={<CreatorDashboard />} />
+            <Route path="chat" element={<CreatorChat />} />
+            <Route path="payment" element={<CreatorPayment />} />
           </Route>
         </Routes>
       </main>
 
-      {!isAdmin && <Footer />}
+      {!hideChrome && <Footer />}
     </div>
   )
 }

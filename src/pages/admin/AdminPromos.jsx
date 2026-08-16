@@ -4,6 +4,7 @@ import toast from 'react-hot-toast'
 import api from '../../services/api'
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchProducts } from '../../store/slices/productSlice'
+import { PLACEHOLDER_IMAGE, onImgError } from '../../utils/imageFallback'
 
 const toastStyle = {
   background: '#1c1917',
@@ -24,6 +25,7 @@ const emptyForm = {
   code: generateCode(), discount: 10, maxUses: 100, expiresAt: '',
   scope: 'all', // 'all' ou 'specific'
   products: [], // IDs des produits sélectionnés
+  owner: '', // creator proprietaire du code (affiliation), vide = code admin classique
 }
 
 export default function AdminPromos() {
@@ -31,6 +33,7 @@ export default function AdminPromos() {
   const { items: allProducts } = useSelector((state) => state.products)
 
   const [promos,      setPromos]      = useState([])
+  const [creators,    setCreators]    = useState([])
   const [loading,     setLoading]     = useState(true)
   const [showForm,    setShowForm]    = useState(false)
   const [saving,      setSaving]      = useState(false)
@@ -48,10 +51,24 @@ export default function AdminPromos() {
     setLoading(false)
   }
 
+  const fetchCreators = async function() {
+    try {
+      const res = await api.get('/users')
+      setCreators(res.data.filter(function(u) { return u.role === 'creator' }))
+    } catch(e) {
+      // silencieux — l'admin peut quand meme creer un code sans assignation
+    }
+  }
+
   useEffect(function() {
     fetchPromos()
+    fetchCreators()
     dispatch(fetchProducts())
   }, [dispatch])
+
+  const creatorsWithoutCode = creators.filter(function(c) {
+    return !promos.some(function(p) { return p.owner && p.owner._id === c._id })
+  })
 
   const toggleProduct = function(productId) {
     setForm(function(prev) {
@@ -78,6 +95,7 @@ export default function AdminPromos() {
         maxUses:  form.maxUses,
         expiresAt: form.expiresAt,
         products: form.scope === 'specific' ? form.products : [],
+        owner:    form.owner || null,
       })
       toast.success('Code créé !', { style: toastStyle })
       setForm({ ...emptyForm, code: generateCode() })
@@ -127,8 +145,8 @@ export default function AdminPromos() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-2xl font-light tracking-widest uppercase text-stone-800">Codes Promo</h2>
-          <p className="text-xs text-stone-400 mt-1">{promos.length} codes au total</p>
+          <h2 className="text-2xl font-light tracking-widest uppercase text-stone-800 dark:text-stone-100">Codes Promo</h2>
+          <p className="text-xs text-stone-400 dark:text-stone-500 mt-1">{promos.length} codes au total</p>
         </div>
         <button
           onClick={function() { setForm({ ...emptyForm, code: generateCode() }); setShowForm(!showForm) }}
@@ -140,11 +158,11 @@ export default function AdminPromos() {
 
       {/* Formulaire */}
       {showForm && (
-        <div className="bg-white rounded-2xl border border-stone-200 p-6 mb-6 shadow-sm">
+        <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-700 p-6 mb-6 shadow-sm">
           <div className="flex items-center justify-between mb-5">
-            <h3 className="text-sm font-medium tracking-widest uppercase text-stone-700">Nouveau code promo</h3>
+            <h3 className="text-sm font-medium tracking-widest uppercase text-stone-700 dark:text-stone-300">Nouveau code promo</h3>
             <button onClick={function() { setShowForm(false) }}>
-              <X size={16} className="text-stone-400 hover:text-stone-700" />
+              <X size={16} className="text-stone-400 dark:text-stone-500 hover:text-stone-700 dark:hover:text-stone-200" />
             </button>
           </div>
 
@@ -152,17 +170,17 @@ export default function AdminPromos() {
 
             {/* Code */}
             <div>
-              <label className="text-xs text-stone-400 block mb-1">Code *</label>
+              <label className="text-xs text-stone-400 dark:text-stone-500 block mb-1">Code *</label>
               <div className="flex gap-2">
                 <input
                   value={form.code}
                   onChange={function(e) { setForm({ ...form, code: e.target.value.toUpperCase() }) }}
-                  className="flex-1 border border-stone-200 rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:border-stone-400 bg-[#faf9f7] uppercase tracking-widest"
+                  className="flex-1 border border-stone-200 dark:border-stone-700 rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:border-stone-400 dark:focus:border-stone-500 bg-[#faf9f7] dark:bg-stone-800 text-stone-900 dark:text-stone-100 uppercase tracking-widest"
                   placeholder="BRILLANTE20"
                 />
                 <button
                   onClick={function() { setForm({ ...form, code: generateCode() }) }}
-                  className="px-3 py-2 bg-stone-100 hover:bg-stone-200 rounded-xl text-xs text-stone-600 transition"
+                  className="px-3 py-2 bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 rounded-xl text-xs text-stone-600 dark:text-stone-300 transition"
                   title="Générer un code aléatoire"
                 >🔀</button>
               </div>
@@ -170,37 +188,55 @@ export default function AdminPromos() {
 
             {/* Remise */}
             <div>
-              <label className="text-xs text-stone-400 block mb-1">Remise (%) *</label>
+              <label className="text-xs text-stone-400 dark:text-stone-500 block mb-1">Remise (%) *</label>
               <input
                 type="number" min="1" max="100"
                 value={form.discount}
                 onChange={function(e) { setForm({ ...form, discount: e.target.value }) }}
-                className="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-stone-400 bg-[#faf9f7]"
+                className="w-full border border-stone-200 dark:border-stone-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-stone-400 dark:focus:border-stone-500 bg-[#faf9f7] dark:bg-stone-800 text-stone-900 dark:text-stone-100"
                 placeholder="15"
               />
             </div>
 
             {/* Utilisations max */}
             <div>
-              <label className="text-xs text-stone-400 block mb-1">Utilisations max</label>
+              <label className="text-xs text-stone-400 dark:text-stone-500 block mb-1">Utilisations max</label>
               <input
                 type="number" min="1"
                 value={form.maxUses}
                 onChange={function(e) { setForm({ ...form, maxUses: e.target.value }) }}
-                className="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-stone-400 bg-[#faf9f7]"
+                className="w-full border border-stone-200 dark:border-stone-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-stone-400 dark:focus:border-stone-500 bg-[#faf9f7] dark:bg-stone-800 text-stone-900 dark:text-stone-100"
                 placeholder="100"
               />
             </div>
 
             {/* Expiration */}
             <div>
-              <label className="text-xs text-stone-400 block mb-1">Date expiration (optionnel)</label>
+              <label className="text-xs text-stone-400 dark:text-stone-500 block mb-1">Date expiration (optionnel)</label>
               <input
                 type="date"
                 value={form.expiresAt}
                 onChange={function(e) { setForm({ ...form, expiresAt: e.target.value }) }}
-                className="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-stone-400 bg-[#faf9f7]"
+                className="w-full border border-stone-200 dark:border-stone-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-stone-400 dark:focus:border-stone-500 bg-[#faf9f7] dark:bg-stone-800 text-stone-900 dark:text-stone-100"
               />
+            </div>
+
+            {/* Creator (affiliation) */}
+            <div className="sm:col-span-2">
+              <label className="text-xs text-stone-400 dark:text-stone-500 block mb-1">Assigner à un créateur (affiliation, optionnel)</label>
+              <select
+                value={form.owner}
+                onChange={function(e) { setForm({ ...form, owner: e.target.value }) }}
+                className="w-full border border-stone-200 dark:border-stone-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-stone-400 dark:focus:border-stone-500 bg-[#faf9f7] dark:bg-stone-800 text-stone-900 dark:text-stone-100"
+              >
+                <option value="">Aucun — code admin classique</option>
+                {creatorsWithoutCode.map(function(c) {
+                  return <option key={c._id} value={c._id}>{c.name} ({c.email})</option>
+                })}
+              </select>
+              <p className="text-[11px] text-stone-400 dark:text-stone-500 mt-1">
+                Ce créateur gagnera 10% du sous-total des produits (hors livraison) sur chaque commande livrée et payée passée avec ce code.
+              </p>
             </div>
           </div>
 
@@ -210,13 +246,13 @@ export default function AdminPromos() {
             <div className="flex gap-3">
               <button
                 onClick={function() { setForm({ ...form, scope: 'all', products: [] }) }}
-                className={'flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm border transition ' + (form.scope === 'all' ? 'bg-stone-900 text-white border-stone-900' : 'bg-stone-50 text-stone-600 border-stone-200 hover:border-stone-400')}
+                className={'flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm border transition ' + (form.scope === 'all' ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 border-stone-900 dark:border-stone-100' : 'bg-stone-50 dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-stone-400 dark:hover:border-stone-500')}
               >
                 🛍️ Tous les produits
               </button>
               <button
                 onClick={function() { setForm({ ...form, scope: 'specific' }) }}
-                className={'flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm border transition ' + (form.scope === 'specific' ? 'bg-stone-900 text-white border-stone-900' : 'bg-stone-50 text-stone-600 border-stone-200 hover:border-stone-400')}
+                className={'flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm border transition ' + (form.scope === 'specific' ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 border-stone-900 dark:border-stone-100' : 'bg-stone-50 dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-stone-400 dark:hover:border-stone-500')}
               >
                 <Package size={14} /> Produits spécifiques
               </button>
@@ -235,7 +271,7 @@ export default function AdminPromos() {
                 <div className="flex flex-wrap gap-2 mb-3">
                   {form.products.map(function(id) {
                     return (
-                      <span key={id} className="flex items-center gap-1.5 bg-stone-900 text-white text-xs px-3 py-1.5 rounded-full">
+                      <span key={id} className="flex items-center gap-1.5 bg-stone-900 dark:bg-stone-700 text-white text-xs px-3 py-1.5 rounded-full">
                         {getProductName(id).substring(0, 25)}{getProductName(id).length > 25 ? '...' : ''}
                         <button onClick={function() { toggleProduct(id) }} className="hover:text-red-300 transition">
                           <X size={11} />
@@ -252,13 +288,13 @@ export default function AdminPromos() {
                 value={searchProd}
                 onChange={function(e) { setSearchProd(e.target.value) }}
                 placeholder="Rechercher un produit..."
-                className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-stone-400 bg-[#faf9f7] mb-2"
+                className="w-full border border-stone-200 dark:border-stone-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-stone-400 dark:focus:border-stone-500 bg-[#faf9f7] dark:bg-stone-800 text-stone-900 dark:text-stone-100 mb-2"
               />
 
               {/* Liste produits */}
-              <div className="border border-stone-100 rounded-xl overflow-hidden max-h-52 overflow-y-auto">
+              <div className="border border-stone-100 dark:border-stone-800 rounded-xl overflow-hidden max-h-52 overflow-y-auto">
                 {filteredProducts.length === 0 && (
-                  <p className="text-xs text-stone-400 text-center py-4">Aucun produit</p>
+                  <p className="text-xs text-stone-400 dark:text-stone-500 text-center py-4">Aucun produit</p>
                 )}
                 {filteredProducts.map(function(p) {
                   const selected = form.products.includes(p._id)
@@ -266,19 +302,20 @@ export default function AdminPromos() {
                     <button
                       key={p._id}
                       onClick={function() { toggleProduct(p._id) }}
-                      className={'w-full flex items-center gap-3 px-4 py-3 text-left transition border-b border-stone-50 last:border-0 ' + (selected ? 'bg-stone-50' : 'hover:bg-stone-50')}
+                      className={'w-full flex items-center gap-3 px-4 py-3 text-left transition border-b border-stone-50 dark:border-stone-800 last:border-0 ' + (selected ? 'bg-stone-50 dark:bg-stone-800' : 'hover:bg-stone-50 dark:hover:bg-stone-800/50')}
                     >
-                      <div className={'w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border transition ' + (selected ? 'bg-stone-900 border-stone-900' : 'border-stone-300')}>
-                        {selected && <span className="text-white text-[10px]">✓</span>}
+                      <div className={'w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border transition ' + (selected ? 'bg-stone-900 dark:bg-stone-100 border-stone-900 dark:border-stone-100' : 'border-stone-300 dark:border-stone-600')}>
+                        {selected && <span className="text-white dark:text-stone-900 text-[10px]">✓</span>}
                       </div>
                       <img
-                        src={p.image && p.image.startsWith('http') ? p.image : 'https://via.placeholder.com/32'}
+                        src={p.image && p.image.startsWith('http') ? p.image : PLACEHOLDER_IMAGE}
                         alt={p.name}
                         className="w-8 h-8 object-cover rounded-lg flex-shrink-0"
+                        onError={onImgError}
                       />
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium text-stone-800 truncate">{p.name}</p>
-                        <p className="text-[10px] text-stone-400">{p.price} MAD · {p.category}</p>
+                        <p className="text-xs font-medium text-stone-800 dark:text-stone-200 truncate">{p.name}</p>
+                        <p className="text-[10px] text-stone-400 dark:text-stone-500">{p.price} MAD · {p.category}</p>
                       </div>
                     </button>
                   )
@@ -293,18 +330,18 @@ export default function AdminPromos() {
 
           {/* Info scope */}
           {form.scope === 'all' && (
-            <div className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 mb-5 text-xs text-blue-600">
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/40 rounded-xl px-4 py-3 mb-5 text-xs text-blue-600 dark:text-blue-400">
               🛍️ Ce code sera valable sur <strong>tous les produits</strong> de la boutique.
             </div>
           )}
           {form.scope === 'specific' && form.products.length > 0 && (
-            <div className="bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 mb-5 text-xs text-amber-700">
+            <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/40 rounded-xl px-4 py-3 mb-5 text-xs text-amber-700 dark:text-amber-400">
               📦 Ce code sera valable uniquement sur les <strong>{form.products.length} produit{form.products.length > 1 ? 's' : ''}</strong> sélectionné{form.products.length > 1 ? 's' : ''}.
             </div>
           )}
 
-          <div className="flex justify-end gap-3 pt-5 border-t border-stone-100">
-            <button onClick={function() { setShowForm(false) }} className="text-sm text-stone-400 hover:text-stone-700 transition px-5 py-2.5">
+          <div className="flex justify-end gap-3 pt-5 border-t border-stone-100 dark:border-stone-800">
+            <button onClick={function() { setShowForm(false) }} className="text-sm text-stone-400 dark:text-stone-500 hover:text-stone-700 dark:hover:text-stone-200 transition px-5 py-2.5">
               Annuler
             </button>
             <button
@@ -319,13 +356,14 @@ export default function AdminPromos() {
       )}
 
       {/* Table */}
-      <div className="bg-white rounded-2xl border border-stone-100 overflow-hidden">
+      <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-100 dark:border-stone-800 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-stone-50 text-xs tracking-widest uppercase text-stone-400">
+            <thead className="bg-stone-50 dark:bg-stone-800/50 text-xs tracking-widest uppercase text-stone-400 dark:text-stone-500">
               <tr>
                 <th className="px-6 py-3 text-left">Code</th>
                 <th className="px-6 py-3 text-left">Remise</th>
+                <th className="px-6 py-3 text-left">Créateur</th>
                 <th className="px-6 py-3 text-left">Produits</th>
                 <th className="px-6 py-3 text-left">Utilisations</th>
                 <th className="px-6 py-3 text-left">Expiration</th>
@@ -336,12 +374,12 @@ export default function AdminPromos() {
             <tbody>
               {loading && (
                 <tr>
-                  <td colSpan={7} className="px-6 py-10 text-center text-stone-400">Chargement...</td>
+                  <td colSpan={8} className="px-6 py-10 text-center text-stone-400 dark:text-stone-500">Chargement...</td>
                 </tr>
               )}
               {!loading && promos.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-6 py-10 text-center text-stone-400">Aucun code promo — créez votre premier code !</td>
+                  <td colSpan={8} className="px-6 py-10 text-center text-stone-400 dark:text-stone-500">Aucun code promo — créez votre premier code !</td>
                 </tr>
               )}
               {!loading && promos.map(function(p) {
@@ -350,61 +388,70 @@ export default function AdminPromos() {
                 const pid     = p._id
                 const hasSpecificProducts = p.products && p.products.length > 0
                 return (
-                  <tr key={pid} className="border-t border-stone-50 hover:bg-stone-50 transition">
+                  <tr key={pid} className="border-t border-stone-50 dark:border-stone-800 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <span className="font-mono font-bold text-stone-800 tracking-widest">{p.code}</span>
-                        <button onClick={function() { handleCopy(p.code) }} className="p-1 text-stone-400 hover:text-stone-700 transition" title="Copier">
+                        <span className="font-mono font-bold text-stone-800 dark:text-stone-200 tracking-widest">{p.code}</span>
+                        <button onClick={function() { handleCopy(p.code) }} className="p-1 text-stone-400 dark:text-stone-500 hover:text-stone-700 dark:hover:text-stone-200 transition" title="Copier">
                           <Copy size={12} />
                         </button>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full">
+                      <span className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-bold px-2.5 py-1 rounded-full">
                         -{p.discount}%
                       </span>
                     </td>
                     <td className="px-6 py-4">
+                      {p.owner ? (
+                        <span className="text-xs text-purple-700 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/30 px-2.5 py-1 rounded-full font-medium">
+                          {p.owner.name}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-stone-300 dark:text-stone-600">—</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
                       {hasSpecificProducts ? (
-                        <span className="text-xs text-stone-600 flex items-center gap-1">
-                          <Package size={11} className="text-stone-400" />
+                        <span className="text-xs text-stone-600 dark:text-stone-400 flex items-center gap-1">
+                          <Package size={11} className="text-stone-400 dark:text-stone-500" />
                           {p.products.length} produit{p.products.length > 1 ? 's' : ''}
                         </span>
                       ) : (
-                        <span className="text-xs text-stone-400">Tous</span>
+                        <span className="text-xs text-stone-400 dark:text-stone-500">Tous</span>
                       )}
                     </td>
                     <td className="px-6 py-4 text-xs">
-                      <span className={p.usedCount >= p.maxUses ? 'text-red-500 font-medium' : 'text-stone-600'}>
+                      <span className={p.usedCount >= p.maxUses ? 'text-red-500 dark:text-red-400 font-medium' : 'text-stone-600 dark:text-stone-400'}>
                         {p.usedCount} / {p.maxUses}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-xs text-stone-500">
+                    <td className="px-6 py-4 text-xs text-stone-500 dark:text-stone-400">
                       {p.expiresAt ? new Date(p.expiresAt).toLocaleDateString('fr-FR') : '—'}
                     </td>
                     <td className="px-6 py-4">
                       {expired ? (
-                        <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-stone-100 text-stone-500">Expiré</span>
+                        <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-stone-100 dark:bg-stone-700 text-stone-500 dark:text-stone-400">Expiré</span>
                       ) : epuise ? (
-                        <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-red-100 text-red-600">Épuisé</span>
+                        <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400">Épuisé</span>
                       ) : p.active ? (
-                        <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-green-100 text-green-700">Actif</span>
+                        <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">Actif</span>
                       ) : (
-                        <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-stone-100 text-stone-500">Inactif</span>
+                        <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-stone-100 dark:bg-stone-700 text-stone-500 dark:text-stone-400">Inactif</span>
                       )}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-1">
                         <button
                           onClick={function() { handleToggle(pid) }}
-                          className={'p-1.5 rounded-lg transition ' + (p.active ? 'text-green-500 hover:bg-green-50' : 'text-stone-400 hover:bg-stone-100')}
+                          className={'p-1.5 rounded-lg transition ' + (p.active ? 'text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20' : 'text-stone-400 dark:text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800')}
                           title={p.active ? 'Désactiver' : 'Activer'}
                         >
                           {p.active ? <ToggleRight size={18} /> : <ToggleLeft size={18} />}
                         </button>
                         <button
                           onClick={function() { handleDelete(pid) }}
-                          className="p-1.5 rounded-lg hover:bg-red-50 text-stone-400 hover:text-red-500 transition"
+                          className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 text-stone-400 dark:text-stone-500 hover:text-red-500 dark:hover:text-red-400 transition"
                           title="Supprimer"
                         >
                           <Trash2 size={14} />

@@ -1,5 +1,15 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+body {
+  background: #ffffff;
+}
+
+.dark body {
+  background: #0c0a09;
+}
+
 @keyframes scrollLeft {
   0%   { transform: translateX(0); }
   100% { transform: translateX(-50%); }

@@ -5,6 +5,7 @@ import { addToCart } from '../store/slices/cartSlice'
 import { ChevronLeft, ShoppingBag, Heart, Share2, Zap } from 'lucide-react'
 import api from '../services/api'
 import toast from 'react-hot-toast'
+import { PLACEHOLDER_IMAGE, onImgError } from '../utils/imageFallback'
 
 const toastStyle = {
   background: '#1c1917',
@@ -89,6 +90,8 @@ export default function ProductPage() {
   const [wished,     setWished]     = useState(false)
   const [activeTab,  setActiveTab]  = useState('avis')
 
+  const [selectedVariantIndex, setSelectedVariantIndex] = useState(null)
+
   const [form,       setForm]       = useState({ name: '', rating: 0, comment: '' })
   const [submitting, setSubmitting] = useState(false)
   const [formError,  setFormError]  = useState('')
@@ -102,23 +105,111 @@ export default function ProductPage() {
       ])
       setProduct(pRes.data)
       setReviews(rRes.data)
+
+      if (pRes.data.hasVariants && pRes.data.variants?.length > 0) {
+        setSelectedVariantIndex(0)
+      } else {
+        setSelectedVariantIndex(null)
+      }
     } catch(e) { console.error(e) }
     setLoading(false)
   }
 
   useEffect(function() { fetchAll() }, [id])
 
+  const activeVariant = (
+    product?.hasVariants &&
+    product.variants?.length > 0 &&
+    selectedVariantIndex !== null
+  ) ? product.variants[selectedVariantIndex] : null
+
+  const displayPrice = activeVariant && Number(activeVariant.price) > 0
+    ? activeVariant.price
+    : product?.price
+
+  const displayStock = activeVariant
+    ? activeVariant.stock
+    : product?.stock
+
+  const displayImage = activeVariant && activeVariant.image
+    ? activeVariant.image
+    : product?.image
+
+  const galleryImages = product
+    ? [product.image, ...(product.images || [])].filter(Boolean).filter(function(img, i, arr) { return arr.indexOf(img) === i })
+    : []
+
+  const [selectedImage, setSelectedImage] = useState(null)
+  const [zoomStyle,     setZoomStyle]     = useState({})
+
+  useEffect(function() {
+    setSelectedImage(displayImage)
+  }, [displayImage])
+
+  const handleImageMouseMove = function(e) {
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect()
+    const x = ((e.clientX - left) / width) * 100
+    const y = ((e.clientY - top) / height) * 100
+    setZoomStyle({ transformOrigin: x + '% ' + y + '%', transform: 'scale(2)' })
+  }
+
+  const handleImageMouseLeave = function() {
+    setZoomStyle({ transformOrigin: 'center', transform: 'scale(1)' })
+  }
+
+  useEffect(function() {
+    if (displayStock !== undefined && qty > displayStock) {
+      setQty(Math.max(1, displayStock))
+    }
+  }, [selectedVariantIndex])
+
+  // =====================================================
+  // META PIXEL — helper pour envoyer AddToCart
+  // =====================================================
+  const trackAddToCart = function() {
+    if (window.fbq) {
+      window.fbq('track', 'AddToCart', {
+        content_ids: [product._id],
+        content_name: product.name + (activeVariant ? ' — ' + activeVariant.label : ''),
+        content_type: 'product',
+        value: displayPrice * qty,
+        currency: 'MAD',
+        contents: [{ id: product._id, quantity: qty }],
+      })
+    }
+  }
+
   const handleAdd = function() {
-    if (!product || product.stock === 0) return
-    dispatch(addToCart({ _id: product._id, name: product.name, price: product.price, image: product.image, qty }))
+    if (!product || displayStock === 0) return
+
+    trackAddToCart()
+
+    dispatch(addToCart({
+      _id: product._id,
+      name: product.name + (activeVariant ? ' — ' + activeVariant.label : ''),
+      price: displayPrice,
+      image: getImageUrl(displayImage),
+      qty,
+      variantLabel: activeVariant ? activeVariant.label : undefined,
+    }))
     setAdded(true)
     setTimeout(function() { setAdded(false) }, 2000)
     toast.success(product.name + ' ajouté au panier !', { icon: '🛍️', style: toastStyle })
   }
 
   const handleBuyNow = function() {
-    if (!product || product.stock === 0) return
-    dispatch(addToCart({ _id: product._id, name: product.name, price: product.price, image: product.image, qty }))
+    if (!product || displayStock === 0) return
+
+    trackAddToCart()
+
+    dispatch(addToCart({
+      _id: product._id,
+      name: product.name + (activeVariant ? ' — ' + activeVariant.label : ''),
+      price: displayPrice,
+      image: getImageUrl(displayImage),
+      qty,
+      variantLabel: activeVariant ? activeVariant.label : undefined,
+    }))
     navigate('/checkout')
   }
 
@@ -142,9 +233,10 @@ export default function ProductPage() {
   }
 
   const getImageUrl = function(image) {
-    if (!image) return 'https://via.placeholder.com/600x600?text=Aucune+image'
+    if (!image) return PLACEHOLDER_IMAGE
     if (image.startsWith('http')) return image
-    return 'https://via.placeholder.com/600x600?text=Aucune+image'
+    if (image.startsWith('/uploads')) return 'http://localhost:5000' + image
+    return PLACEHOLDER_IMAGE
   }
 
   const avgRating  = product?.rating     || 0
@@ -167,7 +259,6 @@ export default function ProductPage() {
   return (
     <main className="min-h-screen" style={{ background: '#FAF9F7' }}>
 
-      {/* Barre de navigation */}
       <div className="bg-white border-b border-stone-100 sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 h-12 flex items-center justify-between">
           <Link to="/shop" className="flex items-center gap-1 text-stone-500 hover:text-stone-800 transition">
@@ -190,16 +281,20 @@ export default function ProductPage() {
 
       <div className="max-w-5xl mx-auto px-4 py-6">
 
-        {/* Fiche produit */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
 
-          {/* Image */}
           <div className="relative">
-            <div className="rounded-2xl overflow-hidden bg-white shadow-sm aspect-square">
+            <div
+              className="rounded-2xl overflow-hidden bg-white shadow-sm aspect-square cursor-zoom-in"
+              onMouseMove={handleImageMouseMove}
+              onMouseLeave={handleImageMouseLeave}
+            >
               <img
-                src={getImageUrl(product.image)}
+                src={getImageUrl(selectedImage || displayImage)}
                 alt={product.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-200 ease-out"
+                style={zoomStyle}
+                onError={onImgError}
               />
             </div>
             <div className="absolute top-3 left-3 flex flex-col gap-1.5">
@@ -210,9 +305,26 @@ export default function ProductPage() {
                 <span className="bg-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-sm">POPULAIRE</span>
               )}
             </div>
+
+            {galleryImages.length > 1 && (
+              <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
+                {galleryImages.map(function(img, i) {
+                  const isActive = (selectedImage || displayImage) === img
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={function() { setSelectedImage(img) }}
+                      className={'w-16 h-16 rounded-xl overflow-hidden border-2 flex-shrink-0 transition ' + (isActive ? 'border-stone-900' : 'border-stone-200 hover:border-stone-400')}
+                    >
+                      <img src={getImageUrl(img)} alt={product.name + ' ' + (i + 1)} className="w-full h-full object-cover" onError={onImgError} />
+                    </button>
+                  )
+                })}
+              </div>
+            )}
           </div>
 
-          {/* Détails */}
           <div className="flex flex-col">
 
             <p className="text-[10px] tracking-[0.4em] uppercase text-stone-400 mb-2 capitalize">{product.category}</p>
@@ -220,7 +332,6 @@ export default function ProductPage() {
               {product.name}
             </h1>
 
-            {/* Note */}
             <div className="mb-4">
               {numReviews > 0 ? (
                 <StarDisplay value={avgRating} count={numReviews} />
@@ -229,34 +340,74 @@ export default function ProductPage() {
               )}
             </div>
 
-            {/* Prix */}
             <div className="flex items-baseline gap-3 mb-5">
-              <span className="text-3xl font-semibold text-stone-900">{product.price} <span className="text-lg font-normal">MAD</span></span>
+              <span className="text-3xl font-semibold text-stone-900">{displayPrice} <span className="text-lg font-normal">MAD</span></span>
               {product.oldPrice > 0 && (
                 <span className="text-lg text-stone-400 line-through">{product.oldPrice} MAD</span>
               )}
             </div>
 
-            {/* Description */}
             {product.description && (
               <p className="text-sm text-stone-500 leading-relaxed mb-5 border-l-2 border-stone-200 pl-4">
                 {product.description}
               </p>
             )}
 
-            {/* Disponibilité */}
-            <div className={'inline-flex items-center gap-1.5 text-xs font-medium mb-6 px-3 py-1.5 rounded-full w-fit ' + (product.stock > 0 ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600')}>
-              <span className={'w-1.5 h-1.5 rounded-full ' + (product.stock > 0 ? 'bg-green-500' : 'bg-red-500')} />
-              {product.stock > 0 ? 'En stock (' + product.stock + ' disponibles)' : 'Rupture de stock'}
+            {product.hasVariants && product.variants?.length > 0 && (
+              <div className="mb-5">
+                <p className="text-xs text-stone-400 mb-2">
+                  Choix :{' '}
+                  <span className="text-stone-700 font-medium">
+                    {activeVariant ? activeVariant.label : 'Sélectionnez une option'}
+                  </span>
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {product.variants.map(function(v, i) {
+                    const isActive = selectedVariantIndex === i
+                    const outOfStock = Number(v.stock) === 0
+                    return (
+                      <button
+                        key={i}
+                        type="button"
+                        disabled={outOfStock}
+                        onClick={function() { setSelectedVariantIndex(i); setQty(1) }}
+                        title={outOfStock ? v.label + ' — rupture de stock' : v.label}
+                        className={
+                          'relative flex items-center gap-2 px-3 py-2 rounded-xl border-2 text-xs font-medium transition ' +
+                          (outOfStock
+                            ? 'border-stone-100 text-stone-300 cursor-not-allowed line-through'
+                            : isActive
+                              ? 'border-stone-900 text-stone-900 bg-stone-50'
+                              : 'border-stone-200 text-stone-600 hover:border-stone-400')
+                        }
+                      >
+                        {v.image && (
+                          <img
+                            src={getImageUrl(v.image)}
+                            alt={v.label}
+                            className="w-6 h-6 rounded-md object-cover flex-shrink-0"
+                            onError={onImgError}
+                          />
+                        )}
+                        {v.label}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            <div className={'inline-flex items-center gap-1.5 text-xs font-medium mb-6 px-3 py-1.5 rounded-full w-fit ' + (displayStock > 0 ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600')}>
+              <span className={'w-1.5 h-1.5 rounded-full ' + (displayStock > 0 ? 'bg-green-500' : 'bg-red-500')} />
+              {displayStock > 0 ? 'En stock (' + displayStock + ' disponibles)' : 'Rupture de stock'}
             </div>
 
-            {/* Quantité + Favoris */}
-            {product.stock > 0 && (
+            {displayStock > 0 && (
               <div className="flex items-center gap-3 mb-4">
                 <div className="flex items-center border border-stone-200 rounded-xl overflow-hidden bg-white">
                   <button onClick={function() { setQty(function(q) { return Math.max(1, q - 1) }) }} className="w-10 h-11 flex items-center justify-center text-stone-500 hover:bg-stone-50 transition text-lg">−</button>
                   <span className="w-10 text-center text-sm font-semibold text-stone-800">{qty}</span>
-                  <button onClick={function() { setQty(function(q) { return Math.min(product.stock, q + 1) }) }} className="w-10 h-11 flex items-center justify-center text-stone-500 hover:bg-stone-50 transition text-lg">+</button>
+                  <button onClick={function() { setQty(function(q) { return Math.min(displayStock, q + 1) }) }} className="w-10 h-11 flex items-center justify-center text-stone-500 hover:bg-stone-50 transition text-lg">+</button>
                 </div>
                 <button
                   onClick={function() { setWished(!wished) }}
@@ -268,22 +419,19 @@ export default function ProductPage() {
               </div>
             )}
 
-            {/* Boutons */}
             <div className="flex flex-col gap-3">
-              {/* Ajouter au panier */}
               <button
                 onClick={handleAdd}
-                disabled={product.stock === 0}
+                disabled={displayStock === 0}
                 className={'w-full py-4 text-sm tracking-[0.2em] uppercase font-medium rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed border-2 border-stone-900 ' + (added ? 'bg-stone-900 text-white' : 'text-stone-900 hover:bg-stone-900 hover:text-white')}
               >
                 <ShoppingBag size={16} />
-                {product.stock === 0 ? 'Rupture de stock' : added ? '✓ Ajouté au panier !' : 'Ajouter au panier'}
+                {displayStock === 0 ? 'Rupture de stock' : added ? '✓ Ajouté au panier !' : 'Ajouter au panier'}
               </button>
 
-              {/* Commander maintenant */}
               <button
                 onClick={handleBuyNow}
-                disabled={product.stock === 0}
+                disabled={displayStock === 0}
                 className="w-full py-4 text-sm tracking-[0.2em] uppercase font-medium rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed bg-stone-900 text-white hover:bg-stone-700"
               >
                 <Zap size={16} />
@@ -291,7 +439,6 @@ export default function ProductPage() {
               </button>
             </div>
 
-            {/* Garanties */}
             <div className="grid grid-cols-3 gap-2 mt-5 pt-5 border-t border-stone-100">
               {[
                 { icon: '🚚', label: 'Livraison gratuite' },
@@ -309,10 +456,8 @@ export default function ProductPage() {
           </div>
         </div>
 
-        {/* Section avis */}
         <div className="bg-white rounded-2xl border border-stone-100 overflow-hidden">
 
-          {/* Onglets */}
           <div className="flex border-b border-stone-100">
             {[
               { key: 'avis',   label: 'Avis clients (' + numReviews + ')' },
@@ -330,7 +475,6 @@ export default function ProductPage() {
             })}
           </div>
 
-          {/* Liste des avis */}
           {activeTab === 'avis' && (
             <div className="p-5">
               {reviews.length === 0 ? (
@@ -373,7 +517,6 @@ export default function ProductPage() {
             </div>
           )}
 
-          {/* Formulaire d'avis */}
           {activeTab === 'ecrire' && (
             <div className="p-5">
               <form onSubmit={handleSubmitReview} className="flex flex-col gap-4">

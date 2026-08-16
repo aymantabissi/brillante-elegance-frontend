@@ -5,6 +5,7 @@ import { fetchProducts } from '../store/slices/productSlice'
 import { Link, useSearchParams, useNavigate } from 'react-router-dom'
 import { Search, SlidersHorizontal, X, Heart, ShoppingBag, ChevronDown, Share2, Zap } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { PLACEHOLDER_IMAGE, onImgError } from '../utils/imageFallback'
 
 const categories = [
   { value: 'all',       label: 'Tous',      emoji: '✦' },
@@ -94,7 +95,7 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
       _id: product._id,
       name: product.name,
       price: product.price,
-      image: product.image && product.image.startsWith('http') ? product.image : 'https://via.placeholder.com/400',
+      image: product.image && product.image.startsWith('http') ? product.image : PLACEHOLDER_IMAGE,
       qty: 1,
     }))
     setAddedId(product._id)
@@ -112,7 +113,7 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
       _id: product._id,
       name: product.name,
       price: product.price,
-      image: product.image && product.image.startsWith('http') ? product.image : 'https://via.placeholder.com/400',
+      image: product.image && product.image.startsWith('http') ? product.image : PLACEHOLDER_IMAGE,
       qty: 1,
     }))
     navigate('/checkout')
@@ -131,9 +132,9 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
   }
 
   const getImageUrl = function(image) {
-    if (!image) return 'https://via.placeholder.com/400x400?text=Aucune+image'
+    if (!image) return PLACEHOLDER_IMAGE
     if (image.startsWith('http')) return image
-    return 'https://via.placeholder.com/400x400?text=Aucune+image'
+    return PLACEHOLDER_IMAGE
   }
 
   return (
@@ -308,6 +309,7 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
                       src={getImageUrl(product.image)}
                       alt={product.name}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      onError={onImgError}
                     />
 
                     {/* Badges */}

@@ -5,6 +5,7 @@ import { removeFromCart, updateQty, clearCart } from '../store/slices/cartSlice'
 import { Trash2 } from 'lucide-react'
 import api from '../services/api'
 import toast from 'react-hot-toast'
+import { onImgError } from '../utils/imageFallback'
 
 const toastStyle = {
   background: '#1c1917',
@@ -104,7 +105,10 @@ export default function CartPage() {
           <div className="lg:col-span-2 flex flex-col gap-4">
             <div className="flex justify-end">
               <button
-                onClick={function() { dispatch(clearCart()) }}
+                onClick={function() {
+                  dispatch(clearCart())
+                  toast('Panier vidé', { icon: '🗑️', style: toastStyle })
+                }}
                 className="text-xs text-stone-400 hover:text-red-500 tracking-widest uppercase transition"
               >
                 Vider le panier
@@ -120,7 +124,7 @@ export default function CartPage() {
               return (
                 <div key={item._id} className={'bg-white rounded-2xl p-5 flex gap-5 items-center shadow-sm transition ' + (promoApplied && isEligible ? 'ring-1 ring-green-200' : '')}>
                   <div className="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 relative">
-                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" onError={onImgError} />
                     {promoApplied && isEligible && (
                       <div className="absolute top-1 left-1 bg-green-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">
                         -{promoApplied.discount}%
@@ -133,8 +137,12 @@ export default function CartPage() {
                     <div className="flex items-center border border-stone-200 rounded-full w-fit overflow-hidden">
                       <button
                         onClick={function() {
-                          if (item.qty === 1) dispatch(removeFromCart(item._id))
-                          else dispatch(updateQty({ id: item._id, qty: item.qty - 1 }))
+                          if (item.qty === 1) {
+                            dispatch(removeFromCart(item._id))
+                            toast.error(item.name + ' retiré du panier', { style: toastStyle })
+                          } else {
+                            dispatch(updateQty({ id: item._id, qty: item.qty - 1 }))
+                          }
                         }}
                         className="w-8 h-8 flex items-center justify-center text-stone-500 hover:bg-stone-100 transition text-sm"
                       >−</button>
@@ -147,7 +155,13 @@ export default function CartPage() {
                   </div>
                   <div className="flex flex-col items-end gap-3 flex-shrink-0">
                     <span className="text-sm font-semibold text-stone-900">{(item.price * item.qty).toFixed(2)} MAD</span>
-                    <button onClick={function() { dispatch(removeFromCart(item._id)) }} className="text-stone-300 hover:text-red-500 transition">
+                    <button
+                      onClick={function() {
+                        dispatch(removeFromCart(item._id))
+                        toast.error(item.name + ' retiré du panier', { style: toastStyle })
+                      }}
+                      className="text-stone-300 hover:text-red-500 transition"
+                    >
                       <Trash2 size={16} />
                     </button>
                   </div>

@@ -2,26 +2,26 @@ import { Link } from 'react-router-dom'
 
 export default function Footer() {
   return (
-    <footer className="bg-white border-t border-stone-100">
+    <footer className="bg-white dark:bg-stone-900 border-t border-stone-100 dark:border-stone-800">
       <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-4 gap-10">
 
         {/* Logo + Contact */}
         <div>
           <div className="mb-6">
-            <h3 className="text-2xl font-bold tracking-[0.15em] text-stone-900 uppercase">Brillante</h3>
-            <p className="text-[9px] tracking-[0.4em] uppercase text-stone-400">Élégance</p>
+            <h3 className="text-2xl font-bold tracking-[0.15em] text-stone-900 dark:text-white uppercase">Brillante</h3>
+            <p className="text-[9px] tracking-[0.4em] uppercase text-stone-400 dark:text-stone-500">Élégance</p>
           </div>
-          <div className="flex flex-col gap-3 text-sm text-stone-600">
+          <div className="flex flex-col gap-3 text-sm text-stone-600 dark:text-stone-400">
             <div className="flex gap-2">
-              <span className="font-semibold text-stone-900 min-w-[70px]">Email :</span>
+              <span className="font-semibold text-stone-900 dark:text-stone-200 min-w-[70px]">Email :</span>
               <span>brillanteelegance@gmail.com</span>
             </div>
             <div className="flex gap-2">
-              <span className="font-semibold text-stone-900 min-w-[70px]">Téléphone :</span>
+              <span className="font-semibold text-stone-900 dark:text-stone-200 min-w-[70px]">Téléphone :</span>
               <span>06 38 29 86 30</span>
             </div>
             <div className="flex gap-2">
-              <span className="font-semibold text-stone-900 min-w-[70px]">Adresse :</span>
+              <span className="font-semibold text-stone-900 dark:text-stone-200 min-w-[70px]">Adresse :</span>
               <span>Maroc, Casablanca</span>
             </div>
           </div>
@@ -29,7 +29,7 @@ export default function Footer() {
 
         {/* Information */}
         <div>
-          <h4 className="text-xs font-bold tracking-[0.2em] uppercase text-stone-900 mb-5">Informations</h4>
+          <h4 className="text-xs font-bold tracking-[0.2em] uppercase text-stone-900 dark:text-white mb-5">Informations</h4>
           <ul className="flex flex-col gap-3">
             {[
               { label: 'Contactez-nous',      to: '/contact' },
@@ -40,7 +40,7 @@ export default function Footer() {
             ].map(function(item) {
               return (
                 <li key={item.label}>
-                  <Link to={item.to} className="text-sm text-stone-500 hover:text-stone-900 transition">{item.label}</Link>
+                  <Link to={item.to} className="text-sm text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white transition">{item.label}</Link>
                 </li>
               )
             })}
@@ -49,7 +49,7 @@ export default function Footer() {
 
         {/* Quick Shop */}
         <div>
-          <h4 className="text-xs font-bold tracking-[0.2em] uppercase text-stone-900 mb-5">Boutique rapide</h4>
+          <h4 className="text-xs font-bold tracking-[0.2em] uppercase text-stone-900 dark:text-white mb-5">Boutique rapide</h4>
           <ul className="flex flex-col gap-3">
             {[
               { label: 'Colliers',    to: '/shop?cat=colliers' },
@@ -59,7 +59,7 @@ export default function Footer() {
             ].map(function(item) {
               return (
                 <li key={item.label}>
-                  <Link to={item.to} className="text-sm text-stone-500 hover:text-stone-900 transition">{item.label}</Link>
+                  <Link to={item.to} className="text-sm text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white transition">{item.label}</Link>
                 </li>
               )
             })}
@@ -68,7 +68,7 @@ export default function Footer() {
 
         {/* Customer Services */}
         <div>
-          <h4 className="text-xs font-bold tracking-[0.2em] uppercase text-stone-900 mb-5">Service client</h4>
+          <h4 className="text-xs font-bold tracking-[0.2em] uppercase text-stone-900 dark:text-white mb-5">Service client</h4>
           <ul className="flex flex-col gap-3">
             {[
               { label: 'FAQ Commandes',                to: '/contact' },
@@ -78,7 +78,7 @@ export default function Footer() {
             ].map(function(item) {
               return (
                 <li key={item.label}>
-                  <Link to={item.to} className="text-sm text-stone-500 hover:text-stone-900 transition">{item.label}</Link>
+                  <Link to={item.to} className="text-sm text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white transition">{item.label}</Link>
                 </li>
               )
             })}
@@ -87,21 +87,21 @@ export default function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t border-stone-100 px-6 py-5">
+      <div className="border-t border-stone-100 dark:border-stone-800 px-6 py-5">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-stone-400">© 2026 Brillante Élégance. Tous droits réservés.</p>
+          <p className="text-xs text-stone-400 dark:text-stone-500">© 2026 Brillante Élégance. Tous droits réservés.</p>
           <div className="flex items-center gap-2">
-            <div className="w-10 h-6 bg-stone-100 rounded flex items-center justify-center">
+            <div className="w-10 h-6 bg-stone-100 dark:bg-stone-800 rounded flex items-center justify-center">
               <span className="text-[10px] font-bold text-blue-700">VISA</span>
             </div>
-            <div className="w-10 h-6 bg-stone-100 rounded flex items-center justify-center gap-0.5">
+            <div className="w-10 h-6 bg-stone-100 dark:bg-stone-800 rounded flex items-center justify-center gap-0.5">
               <div className="w-3 h-3 rounded-full bg-red-500 opacity-90"></div>
               <div className="w-3 h-3 rounded-full bg-yellow-400 opacity-90 -ml-1"></div>
             </div>
             <div className="w-10 h-6 bg-blue-600 rounded flex items-center justify-center">
               <span className="text-[8px] font-bold text-white">AMEX</span>
             </div>
-            <div className="w-10 h-6 bg-stone-100 rounded flex items-center justify-center">
+            <div className="w-10 h-6 bg-stone-100 dark:bg-stone-800 rounded flex items-center justify-center">
               <span className="text-[10px] font-bold text-blue-800">PP</span>
             </div>
             <div className="w-10 h-6 bg-orange-400 rounded flex items-center justify-center">
