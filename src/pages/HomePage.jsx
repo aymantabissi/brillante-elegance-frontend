@@ -229,7 +229,7 @@ function TrendingProducts({ wishlist, toggleWishlist }) {
         <div className="max-w-6xl mx-auto grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
           {Array(6).fill(null).map((_, i) => (
             <div key={i} className="rounded-2xl overflow-hidden">
-              <div className="w-full h-40 sm:h-72 bg-stone-200 animate-pulse rounded-2xl" />
+              <div className="w-full aspect-square bg-stone-200 animate-pulse rounded-2xl" />
               <div className="mt-3 space-y-2">
                 <div className="h-3 bg-stone-200 rounded-full animate-pulse w-2/3" />
                 <div className="h-3 bg-stone-200 rounded-full animate-pulse w-1/3" />
@@ -251,11 +251,11 @@ function TrendingProducts({ wishlist, toggleWishlist }) {
                 className="group relative cursor-pointer"
                 onClick={function() { navigate('/product/' + pid) }}
               >
-                <div className="relative overflow-hidden rounded-2xl">
+                <div className="relative overflow-hidden rounded-2xl aspect-square bg-stone-50">
                   <img
                     src={getImageUrl(product.image)}
                     alt={product.name}
-                    className="w-full h-40 sm:h-72 object-contain sm:object-cover bg-stone-50 transition-transform duration-500 group-hover:scale-105"
+                    className="w-full h-full object-contain sm:object-cover transition-transform duration-500 group-hover:scale-105"
                     onError={onImgError}
                   />
 
