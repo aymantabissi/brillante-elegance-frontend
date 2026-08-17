@@ -58,6 +58,15 @@ function App() {
     }
   }, [location.pathname])
 
+  // =====================================================
+  // SCROLL TO TOP — a chaque changement de page
+  // (React Router garde la position de scroll precedente
+  // par defaut, ce qui fait atterrir sur le footer)
+  // =====================================================
+  useEffect(function() {
+    window.scrollTo(0, 0)
+  }, [location.pathname])
+
   const toggleWishlist = function(productId) {
     setWishlist(function(prev) {
       if (prev.includes(productId)) {
