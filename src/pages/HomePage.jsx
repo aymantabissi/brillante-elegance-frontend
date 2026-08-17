@@ -226,10 +226,10 @@ function TrendingProducts({ wishlist, toggleWishlist }) {
       </div>
 
       {loading && (
-        <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="max-w-6xl mx-auto grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
           {Array(6).fill(null).map((_, i) => (
             <div key={i} className="rounded-2xl overflow-hidden">
-              <div className="w-full h-72 bg-stone-200 animate-pulse rounded-2xl" />
+              <div className="w-full h-40 sm:h-72 bg-stone-200 animate-pulse rounded-2xl" />
               <div className="mt-3 space-y-2">
                 <div className="h-3 bg-stone-200 rounded-full animate-pulse w-2/3" />
                 <div className="h-3 bg-stone-200 rounded-full animate-pulse w-1/3" />
@@ -240,7 +240,7 @@ function TrendingProducts({ wishlist, toggleWishlist }) {
       )}
 
       {!loading && (
-        <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="max-w-6xl mx-auto grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
           {displayed.map(function(product) {
             const pid      = product._id
             const isWished = wishlist.includes(pid)
@@ -255,7 +255,7 @@ function TrendingProducts({ wishlist, toggleWishlist }) {
                   <img
                     src={getImageUrl(product.image)}
                     alt={product.name}
-                    className="w-full h-72 object-contain sm:object-cover bg-stone-50 transition-transform duration-500 group-hover:scale-105"
+                    className="w-full h-40 sm:h-72 object-contain sm:object-cover bg-stone-50 transition-transform duration-500 group-hover:scale-105"
                     onError={onImgError}
                   />
 
