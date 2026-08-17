@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { addToCart } from '../store/slices/cartSlice'
 import { fetchProducts } from '../store/slices/productSlice'
 import { Link, useSearchParams, useNavigate } from 'react-router-dom'
-import { Search, SlidersHorizontal, X, Heart, ShoppingBag, ChevronDown, Share2, Zap } from 'lucide-react'
+import { Search, SlidersHorizontal, X, Heart, ShoppingBag, ChevronDown, Eye, Check } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { PLACEHOLDER_IMAGE, onImgError } from '../utils/imageFallback'
 
@@ -61,7 +61,6 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
   const [showFilters, setShowFilters] = useState(false)
   const [addedId,     setAddedId]     = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
-  const [sharedId,    setSharedId]    = useState(null)
 
   useEffect(function() { dispatch(fetchProducts()) }, [dispatch])
   useEffect(function() { if (catParam) setCategory(catParam) }, [catParam])
@@ -101,34 +100,6 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
     setAddedId(product._id)
     setTimeout(function() { setAddedId(null) }, 1500)
     toast.success(product.name + ' ajouté au panier !', { icon: '🛍️', style: toastStyle })
-  }
-
-  const handleBuyNow = function(e, product) {
-    e.stopPropagation()
-    if (product.stock === 0) {
-      toast.error('Produit en rupture de stock', { style: toastStyle })
-      return
-    }
-    dispatch(addToCart({
-      _id: product._id,
-      name: product.name,
-      price: product.price,
-      image: product.image && product.image.startsWith('http') ? product.image : PLACEHOLDER_IMAGE,
-      qty: 1,
-    }))
-    navigate('/checkout')
-  }
-
-  const handleShare = function(e, product) {
-    e.stopPropagation()
-    const url = window.location.origin + '/product/' + product._id
-    navigator.clipboard.writeText(url).then(function() {
-      setSharedId(product._id)
-      setTimeout(function() { setSharedId(null) }, 2000)
-      toast.success('Lien copié !', { icon: '🔗', style: toastStyle })
-    }).catch(function() {
-      toast.success('Lien copié !', { icon: '🔗', style: toastStyle })
-    })
   }
 
   const getImageUrl = function(image) {
@@ -294,7 +265,6 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
               const pid      = product._id
               const isWished = wishlist.includes(pid)
               const isAdded  = addedId === pid
-              const isShared = sharedId === pid
               const outOfStock = product.stock === 0
 
               return (
@@ -326,7 +296,7 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
                     </div>
 
                     {/* Boutons top-right */}
-                    <div className="absolute top-2 right-2 flex flex-col gap-1.5">
+                    <div className="absolute top-2 right-2 flex flex-col gap-1.5 z-10">
                       <button
                         onClick={function(e) { e.stopPropagation(); toggleWishlist(pid) }}
                         className="w-7 h-7 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform"
@@ -335,51 +305,26 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
                         <Heart size={13} className={'transition ' + (isWished ? 'fill-red-500 text-red-500' : 'text-stone-400')} />
                       </button>
                       <button
-                        onClick={function(e) { handleShare(e, product) }}
-                        className={'w-7 h-7 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-all ' + (isShared ? 'bg-green-500' : 'bg-white/90')}
-                        title="Partager"
+                        onClick={function(e) { e.stopPropagation(); navigate('/product/' + pid) }}
+                        className="w-7 h-7 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform"
+                        title="Aperçu rapide"
                       >
-                        <Share2 size={12} className={isShared ? 'text-white' : 'text-stone-400'} />
+                        <Eye size={13} className="text-stone-400" />
                       </button>
                     </div>
 
-                    {/* Boutons panier + commander — desktop hover */}
-                    <div className="hidden md:flex flex-col absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                      <button
-                        onClick={function(e) { handleAdd(e, product) }}
-                        disabled={outOfStock}
-                        className={'w-full py-2.5 text-[11px] tracking-[0.15em] uppercase font-medium transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50 ' + (isAdded ? 'bg-green-600 text-white' : 'bg-white text-stone-900 hover:bg-stone-100')}
-                      >
-                        <ShoppingBag size={11} />
-                        {isAdded ? 'Ajouté !' : 'Ajouter au panier'}
-                      </button>
-                      <button
-                        onClick={function(e) { handleBuyNow(e, product) }}
-                        disabled={outOfStock}
-                        className="w-full py-2.5 text-[11px] tracking-[0.15em] uppercase font-medium bg-stone-900 text-white hover:bg-stone-800 transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
-                      >
-                        <Zap size={11} />
-                        Commander
-                      </button>
-                    </div>
-
-                    {/* Boutons mobile — toujours visibles */}
-                    <div className="md:hidden absolute bottom-0 left-0 right-0 flex">
-                      <button
-                        onClick={function(e) { handleAdd(e, product) }}
-                        disabled={outOfStock}
-                        className={'flex-1 py-2.5 text-[9px] tracking-wide uppercase font-medium transition-colors disabled:opacity-50 ' + (isAdded ? 'bg-green-600 text-white' : 'bg-white/95 text-stone-900')}
-                      >
-                        {isAdded ? '✓' : '🛍️'}
-                      </button>
-                      <button
-                        onClick={function(e) { handleBuyNow(e, product) }}
-                        disabled={outOfStock}
-                        className="flex-1 py-2.5 text-[9px] tracking-wide uppercase font-medium bg-stone-900/95 text-white transition-colors disabled:opacity-50 border-l border-stone-700"
-                      >
-                        ⚡
-                      </button>
-                    </div>
+                    {/* Ajouter au panier */}
+                    <button
+                      onClick={function(e) { handleAdd(e, product) }}
+                      disabled={outOfStock}
+                      title={outOfStock ? 'Rupture de stock' : 'Ajouter au panier'}
+                      className={
+                        'absolute bottom-2 left-2 right-2 h-9 rounded-full shadow-md flex items-center justify-center transition disabled:opacity-50 z-10 ' +
+                        (isAdded ? 'bg-stone-900 text-white' : 'bg-white text-stone-800 hover:bg-stone-100')
+                      }
+                    >
+                      {isAdded ? <Check size={15} /> : <ShoppingBag size={15} />}
+                    </button>
                   </div>
 
                   {/* Infos */}
