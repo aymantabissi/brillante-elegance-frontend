@@ -15,8 +15,6 @@ const toastStyle = {
   padding: '12px 16px',
 }
 
-const WHATSAPP_NUMBER = '212638298630'
-
 export default function CheckoutPage() {
   const { items } = useSelector((state) => state.cart)
   const { user } = useSelector((state) => state.auth)
@@ -282,117 +280,10 @@ export default function CheckoutPage() {
       }
 
 
-      // =================================================
-      // WHATSAPP MESSAGE
-      // =================================================
-
-      const orderLines = items
-        .map((item) => {
-          return (
-            '• ' +
-            item.name +
-            ' x' +
-            item.qty +
-            ' — ' +
-            (
-              item.price * item.qty
-            ).toFixed(2) +
-            ' MAD'
-          )
-        })
-        .join('\n')
-
-
-      const deliveryText = isSafi
-        ? 'Safi — 10 MAD'
-        : 'Hors Safi — 35 MAD'
-
-
-      const message = [
-        '🛍️ *NOUVELLE COMMANDE — Brillante Elegance*',
-        '',
-        '🔖 *Commande:* #' +
-          createdOrder._id.slice(-6).toUpperCase(),
-        '',
-        '👤 *Client:* ' +
-          form.fullName,
-
-        '📞 *Tel:* ' +
-          form.phone,
-
-        '🏠 *Adresse:* ' +
-          form.fullAddress,
-
-        form.note
-          ? '📝 *Note:* ' +
-            form.note
-          : '',
-
-        '',
-
-        '*Produits:*',
-
-        orderLines,
-
-        '',
-
-        '💰 *Sous-total:* ' +
-          subtotal.toFixed(2) +
-          ' MAD',
-
-        discountAmount > 0
-          ? '🎉 *Code promo ' +
-            promoApplied.code +
-            ':* -' +
-            discountAmount.toFixed(2) +
-            ' MAD (-' +
-            promoApplied.discount +
-            '%)'
-          : '',
-
-        '🚚 *Livraison:* ' +
-          deliveryText,
-
-        '💵 *TOTAL: ' +
-          total.toFixed(2) +
-          ' MAD*',
-
-        '',
-
-        '💳 *Paiement:* Cash a la livraison',
-
-        '',
-
-        'Merci ! 🙏',
-      ]
-        .filter(Boolean)
-        .join('\n')
-        .trim()
-
-
-      // =================================================
-      // OPEN WHATSAPP
-      // =================================================
-
-      const encoded =
-        encodeURIComponent(message)
-
-      const url =
-        'https://wa.me/' +
-        WHATSAPP_NUMBER +
-        '?text=' +
-        encoded
-
-
       // Clear cart only after successful order
       dispatch(clearCart())
 
       setSent(true)
-
-      window.open(
-        url,
-        '_blank'
-      )
 
     } catch (error) {
 
@@ -463,7 +354,7 @@ export default function CheckoutPage() {
         </h2>
 
         <p className="text-stone-500 text-sm mb-2">
-          Votre commande a ete envoyee sur WhatsApp.
+          Votre commande a bien ete enregistree.
         </p>
 
         <p className="text-stone-400 text-xs mb-8">
@@ -556,21 +447,6 @@ export default function CheckoutPage() {
             <h2 className="text-lg font-light text-stone-900 mb-5">
               Contact Information
             </h2>
-
-            <div className="bg-white rounded-2xl border border-stone-100 px-5 py-4">
-
-              <label className="text-xs text-stone-400 block mb-1">
-                Email address
-              </label>
-
-              <input
-                type="email"
-                defaultValue={user?.email || ''}
-                className="w-full text-sm text-stone-700 focus:outline-none bg-transparent"
-                placeholder="votre@email.com"
-              />
-
-            </div>
 
             <p className="text-xs text-stone-400 mt-2 ml-1">
               {user
@@ -810,7 +686,7 @@ export default function CheckoutPage() {
               </div>
 
               <p className="text-xs text-stone-400 ml-8">
-                Pay with cash upon delivery. Commande envoyee via WhatsApp.
+                Pay with cash upon delivery.
               </p>
 
             </div>
@@ -914,12 +790,12 @@ export default function CheckoutPage() {
               <span>
                 {placingOrder
                   ? '⏳'
-                  : '📲'}
+                  : '✅'}
               </span>
 
               {placingOrder
                 ? 'Creation...'
-                : 'Place Order via WhatsApp'}
+                : 'Place Order'}
 
             </button>
 
@@ -1183,16 +1059,16 @@ export default function CheckoutPage() {
             </div>
 
 
-            {/* WHATSAPP INFO */}
+            {/* ORDER INFO */}
 
             <div className="mt-5 bg-green-50 border border-green-200 rounded-xl px-4 py-3 flex items-center gap-2">
 
               <span className="text-green-600 text-lg">
-                📲
+                ✅
               </span>
 
               <p className="text-xs text-green-700">
-                La commande sera enregistree et envoyee directement sur WhatsApp
+                Votre commande sera enregistree et traitee par notre equipe
               </p>
 
             </div>
@@ -1206,7 +1082,7 @@ export default function CheckoutPage() {
       <ConfirmDialog
         open={showConfirm}
         title="Confirmer la commande ?"
-        message={'Total : ' + total.toFixed(2) + ' MAD — vous serez redirige vers WhatsApp pour finaliser.'}
+        message={'Total : ' + total.toFixed(2) + ' MAD — votre commande sera enregistree et traitee par notre equipe.'}
         confirmLabel="Confirmer"
         onConfirm={submitOrder}
         onCancel={function() { setShowConfirm(false) }}

@@ -140,22 +140,10 @@ export default function ProductPage() {
     : []
 
   const [selectedImage, setSelectedImage] = useState(null)
-  const [zoomStyle,     setZoomStyle]     = useState({})
 
   useEffect(function() {
     setSelectedImage(displayImage)
   }, [displayImage])
-
-  const handleImageMouseMove = function(e) {
-    const { left, top, width, height } = e.currentTarget.getBoundingClientRect()
-    const x = ((e.clientX - left) / width) * 100
-    const y = ((e.clientY - top) / height) * 100
-    setZoomStyle({ transformOrigin: x + '% ' + y + '%', transform: 'scale(2)' })
-  }
-
-  const handleImageMouseLeave = function() {
-    setZoomStyle({ transformOrigin: 'center', transform: 'scale(1)' })
-  }
 
   useEffect(function() {
     if (displayStock !== undefined && qty > displayStock) {
@@ -284,16 +272,11 @@ export default function ProductPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
 
           <div className="relative">
-            <div
-              className="rounded-2xl overflow-hidden bg-white shadow-sm aspect-square cursor-zoom-in"
-              onMouseMove={handleImageMouseMove}
-              onMouseLeave={handleImageMouseLeave}
-            >
+            <div className="rounded-2xl overflow-hidden bg-white shadow-sm aspect-square">
               <img
                 src={getImageUrl(selectedImage || displayImage)}
                 alt={product.name}
-                className="w-full h-full object-cover transition-transform duration-200 ease-out"
-                style={zoomStyle}
+                className="w-full h-full object-cover"
                 onError={onImgError}
               />
             </div>
