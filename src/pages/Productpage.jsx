@@ -272,11 +272,11 @@ export default function ProductPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
 
           <div className="relative">
-            <div className="rounded-2xl overflow-hidden bg-white shadow-sm aspect-square">
+            <div className="rounded-2xl overflow-hidden bg-stone-50 shadow-sm aspect-square">
               <img
                 src={getImageUrl(selectedImage || displayImage)}
                 alt={product.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain sm:object-cover"
                 onError={onImgError}
               />
             </div>

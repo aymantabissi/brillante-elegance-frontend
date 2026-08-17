@@ -255,7 +255,7 @@ function TrendingProducts({ wishlist, toggleWishlist }) {
                   <img
                     src={getImageUrl(product.image)}
                     alt={product.name}
-                    className="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="w-full h-72 object-contain sm:object-cover bg-stone-50 transition-transform duration-500 group-hover:scale-105"
                     onError={onImgError}
                   />
 

@@ -89,11 +89,11 @@ export default function WishlistPage({ wishlist, toggleWishlist, products }) {
                 const pid = product._id
                 return (
                   <div key={pid} className="group bg-white rounded-2xl overflow-hidden border border-stone-100 hover:shadow-md transition duration-300">
-                    <div className="relative overflow-hidden">
+                    <div className="relative overflow-hidden bg-stone-50">
                       <img
                         src={getImageUrl(product.image)}
                         alt={product.name}
-                        className="w-full h-52 object-cover transition-transform duration-500 group-hover:scale-105"
+                        className="w-full h-52 object-contain sm:object-cover transition-transform duration-500 group-hover:scale-105"
                         onError={onImgError}
                       />
 

@@ -308,7 +308,7 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
                     <img
                       src={getImageUrl(product.image)}
                       alt={product.name}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      className="w-full h-full object-contain sm:object-cover transition-transform duration-700 group-hover:scale-105"
                       onError={onImgError}
                     />
 
