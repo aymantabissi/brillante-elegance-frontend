@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import api from '../../services/api'
 import toast from 'react-hot-toast'
 import { onImgError } from '../../utils/imageFallback'
+import ConfirmDialog from '../../components/ConfirmDialog'
 import {
   Package,
   RefreshCw,
@@ -13,6 +14,8 @@ import {
   MapPin,
   Calendar,
   CreditCard,
+  Trash2,
+  X,
 } from 'lucide-react'
 
 export default function AdminOrders() {
@@ -20,6 +23,9 @@ export default function AdminOrders() {
   const [loading, setLoading] = useState(true)
   const [sendingId, setSendingId] = useState(null)
   const [trackingId, setTrackingId] = useState(null)
+  const [selectedIds, setSelectedIds] = useState([])
+  const [bulkDeleting, setBulkDeleting] = useState(false)
+  const [showBulkConfirm, setShowBulkConfirm] = useState(false)
 
   // =====================================================
   // GET ORDERS
@@ -47,6 +53,39 @@ export default function AdminOrders() {
   useEffect(() => {
     fetchOrders()
   }, [])
+
+  // =====================================================
+  // SELECTION MULTIPLE + SUPPRESSION
+  // =====================================================
+
+  const toggleSelect = (id) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    )
+  }
+
+  const toggleSelectAll = () => {
+    setSelectedIds((prev) =>
+      prev.length === orders.length ? [] : orders.map((o) => o._id)
+    )
+  }
+
+  const confirmBulkDelete = async () => {
+    setShowBulkConfirm(false)
+    setBulkDeleting(true)
+    try {
+      await Promise.all(selectedIds.map((id) => api.delete(`/orders/${id}`)))
+      toast.success(
+        selectedIds.length + ' commande' + (selectedIds.length > 1 ? 's supprimées' : ' supprimée') + ' !'
+      )
+      setSelectedIds([])
+      await fetchOrders()
+    } catch (error) {
+      console.error('Bulk delete error:', error)
+      toast.error('Erreur lors de la suppression')
+    }
+    setBulkDeleting(false)
+  }
 
   // =====================================================
   // SEND ORDER TO COLISSPEED
@@ -283,13 +322,33 @@ export default function AdminOrders() {
           </p>
         </div>
 
-        <button
-          onClick={fetchOrders}
-          className="flex items-center justify-center gap-2 bg-stone-900 text-white text-xs px-5 py-3 rounded-xl hover:bg-stone-700 transition"
-        >
-          <RefreshCw size={14} />
-          Actualiser
-        </button>
+        <div className="flex items-center gap-3">
+
+          {selectedIds.length > 0 && (
+            <div className="flex items-center gap-3 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 rounded-xl px-4 py-2.5">
+              <span className="text-xs">{selectedIds.length} sélectionnée{selectedIds.length > 1 ? 's' : ''}</span>
+              <button
+                onClick={() => setShowBulkConfirm(true)}
+                disabled={bulkDeleting}
+                className="flex items-center gap-1.5 text-xs text-red-400 dark:text-red-600 hover:text-red-300 dark:hover:text-red-500 transition disabled:opacity-50"
+              >
+                <Trash2 size={13} /> {bulkDeleting ? 'Suppression...' : 'Supprimer'}
+              </button>
+              <button onClick={() => setSelectedIds([])} className="text-stone-400 dark:text-stone-500 hover:text-white dark:hover:text-stone-900 transition">
+                <X size={14} />
+              </button>
+            </div>
+          )}
+
+          <button
+            onClick={fetchOrders}
+            className="flex items-center justify-center gap-2 bg-stone-900 text-white text-xs px-5 py-3 rounded-xl hover:bg-stone-700 transition"
+          >
+            <RefreshCw size={14} />
+            Actualiser
+          </button>
+
+        </div>
 
       </div>
 
@@ -327,6 +386,15 @@ export default function AdminOrders() {
               <thead className="bg-stone-50 dark:bg-stone-800/50">
 
                 <tr className="text-xs tracking-widest uppercase text-stone-400 dark:text-stone-500">
+
+                  <th className="px-5 py-4 text-left w-10">
+                    <input
+                      type="checkbox"
+                      checked={orders.length > 0 && selectedIds.length === orders.length}
+                      onChange={toggleSelectAll}
+                      className="accent-stone-900 w-4 h-4"
+                    />
+                  </th>
 
                   <th className="px-5 py-4 text-left">
                     Commande
@@ -370,8 +438,20 @@ export default function AdminOrders() {
 
                   <tr
                     key={order._id}
-                    className="border-t border-stone-100 dark:border-stone-800 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition align-top"
+                    className={
+                      'border-t border-stone-100 dark:border-stone-800 transition align-top ' +
+                      (selectedIds.includes(order._id) ? 'bg-blue-50/50 dark:bg-blue-900/10' : 'hover:bg-stone-50 dark:hover:bg-stone-800/50')
+                    }
                   >
+
+                    <td className="px-5 py-5">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(order._id)}
+                        onChange={() => toggleSelect(order._id)}
+                        className="accent-stone-900 w-4 h-4"
+                      />
+                    </td>
 
                     {/* =====================================
                         ORDER
@@ -812,6 +892,16 @@ export default function AdminOrders() {
         </div>
 
       )}
+
+      <ConfirmDialog
+        open={showBulkConfirm}
+        title={'Supprimer ' + selectedIds.length + ' commande' + (selectedIds.length > 1 ? 's' : '') + ' ?'}
+        message="Cette action est irreversible."
+        confirmLabel="Supprimer"
+        danger
+        onConfirm={confirmBulkDelete}
+        onCancel={() => setShowBulkConfirm(false)}
+      />
 
     </div>
   )

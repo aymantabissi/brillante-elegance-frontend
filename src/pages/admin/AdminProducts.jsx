@@ -33,6 +33,9 @@ export default function AdminProducts() {
   const [uploadingVariantIndex, setUploadingVariantIndex] = useState(null)
   const [uploadingGallery, setUploadingGallery] = useState(false)
   const [deleteTarget,   setDeleteTarget]   = useState(null)
+  const [selectedIds,    setSelectedIds]    = useState([])
+  const [bulkDeleting,   setBulkDeleting]   = useState(false)
+  const [showBulkConfirm, setShowBulkConfirm] = useState(false)
 
   const getImageUrl = function(image) {
     if (!image) return PLACEHOLDER_IMAGE
@@ -237,6 +240,35 @@ export default function AdminProducts() {
     } catch(e) {
       toast.error('Erreur')
     }
+  }
+
+  // =====================================================
+  // SELECTION MULTIPLE
+  // =====================================================
+  const toggleSelect = function(id) {
+    setSelectedIds(function(prev) {
+      return prev.includes(id) ? prev.filter(function(x) { return x !== id }) : [...prev, id]
+    })
+  }
+
+  const toggleSelectAll = function() {
+    setSelectedIds(function(prev) {
+      return prev.length === filtered.length ? [] : filtered.map(function(p) { return p._id })
+    })
+  }
+
+  const confirmBulkDelete = async function() {
+    setShowBulkConfirm(false)
+    setBulkDeleting(true)
+    try {
+      await Promise.all(selectedIds.map(function(id) { return deleteProduct(id) }))
+      toast.success(selectedIds.length + ' produit' + (selectedIds.length > 1 ? 's supprimés' : ' supprimé') + ' !', { style: toastStyle })
+      setSelectedIds([])
+      dispatch(fetchProducts())
+    } catch (e) {
+      toast.error('Erreur lors de la suppression')
+    }
+    setBulkDeleting(false)
   }
 
   const handleToggleFeatured = async function(p) {
@@ -586,8 +618,8 @@ export default function AdminProducts() {
         </div>
       )}
 
-      {/* Search */}
-      <div className="mb-4">
+      {/* Search + Bulk actions */}
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <input
           type="text"
           value={search}
@@ -595,6 +627,22 @@ export default function AdminProducts() {
           placeholder="Rechercher un produit..."
           className="w-full sm:w-80 border border-stone-200 dark:border-stone-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-stone-400 dark:focus:border-stone-500 bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100"
         />
+
+        {selectedIds.length > 0 && (
+          <div className="flex items-center gap-3 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 rounded-xl px-4 py-2.5">
+            <span className="text-xs">{selectedIds.length} sélectionné{selectedIds.length > 1 ? 's' : ''}</span>
+            <button
+              onClick={function() { setShowBulkConfirm(true) }}
+              disabled={bulkDeleting}
+              className="flex items-center gap-1.5 text-xs text-red-400 dark:text-red-600 hover:text-red-300 dark:hover:text-red-500 transition disabled:opacity-50"
+            >
+              <Trash2 size={13} /> {bulkDeleting ? 'Suppression...' : 'Supprimer'}
+            </button>
+            <button onClick={function() { setSelectedIds([]) }} className="text-stone-400 dark:text-stone-500 hover:text-white dark:hover:text-stone-900 transition">
+              <X size={14} />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Table */}
@@ -603,6 +651,14 @@ export default function AdminProducts() {
           <table className="w-full text-sm">
             <thead className="bg-stone-50 dark:bg-stone-800/50 text-xs tracking-widest uppercase text-stone-400 dark:text-stone-500">
               <tr>
+                <th className="px-6 py-3 text-left w-10">
+                  <input
+                    type="checkbox"
+                    checked={filtered.length > 0 && selectedIds.length === filtered.length}
+                    onChange={toggleSelectAll}
+                    className="accent-stone-900 w-4 h-4"
+                  />
+                </th>
                 <th className="px-6 py-3 text-left">Produit</th>
                 <th className="px-6 py-3 text-left">Catégorie</th>
                 <th className="px-6 py-3 text-left">Prix</th>
@@ -615,12 +671,21 @@ export default function AdminProducts() {
             <tbody>
               {loading && (
                 <tr>
-                  <td colSpan={7} className="px-6 py-10 text-center text-stone-400 dark:text-stone-500">Chargement...</td>
+                  <td colSpan={8} className="px-6 py-10 text-center text-stone-400 dark:text-stone-500">Chargement...</td>
                 </tr>
               )}
               {!loading && filtered.map(function(p) {
+                const isSelected = selectedIds.includes(p._id)
                 return (
-                  <tr key={p._id} className={'border-t border-stone-50 dark:border-stone-800 transition ' + (p.featured ? 'bg-amber-50/50 dark:bg-amber-900/10' : 'hover:bg-stone-50 dark:hover:bg-stone-800/50')}>
+                  <tr key={p._id} className={'border-t border-stone-50 dark:border-stone-800 transition ' + (isSelected ? 'bg-blue-50/50 dark:bg-blue-900/10' : p.featured ? 'bg-amber-50/50 dark:bg-amber-900/10' : 'hover:bg-stone-50 dark:hover:bg-stone-800/50')}>
+                    <td className="px-6 py-4">
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={function() { toggleSelect(p._id) }}
+                        className="accent-stone-900 w-4 h-4"
+                      />
+                    </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <img
@@ -692,7 +757,7 @@ export default function AdminProducts() {
               })}
               {!loading && filtered.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-6 py-10 text-center text-stone-400 dark:text-stone-500">Aucun produit</td>
+                  <td colSpan={8} className="px-6 py-10 text-center text-stone-400 dark:text-stone-500">Aucun produit</td>
                 </tr>
               )}
             </tbody>
@@ -708,6 +773,16 @@ export default function AdminProducts() {
         danger
         onConfirm={confirmDelete}
         onCancel={function() { setDeleteTarget(null) }}
+      />
+
+      <ConfirmDialog
+        open={showBulkConfirm}
+        title={'Supprimer ' + selectedIds.length + ' produit' + (selectedIds.length > 1 ? 's' : '') + ' ?'}
+        message="Cette action est irreversible."
+        confirmLabel="Supprimer"
+        danger
+        onConfirm={confirmBulkDelete}
+        onCancel={function() { setShowBulkConfirm(false) }}
       />
     </div>
   )
