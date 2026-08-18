@@ -66,7 +66,9 @@ export default function CheckoutPage() {
 
   const isSafi = form.deliveryMethod === 'safi_10dh'
 
-  const deliveryFee = isSafi ? 10 : 35
+  const hasFreeShipping = items.some((item) => item.freeShipping)
+
+  const deliveryFee = hasFreeShipping ? 0 : (isSafi ? 10 : 35)
 
   const total =
     subtotal -
@@ -551,14 +553,24 @@ export default function CheckoutPage() {
                   Mode de livraison *
                 </label>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {hasFreeShipping && (
+                  <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-4 py-2.5 mb-3">
+                    <span className="text-green-600">🚚</span>
+                    <p className="text-xs text-green-700">
+                      Livraison gratuite — un article de votre panier en bénéficie.
+                    </p>
+                  </div>
+                )}
+
+                <div className={'grid grid-cols-1 sm:grid-cols-2 gap-3 ' + (hasFreeShipping ? 'opacity-60' : '')}>
 
                   <label
                     className={
-                      'flex items-center justify-between border-2 rounded-xl px-4 py-3 cursor-pointer transition ' +
+                      'flex items-center justify-between border-2 rounded-xl px-4 py-3 transition ' +
                       (form.deliveryMethod === 'safi_10dh'
                         ? 'border-stone-900 bg-[#faf9f7]'
-                        : 'border-stone-200 hover:border-stone-300')
+                        : 'border-stone-200 hover:border-stone-300') +
+                      (hasFreeShipping ? ' cursor-not-allowed' : ' cursor-pointer')
                     }
                   >
                     <div className="flex items-center gap-3">
@@ -567,6 +579,7 @@ export default function CheckoutPage() {
                         name="deliveryMethod"
                         value="safi_10dh"
                         checked={form.deliveryMethod === 'safi_10dh'}
+                        disabled={hasFreeShipping}
                         onChange={(e) =>
                           setForm({
                             ...form,
@@ -579,17 +592,18 @@ export default function CheckoutPage() {
                         Livraison à Safi
                       </span>
                     </div>
-                    <span className="text-sm font-semibold text-stone-800">
-                      10 DH
+                    <span className={'text-sm font-semibold ' + (hasFreeShipping ? 'text-green-600' : 'text-stone-800')}>
+                      {hasFreeShipping ? 'Gratuit' : '10 DH'}
                     </span>
                   </label>
 
                   <label
                     className={
-                      'flex items-center justify-between border-2 rounded-xl px-4 py-3 cursor-pointer transition ' +
+                      'flex items-center justify-between border-2 rounded-xl px-4 py-3 transition ' +
                       (form.deliveryMethod === 'outside_safi_35dh'
                         ? 'border-stone-900 bg-[#faf9f7]'
-                        : 'border-stone-200 hover:border-stone-300')
+                        : 'border-stone-200 hover:border-stone-300') +
+                      (hasFreeShipping ? ' cursor-not-allowed' : ' cursor-pointer')
                     }
                   >
                     <div className="flex items-center gap-3">
@@ -598,6 +612,7 @@ export default function CheckoutPage() {
                         name="deliveryMethod"
                         value="outside_safi_35dh"
                         checked={form.deliveryMethod === 'outside_safi_35dh'}
+                        disabled={hasFreeShipping}
                         onChange={(e) =>
                           setForm({
                             ...form,
@@ -610,8 +625,8 @@ export default function CheckoutPage() {
                         Hors Safi
                       </span>
                     </div>
-                    <span className="text-sm font-semibold text-stone-800">
-                      35 DH
+                    <span className={'text-sm font-semibold ' + (hasFreeShipping ? 'text-green-600' : 'text-stone-800')}>
+                      {hasFreeShipping ? 'Gratuit' : '35 DH'}
                     </span>
                   </label>
 
@@ -1016,8 +1031,8 @@ export default function CheckoutPage() {
                   Livraison
                 </span>
 
-                <span className="font-medium text-stone-800">
-                  {deliveryFee.toFixed(2)} MAD
+                <span className={'font-medium ' + (hasFreeShipping ? 'text-green-600' : 'text-stone-800')}>
+                  {hasFreeShipping ? 'Gratuit' : deliveryFee.toFixed(2) + ' MAD'}
                 </span>
 
               </div>
@@ -1034,9 +1049,9 @@ export default function CheckoutPage() {
                 </span>
 
                 <span>
-                  {isSafi
-                    ? '10 DH'
-                    : '35 DH'}
+                  {hasFreeShipping
+                    ? 'Gratuit'
+                    : (isSafi ? '10 DH' : '35 DH')}
                 </span>
 
               </div>

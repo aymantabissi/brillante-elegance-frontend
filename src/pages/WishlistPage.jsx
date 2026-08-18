@@ -31,6 +31,7 @@ export default function WishlistPage({ wishlist, toggleWishlist, products }) {
       price: product.price,
       image: product.image && product.image.startsWith('http') ? product.image : PLACEHOLDER_IMAGE,
       qty: 1,
+      freeShipping: !!product.freeShipping,
     }))
     toast.success(product.name + ' ajoute au panier !', { icon: '🛍️', style: toastStyle })
   }

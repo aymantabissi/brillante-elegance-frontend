@@ -187,6 +187,7 @@ export default function ProductPage() {
       image: getImageUrl(displayImage),
       qty,
       variantLabel: activeVariant ? activeVariant.label : undefined,
+      freeShipping: !!product.freeShipping,
     }))
     setAdded(true)
     setTimeout(function() { setAdded(false) }, 2000)
@@ -205,6 +206,7 @@ export default function ProductPage() {
       image: getImageUrl(displayImage),
       qty,
       variantLabel: activeVariant ? activeVariant.label : undefined,
+      freeShipping: !!product.freeShipping,
     }))
     navigate('/checkout')
   }
@@ -331,12 +333,18 @@ export default function ProductPage() {
               )}
             </div>
 
-            <div className="flex items-baseline gap-3 mb-5">
+            <div className={'flex items-baseline gap-3 ' + (product.freeShipping ? 'mb-3' : 'mb-5')}>
               <span className="text-3xl font-semibold text-stone-900">{displayPrice} <span className="text-lg font-normal">MAD</span></span>
               {product.oldPrice > 0 && (
                 <span className="text-lg text-stone-400 line-through">{product.oldPrice} MAD</span>
               )}
             </div>
+
+            {product.freeShipping && (
+              <div className="inline-flex items-center gap-1.5 text-xs font-medium mb-5 px-3 py-1.5 rounded-full w-fit bg-green-50 text-green-700">
+                🚚 Livraison gratuite pour cet article
+              </div>
+            )}
 
             {product.hasVariants && product.variants?.length > 0 && (
               <div className="mb-5">

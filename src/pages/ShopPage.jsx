@@ -96,6 +96,7 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
       price: product.price,
       image: product.image && product.image.startsWith('http') ? product.image : PLACEHOLDER_IMAGE,
       qty: 1,
+      freeShipping: !!product.freeShipping,
     }))
     setAddedId(product._id)
     setTimeout(function() { setAddedId(null) }, 1500)

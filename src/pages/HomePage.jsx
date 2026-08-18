@@ -191,6 +191,7 @@ function TrendingProducts({ wishlist, toggleWishlist }) {
       price: product.price,
       image: product.image && product.image.startsWith('http') ? product.image : PLACEHOLDER_IMAGE,
       qty: 1,
+      freeShipping: !!product.freeShipping,
     }))
     setAddedId(product._id)
     setTimeout(function() { setAddedId(null) }, 1500)
@@ -341,7 +342,7 @@ function FeaturedProduct() {
 
   const handleAddToCart = function() {
     if (!product) return
-    dispatch(addToCart({ _id: product._id, name: product.name, price: product.price, image: product.image, qty }))
+    dispatch(addToCart({ _id: product._id, name: product.name, price: product.price, image: product.image, qty, freeShipping: !!product.freeShipping }))
     setAdded(true)
     setTimeout(function() { setAdded(false) }, 2000)
     toast.success(product.name + ' ajouté au panier !', { icon: '🛍️', style: toastStyle })
@@ -442,7 +443,7 @@ function FeaturedProduct() {
               </button>
               <button
                 onClick={function() {
-                  dispatch(addToCart({ _id: product._id, name: product.name, price: product.price, image: product.image, qty }))
+                  dispatch(addToCart({ _id: product._id, name: product.name, price: product.price, image: product.image, qty, freeShipping: !!product.freeShipping }))
                   navigate('/checkout')
                 }}
                 disabled={product.stock === 0}
