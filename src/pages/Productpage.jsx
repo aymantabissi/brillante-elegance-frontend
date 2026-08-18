@@ -396,7 +396,7 @@ export default function ProductPage() {
               </div>
             )}
 
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3 sticky top-16 z-5 bg-[#FAF9F7] py-2">
               <button
                 onClick={handleAdd}
                 disabled={displayStock === 0}
