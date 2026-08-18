@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import toast from 'react-hot-toast'
@@ -49,10 +49,17 @@ function App() {
 
   // =====================================================
   // META PIXEL — PageView à chaque changement de route
-  // (le PageView initial est déjà envoyé par index.html,
-  // ici on couvre la navigation interne du SPA)
+  // (le PageView initial est déjà envoyé par index.html —
+  // on saute le tout premier mount pour ne pas le doubler,
+  // et on couvre seulement la navigation interne du SPA)
   // =====================================================
+  const isFirstPageView = useRef(true)
+
   useEffect(function() {
+    if (isFirstPageView.current) {
+      isFirstPageView.current = false
+      return
+    }
     if (window.fbq) {
       window.fbq('track', 'PageView')
     }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { addToCart } from '../store/slices/cartSlice'
@@ -153,8 +153,16 @@ export default function ProductPage() {
 
   // =====================================================
   // META PIXEL — helper pour envoyer AddToCart
+  // (garde-fou anti double-clic : pas plus d'un envoi
+  // toutes les 2s, pour ne pas polluer les données Pixel)
   // =====================================================
+  const lastAddToCartTrackRef = useRef(0)
+
   const trackAddToCart = function() {
+    const now = Date.now()
+    if (now - lastAddToCartTrackRef.current < 2000) return
+    lastAddToCartTrackRef.current = now
+
     if (window.fbq) {
       window.fbq('track', 'AddToCart', {
         content_ids: [product._id],
