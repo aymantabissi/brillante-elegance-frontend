@@ -245,7 +245,7 @@ export default function ProductPage() {
   )
 
   return (
-    <main className="min-h-screen" style={{ background: '#FAF9F7' }}>
+    <main className="min-h-screen pb-20" style={{ background: '#FAF9F7' }}>
 
       <div className="bg-white border-b border-stone-100 sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 h-12 flex items-center justify-between">
@@ -396,26 +396,6 @@ export default function ProductPage() {
               </div>
             )}
 
-            <div className="flex flex-col gap-3 sticky top-16 z-5 bg-[#FAF9F7] py-2">
-              <button
-                onClick={handleAdd}
-                disabled={displayStock === 0}
-                className={'w-full py-4 text-sm tracking-[0.2em] uppercase font-medium rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed border-2 border-stone-900 ' + (added ? 'bg-stone-900 text-white' : 'text-stone-900 hover:bg-stone-900 hover:text-white')}
-              >
-                <ShoppingBag size={16} />
-                {displayStock === 0 ? 'Rupture de stock' : added ? '✓ Ajouté au panier !' : 'Ajouter au panier'}
-              </button>
-
-              <button
-                onClick={handleBuyNow}
-                disabled={displayStock === 0}
-                className="w-full py-4 text-sm tracking-[0.2em] uppercase font-medium rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed bg-stone-900 text-white hover:bg-stone-700"
-              >
-                <Zap size={16} />
-                Commander maintenant
-              </button>
-            </div>
-
             {product.description && (
               <p className="text-sm text-stone-500 leading-relaxed mt-5 border-l-2 border-stone-200 pl-4">
                 {product.description}
@@ -542,6 +522,25 @@ export default function ProductPage() {
           )}
         </div>
 
+      </div>
+
+      <div className="fixed bottom-0 left-0 right-0 z-20 bg-white border-t border-stone-100 flex shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+        <button
+          onClick={handleAdd}
+          disabled={displayStock === 0}
+          className={'flex-1 py-4 text-xs sm:text-sm tracking-[0.15em] uppercase font-medium transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed ' + (added ? 'bg-stone-900 text-white' : 'text-stone-900 hover:bg-stone-50')}
+        >
+          <ShoppingBag size={16} />
+          {displayStock === 0 ? 'Rupture' : added ? '✓ Ajouté !' : 'Ajouter au panier'}
+        </button>
+        <button
+          onClick={handleBuyNow}
+          disabled={displayStock === 0}
+          className="flex-1 py-4 text-xs sm:text-sm tracking-[0.15em] uppercase font-medium transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed bg-stone-900 text-white hover:bg-stone-700"
+        >
+          <Zap size={16} />
+          Commander maintenant
+        </button>
       </div>
     </main>
   )
