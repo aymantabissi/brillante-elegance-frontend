@@ -330,12 +330,6 @@ export default function ProductPage() {
               )}
             </div>
 
-            {product.description && (
-              <p className="text-sm text-stone-500 leading-relaxed mb-5 border-l-2 border-stone-200 pl-4">
-                {product.description}
-              </p>
-            )}
-
             {product.hasVariants && product.variants?.length > 0 && (
               <div className="mb-5">
                 <p className="text-xs text-stone-400 mb-2">
@@ -421,6 +415,12 @@ export default function ProductPage() {
                 Commander maintenant
               </button>
             </div>
+
+            {product.description && (
+              <p className="text-sm text-stone-500 leading-relaxed mt-5 border-l-2 border-stone-200 pl-4">
+                {product.description}
+              </p>
+            )}
 
             <div className="grid grid-cols-3 gap-2 mt-5 pt-5 border-t border-stone-100">
               {[
