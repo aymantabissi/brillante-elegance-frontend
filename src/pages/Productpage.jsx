@@ -412,7 +412,7 @@ export default function ProductPage() {
 
             <div className="grid grid-cols-3 gap-2 mt-5 pt-5 border-t border-stone-100">
               {[
-                { icon: '🚚', label: 'Livraison gratuite' },
+                { icon: '🚚', label: product.freeShipping ? 'Livraison gratuite' : 'Livraison rapide' },
                 { icon: '🔄', label: 'Retour sous 7 jours' },
                 { icon: '🔒', label: 'Paiement sécurisé' },
               ].map(function(b) {

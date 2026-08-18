@@ -16,6 +16,7 @@ const emptyProduct = {
   name: '', price: '', oldPrice: '', category: 'colliers',
   description: '', image: '', images: [], stock: '', hot: false, discount: '',
   featured: false,
+  freeShipping: false,
   hasVariants: false,
   variants: [],
 }
@@ -495,6 +496,17 @@ export default function AdminProducts() {
                 <span className="text-sm text-stone-600 dark:text-stone-400 flex items-center gap-1">
                   <Star size={13} className="text-amber-500" />
                   Afficher en vedette (page d'accueil)
+                </span>
+              </label>
+
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox" id="freeShipping"
+                  checked={form.freeShipping}
+                  onChange={function(e) { setForm({ ...form, freeShipping: e.target.checked }) }}
+                  className="accent-green-600 w-4 h-4" />
+                <span className="text-sm text-stone-600 dark:text-stone-400">
+                  🚚 Livraison gratuite
                 </span>
               </label>
             </div>
