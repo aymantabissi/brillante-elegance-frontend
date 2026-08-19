@@ -257,7 +257,7 @@ export default function CartPage() {
                   <span>🔒</span> Paiement sécurisé
                 </div>
                 <div className="flex items-center gap-1 text-stone-400 text-[11px]">
-                  <span>🚚</span> Livraison gratuite
+                  <span>🚚</span> Livraison partout au Maroc
                 </div>
               </div>
             </div>

@@ -32,8 +32,9 @@ export default function CheckoutPage() {
   const [form, setForm] = useState({
     fullName: '',
     phone: '',
+    city: '',
     fullAddress: '',
-    deliveryMethod: 'safi_10dh',
+    deliveryMethod: 'national_20dh',
     note: '',
     showNote: false,
     coupon: '',
@@ -60,15 +61,12 @@ export default function CheckoutPage() {
 
   // =====================================================
   // DELIVERY
-  // Choisi manuellement via boutons radio
-  // Safi = 10 DH — Hors Safi = 35 DH
+  // Tarif unique — livraison partout au Maroc = 20 DH
   // =====================================================
-
-  const isSafi = form.deliveryMethod === 'safi_10dh'
 
   const hasFreeShipping = items.some((item) => item.freeShipping)
 
-  const deliveryFee = hasFreeShipping ? 0 : (isSafi ? 10 : 35)
+  const deliveryFee = hasFreeShipping ? 0 : 20
 
   const total =
     subtotal -
@@ -155,6 +153,10 @@ export default function CheckoutPage() {
       e.phone = 'Telephone requis'
     }
 
+    if (!form.city.trim()) {
+      e.city = 'Ville requise'
+    }
+
     if (!form.fullAddress.trim()) {
       e.fullAddress = 'Adresse requise'
     }
@@ -226,7 +228,7 @@ export default function CheckoutPage() {
         client: {
           name: form.fullName.trim(),
           phone: form.phone.trim(),
-          city: isSafi ? 'Safi' : 'Hors Safi',
+          city: form.city.trim(),
           address: form.fullAddress.trim(),
           email: user?.email || '',
         },
@@ -545,92 +547,68 @@ export default function CheckoutPage() {
               </div>
 
 
-              {/* MODE DE LIVRAISON — RADIO */}
+              {/* MODE DE LIVRAISON — TARIF UNIQUE */}
 
               <div>
 
                 <label className="text-xs text-stone-400 block mb-2">
-                  Mode de livraison *
+                  Livraison
                 </label>
 
-                {hasFreeShipping && (
-                  <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-4 py-2.5 mb-3">
-                    <span className="text-green-600">🚚</span>
-                    <p className="text-xs text-green-700">
-                      Livraison gratuite — un article de votre panier en bénéficie.
-                    </p>
+                <div className="flex items-center justify-between border-2 border-stone-900 bg-[#faf9f7] rounded-xl px-4 py-3">
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg">🚚</span>
+                    <span className="text-sm text-stone-800">
+                      Livraison partout au Maroc
+                    </span>
                   </div>
+                  <span className={'text-sm font-semibold ' + (hasFreeShipping ? 'text-green-600' : 'text-stone-800')}>
+                    {hasFreeShipping ? 'Gratuit' : '20 DH'}
+                  </span>
+                </div>
+
+                {hasFreeShipping && (
+                  <p className="text-xs text-green-700 mt-2">
+                    Un article de votre panier bénéficie de la livraison gratuite.
+                  </p>
                 )}
 
-                <div className={'grid grid-cols-1 sm:grid-cols-2 gap-3 ' + (hasFreeShipping ? 'opacity-60' : '')}>
+              </div>
 
-                  <label
-                    className={
-                      'flex items-center justify-between border-2 rounded-xl px-4 py-3 transition ' +
-                      (form.deliveryMethod === 'safi_10dh'
-                        ? 'border-stone-900 bg-[#faf9f7]'
-                        : 'border-stone-200 hover:border-stone-300') +
-                      (hasFreeShipping ? ' cursor-not-allowed' : ' cursor-pointer')
-                    }
-                  >
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="radio"
-                        name="deliveryMethod"
-                        value="safi_10dh"
-                        checked={form.deliveryMethod === 'safi_10dh'}
-                        disabled={hasFreeShipping}
-                        onChange={(e) =>
-                          setForm({
-                            ...form,
-                            deliveryMethod: e.target.value,
-                          })
-                        }
-                        className="accent-stone-900 w-4 h-4"
-                      />
-                      <span className="text-sm text-stone-800">
-                        Livraison à Safi
-                      </span>
-                    </div>
-                    <span className={'text-sm font-semibold ' + (hasFreeShipping ? 'text-green-600' : 'text-stone-800')}>
-                      {hasFreeShipping ? 'Gratuit' : '10 DH'}
-                    </span>
-                  </label>
 
-                  <label
-                    className={
-                      'flex items-center justify-between border-2 rounded-xl px-4 py-3 transition ' +
-                      (form.deliveryMethod === 'outside_safi_35dh'
-                        ? 'border-stone-900 bg-[#faf9f7]'
-                        : 'border-stone-200 hover:border-stone-300') +
-                      (hasFreeShipping ? ' cursor-not-allowed' : ' cursor-pointer')
-                    }
-                  >
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="radio"
-                        name="deliveryMethod"
-                        value="outside_safi_35dh"
-                        checked={form.deliveryMethod === 'outside_safi_35dh'}
-                        disabled={hasFreeShipping}
-                        onChange={(e) =>
-                          setForm({
-                            ...form,
-                            deliveryMethod: e.target.value,
-                          })
-                        }
-                        className="accent-stone-900 w-4 h-4"
-                      />
-                      <span className="text-sm text-stone-800">
-                        Hors Safi
-                      </span>
-                    </div>
-                    <span className={'text-sm font-semibold ' + (hasFreeShipping ? 'text-green-600' : 'text-stone-800')}>
-                      {hasFreeShipping ? 'Gratuit' : '35 DH'}
-                    </span>
-                  </label>
+              {/* VILLE */}
 
-                </div>
+              <div>
+
+                <label className="text-xs text-stone-400 block mb-1">
+                  Ville *
+                </label>
+
+                <input
+                  type="text"
+                  value={form.city}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      city: e.target.value,
+                    })
+                  }
+                  className={
+                    'w-full border rounded-xl px-4 py-3 text-sm text-stone-700 focus:outline-none bg-[#faf9f7] transition ' +
+                    (
+                      errors.city
+                        ? 'border-red-400'
+                        : 'border-stone-200 focus:border-stone-400'
+                    )
+                  }
+                  placeholder="Casablanca, Rabat, Marrakech..."
+                />
+
+                {errors.city && (
+                  <p className="text-red-400 text-[11px] mt-1">
+                    {errors.city}
+                  </p>
+                )}
 
               </div>
 
@@ -640,7 +618,7 @@ export default function CheckoutPage() {
               <div>
 
                 <label className="text-xs text-stone-400 block mb-1">
-                  Ville avec adresse *
+                  Adresse complète *
                 </label>
 
                 <input
@@ -660,7 +638,7 @@ export default function CheckoutPage() {
                         : 'border-stone-200 focus:border-stone-400'
                     )
                   }
-                  placeholder="Casa, quartier X, 01 rue exemple, code postal"
+                  placeholder="Quartier X, 01 rue exemple, code postal"
                 />
 
                 {errors.fullAddress && (
@@ -1043,15 +1021,13 @@ export default function CheckoutPage() {
               <div className="flex justify-between text-[11px] text-stone-400">
 
                 <span>
-                  {isSafi
-                    ? 'Safi'
-                    : 'Hors Safi'}
+                  {form.city.trim() || 'Livraison'}
                 </span>
 
                 <span>
                   {hasFreeShipping
                     ? 'Gratuit'
-                    : (isSafi ? '10 DH' : '35 DH')}
+                    : '20 DH'}
                 </span>
 
               </div>

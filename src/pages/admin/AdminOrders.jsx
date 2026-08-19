@@ -264,6 +264,7 @@ export default function AdminOrders() {
   const deliveryLabels = {
     safi_10dh: 'Safi - 10 DH',
     outside_safi_35dh: 'Hors Safi - 35 DH',
+    national_20dh: 'Partout au Maroc - 20 DH',
   }
 
   // =====================================================
@@ -682,7 +683,7 @@ export default function AdminOrders() {
                       <select
                         value={
                           order.deliveryMethod ||
-                          'safi_10dh'
+                          'national_20dh'
                         }
                         onChange={(e) =>
                           updateDeliveryMethod(
@@ -692,6 +693,10 @@ export default function AdminOrders() {
                         }
                         className="text-[11px] bg-stone-100 dark:bg-stone-700 text-stone-600 dark:text-stone-300 px-3 py-2 rounded-full border-0 outline-none cursor-pointer"
                       >
+
+                        <option value="national_20dh">
+                          Partout au Maroc - 20 DH
+                        </option>
 
                         <option value="safi_10dh">
                           Safi - 10 DH
