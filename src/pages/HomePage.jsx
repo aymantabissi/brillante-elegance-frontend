@@ -188,8 +188,18 @@ function TrendingProducts({ wishlist, toggleWishlist }) {
   const navigate   = useNavigate()
   const { items: products, loading } = useSelector((state) => state.products)
   const [addedId,  setAddedId]  = useState(null)
+  const [displayed, setDisplayed] = useState([])
 
   useEffect(function() { dispatch(fetchProducts()) }, [dispatch])
+
+  useEffect(function() {
+    const shuffled = [...products]
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    }
+    setDisplayed(shuffled.slice(0, 6))
+  }, [products])
 
   const handleAdd = function(product) {
     if (product.stock === 0) {
@@ -213,8 +223,6 @@ function TrendingProducts({ wishlist, toggleWishlist }) {
     if (image.startsWith('http')) return image
     return PLACEHOLDER_IMAGE
   }
-
-  const displayed = products.slice(0, 6)
 
   return (
     <section className="bg-white py-16 px-4">

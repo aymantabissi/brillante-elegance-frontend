@@ -100,7 +100,7 @@ function App() {
           <Route path="/about"       element={<AboutPage />} />
           <Route path="/contact"     element={<ContactPage />} />
           <Route path="/faq"         element={<FAQPage />} />
-          <Route path="/product/:id" element={<ProductPage />} />
+          <Route path="/product/:id" element={<ProductPage wishlist={wishlist} toggleWishlist={toggleWishlist} />} />
           <Route path="/cart"        element={<CartPage />} />
           <Route path="/checkout"    element={<CheckoutPage />} />
           <Route path="/login"       element={!user ? <LoginPage /> : (user.role === 'admin' ? <Navigate to="/admin" /> : user.role === 'creator' ? <Navigate to="/creator" /> : <Navigate to="/" />)} />

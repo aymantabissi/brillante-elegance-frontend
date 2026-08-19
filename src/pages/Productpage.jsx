@@ -77,7 +77,7 @@ function SkeletonProduct() {
   )
 }
 
-export default function ProductPage() {
+export default function ProductPage({ wishlist, toggleWishlist }) {
   const { id }    = useParams()
   const dispatch  = useDispatch()
   const navigate  = useNavigate()
@@ -87,8 +87,8 @@ export default function ProductPage() {
   const [loading,    setLoading]    = useState(true)
   const [qty,        setQty]        = useState(1)
   const [added,      setAdded]      = useState(false)
-  const [wished,     setWished]     = useState(false)
   const [activeTab,  setActiveTab]  = useState('avis')
+  const [related,    setRelated]    = useState([])
 
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(null)
 
@@ -117,6 +117,25 @@ export default function ProductPage() {
 
   useEffect(function() { fetchAll() }, [id])
 
+  // =====================================================
+  // PRODUITS SIMILAIRES — meme categorie, produit actuel exclu
+  // =====================================================
+  useEffect(function() {
+    if (!product) return
+
+    api.get('/products', { params: { category: product.category } })
+      .then(function(res) {
+        const others = res.data.filter(function(p) { return p._id !== product._id })
+        const shuffled = [...others]
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1))
+          ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+        }
+        setRelated(shuffled.slice(0, 4))
+      })
+      .catch(function() {})
+  }, [product?._id, product?.category])
+
   const activeVariant = (
     product?.hasVariants &&
     product.variants?.length > 0 &&
@@ -134,6 +153,8 @@ export default function ProductPage() {
   const displayImage = activeVariant && activeVariant.image
     ? activeVariant.image
     : product?.image
+
+  const isWished = !!(wishlist && product && wishlist.includes(product._id))
 
   const galleryImages = product
     ? [product.image, ...(product.images || [])].filter(Boolean).filter(function(img, i, arr) { return arr.indexOf(img) === i })
@@ -156,12 +177,12 @@ export default function ProductPage() {
   // (garde-fou anti double-clic : pas plus d'un envoi
   // toutes les 2s, pour ne pas polluer les données Pixel)
   // =====================================================
-  const lastAddToCartTrackRef = useRef(0)
+  const addToCartTrackCooldownRef = useRef(false)
 
   const trackAddToCart = function() {
-    const now = Date.now()
-    if (now - lastAddToCartTrackRef.current < 2000) return
-    lastAddToCartTrackRef.current = now
+    if (addToCartTrackCooldownRef.current) return
+    addToCartTrackCooldownRef.current = true
+    setTimeout(function() { addToCartTrackCooldownRef.current = false }, 2000)
 
     if (window.fbq) {
       window.fbq('track', 'AddToCart', {
@@ -403,11 +424,11 @@ export default function ProductPage() {
                   <button onClick={function() { setQty(function(q) { return Math.min(displayStock, q + 1) }) }} className="w-10 h-11 flex items-center justify-center text-stone-500 hover:bg-stone-50 transition text-lg">+</button>
                 </div>
                 <button
-                  onClick={function() { setWished(!wished) }}
-                  className={'w-11 h-11 rounded-xl border flex items-center justify-center transition ' + (wished ? 'bg-red-50 border-red-200 text-red-500' : 'bg-white border-stone-200 text-stone-400 hover:border-stone-300')}
-                  title={wished ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+                  onClick={function() { toggleWishlist && toggleWishlist(product._id) }}
+                  className={'w-11 h-11 rounded-xl border flex items-center justify-center transition ' + (isWished ? 'bg-red-50 border-red-200 text-red-500' : 'bg-white border-stone-200 text-stone-400 hover:border-stone-300')}
+                  title={isWished ? 'Retirer des favoris' : 'Ajouter aux favoris'}
                 >
-                  <Heart size={16} className={wished ? 'fill-red-500' : ''} />
+                  <Heart size={16} className={isWished ? 'fill-red-500' : ''} />
                 </button>
               </div>
             )}
@@ -537,6 +558,66 @@ export default function ProductPage() {
             </div>
           )}
         </div>
+
+        {related.length > 0 && (
+          <div className="mt-12">
+            <h2 className="text-lg font-light text-stone-900 mb-5" style={{ fontFamily: 'Georgia, serif' }}>
+              Vous aimerez aussi
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
+              {related.map(function(p) {
+                const rWished = !!(wishlist && wishlist.includes(p._id))
+                const outOfStock = p.stock === 0
+                return (
+                  <div
+                    key={p._id}
+                    onClick={function() { navigate('/product/' + p._id) }}
+                    className="group bg-white rounded-2xl overflow-hidden cursor-pointer border border-stone-100 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+                  >
+                    <div className="relative overflow-hidden aspect-square bg-stone-50">
+                      <img
+                        src={getImageUrl(p.image)}
+                        alt={p.name}
+                        className="w-full h-full object-contain sm:object-cover transition-transform duration-700 group-hover:scale-105"
+                        onError={onImgError}
+                      />
+
+                      <div className="absolute top-2 left-2 flex flex-col gap-1">
+                        {p.discount > 0 && (
+                          <span className="bg-red-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">-{p.discount}%</span>
+                        )}
+                        {p.hot && (
+                          <span className="bg-amber-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">POPULAIRE</span>
+                        )}
+                        {outOfStock && (
+                          <span className="bg-stone-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">Épuisé</span>
+                        )}
+                      </div>
+
+                      <button
+                        onClick={function(e) { e.stopPropagation(); toggleWishlist && toggleWishlist(p._id) }}
+                        className="absolute top-2 right-2 w-7 h-7 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform"
+                        title="Favoris"
+                      >
+                        <Heart size={13} className={'transition ' + (rWished ? 'fill-red-500 text-red-500' : 'text-stone-400')} />
+                      </button>
+                    </div>
+
+                    <div className="p-3">
+                      <h3 className="text-xs font-medium text-stone-800 mb-1 leading-snug line-clamp-2">{p.name}</h3>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-semibold text-stone-900">{p.price} MAD</span>
+                        {p.oldPrice > 0 && (
+                          <span className="text-[11px] text-stone-400 line-through">{p.oldPrice} MAD</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
 
       </div>
 

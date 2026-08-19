@@ -54,7 +54,7 @@ export default function AdminCollections() {
       })
 
       toast.success('Image mise à jour !', { style: toastStyle })
-    } catch (err) {
+    } catch {
       toast.error('Erreur lors de l\'upload', { style: toastStyle })
     }
 
