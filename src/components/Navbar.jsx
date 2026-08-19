@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { logout } from '../store/slices/authSlice'
 import { ShoppingBag, X, Menu, Heart } from 'lucide-react'
 import toast from 'react-hot-toast'
+import api from '../services/api'
 
 const toastStyle = {
   background: '#1c1917',
@@ -17,6 +18,13 @@ export default function Navbar({ wishlistCount = 0 }) {
   const [showBanner, setShowBanner] = useState(true)
   const [showMenu,   setShowMenu]   = useState(false)
   const [scrolled,   setScrolled]   = useState(false)
+  const [promoBar,   setPromoBar]   = useState({ enabled: true, text: "SOLDES D'ÉTÉ — -15% sur tous les produits.", code: 'foryou50' })
+
+  useEffect(function() {
+    api.get('/settings')
+      .then(function(res) { if (res.data?.promoBar) setPromoBar(res.data.promoBar) })
+      .catch(function() {})
+  }, [])
 
   const { user }  = useSelector((state) => state.auth)
   const { items } = useSelector((state) => state.cart)
@@ -45,21 +53,23 @@ export default function Navbar({ wishlistCount = 0 }) {
     <div className="fixed top-0 left-0 right-0 z-50">
 
       {/* Top Banner */}
-      {showBanner && (
+      {showBanner && promoBar.enabled && (
         <div className="bg-black text-white text-sm py-2.5 px-6 flex items-center justify-center relative">
           <p className="tracking-wide text-center text-xs">
-            SOLDES D'ÉTÉ — -15% sur tous les produits.{' '}
-            <span className="text-stone-300 font-mono">foryou50</span>
+            {promoBar.text}{' '}
+            {promoBar.code && <span className="text-stone-300 font-mono">{promoBar.code}</span>}
           </p>
-          <button
-            onClick={function() {
-              navigator.clipboard.writeText('foryou50')
-              toast.success('Code promo copié : foryou50', { icon: '🎉', style: toastStyle })
-            }}
-            className="absolute right-4 bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded-full transition hidden sm:block"
-          >
-            Obtenir
-          </button>
+          {promoBar.code && (
+            <button
+              onClick={function() {
+                navigator.clipboard.writeText(promoBar.code)
+                toast.success('Code promo copié : ' + promoBar.code, { icon: '🎉', style: toastStyle })
+              }}
+              className="absolute right-4 bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded-full transition hidden sm:block"
+            >
+              Obtenir
+            </button>
+          )}
           <button
             onClick={function() { setShowBanner(false) }}
             className="absolute right-4 sm:right-28 text-white hover:text-stone-300 transition"

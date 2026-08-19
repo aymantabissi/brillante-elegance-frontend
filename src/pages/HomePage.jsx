@@ -64,18 +64,19 @@ const instaImages = [
 
 const INSTAGRAM_URL = 'https://www.instagram.com/brillante_elegance?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=='
 
-function HeroSlider() {
+function HeroSlider({ slides }) {
+  const activeSlides = slides && slides.length > 0 ? slides : heroSlides
   const [current, setCurrent] = useState(0)
   useEffect(() => {
-    const timer = setInterval(() => setCurrent((prev) => (prev + 1) % heroSlides.length), 4500)
+    const timer = setInterval(() => setCurrent((prev) => (prev + 1) % activeSlides.length), 4500)
     return () => clearInterval(timer)
-  }, [])
-  const prev = () => setCurrent((c) => (c - 1 + heroSlides.length) % heroSlides.length)
-  const next = () => setCurrent((c) => (c + 1) % heroSlides.length)
+  }, [activeSlides.length])
+  const prev = () => setCurrent((c) => (c - 1 + activeSlides.length) % activeSlides.length)
+  const next = () => setCurrent((c) => (c + 1) % activeSlides.length)
   return (
     <div className="relative w-full h-[88vh] overflow-hidden">
-      {heroSlides.map((slide, i) => (
-        <div key={slide.id} className={'absolute inset-0 transition-opacity duration-1000 ' + (i === current ? 'opacity-100' : 'opacity-0')}>
+      {activeSlides.map((slide, i) => (
+        <div key={slide.id || slide._id || i} className={'absolute inset-0 transition-opacity duration-1000 ' + (i === current ? 'opacity-100' : 'opacity-0')}>
           <img src={slide.image} alt={slide.title} className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-black/35" />
           <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-4">
@@ -88,7 +89,7 @@ function HeroSlider() {
       <button onClick={prev} className="absolute left-5 top-1/2 -translate-y-1/2 bg-white/15 hover:bg-white/35 backdrop-blur-sm text-white p-2.5 rounded-full transition"><ChevronLeft size={20} /></button>
       <button onClick={next} className="absolute right-5 top-1/2 -translate-y-1/2 bg-white/15 hover:bg-white/35 backdrop-blur-sm text-white p-2.5 rounded-full transition"><ChevronRight size={20} /></button>
       <div className="absolute bottom-7 left-1/2 -translate-x-1/2 flex gap-2">
-        {heroSlides.map((_, i) => (<button key={i} onClick={() => setCurrent(i)} className={'h-1.5 rounded-full transition-all duration-500 ' + (i === current ? 'bg-white w-8' : 'bg-white/40 w-2')} />))}
+        {activeSlides.map((_, i) => (<button key={i} onClick={() => setCurrent(i)} className={'h-1.5 rounded-full transition-all duration-500 ' + (i === current ? 'bg-white w-8' : 'bg-white/40 w-2')} />))}
       </div>
     </div>
   )
@@ -119,8 +120,9 @@ function DealsBanner() {
   )
 }
 
-function ProductsStrip() {
-  const images = [...stripImages, ...stripImages]
+function ProductsStrip({ images: customImages }) {
+  const base = customImages && customImages.length > 0 ? customImages : stripImages
+  const images = [...base, ...base]
   return (
     <section className="bg-[#f9f8f6] py-12 overflow-hidden">
       <div className="flex gap-4 mb-4 w-max animate-scroll-left">
@@ -573,10 +575,11 @@ function WhyUs() {
   )
 }
 
-function InstagramSection() {
+function InstagramSection({ images: customImages }) {
   const { items: products } = useSelector(function(state) { return state.products })
   const realImages = products.filter(function(p) { return p.image && p.image.startsWith('http') }).slice(0, 5)
-  const useReal = realImages.length >= 3
+  const hasCustom = customImages && customImages.length > 0
+  const useReal = !hasCustom && realImages.length >= 3
   const igSvg = (
     <svg className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition duration-300" fill="currentColor" viewBox="0 0 24 24">
       <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
@@ -604,7 +607,7 @@ function InstagramSection() {
                   </a>
                 )
               })
-            : instaImages.map(function(img, i) {
+            : (hasCustom ? customImages : instaImages).map(function(img, i) {
                 return (
                   <a key={i} href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className={linkClass(i)}>
                     <img src={img} alt={'instagram ' + (i + 1)} className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105" />
@@ -651,18 +654,26 @@ function Newsletter() {
 }
 
 export default function HomePage({ wishlist = [], toggleWishlist = function() {} }) {
+  const [settings, setSettings] = useState(null)
+
+  useEffect(function() {
+    api.get('/settings')
+      .then(function(res) { setSettings(res.data) })
+      .catch(function() {})
+  }, [])
+
   return (
     <main>
-      <HeroSlider />
+      <HeroSlider slides={settings?.heroSlides} />
       <CategoriesBar />
       <DealsBanner />
-      <ProductsStrip />
+      <ProductsStrip images={settings?.stripImages} />
       <FeaturedCategories />
       <TrendingProducts wishlist={wishlist} toggleWishlist={toggleWishlist} />
       <FeaturedProduct />
       <Testimonials />
       <WhyUs />
-      <InstagramSection />
+      <InstagramSection images={settings?.instagramImages} />
       <Newsletter />
     </main>
   )

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Navigate, Outlet, useLocation, Link } from 'react-router-dom'
 import { logout } from '../../store/slices/authSlice'
-import { LayoutDashboard, Package, ShoppingBag, BarChart2, Tag, LogOut, ExternalLink, MessageCircle, Image } from 'lucide-react'
+import { LayoutDashboard, Package, ShoppingBag, BarChart2, Tag, LogOut, ExternalLink, MessageCircle, Image, LayoutTemplate } from 'lucide-react'
 import AdminNavbar from './AdminNavbar'
 import api from '../../services/api'
 
@@ -59,6 +59,7 @@ export default function AdminLayout() {
     { name: 'Statistiques', to: '/admin/stats',     icon: <BarChart2 size={16} />,       roles: ['admin'] },
     { name: 'Promos',       to: '/admin/promos',    icon: <Tag size={16} />,             roles: ['admin', 'manager'] },
     { name: 'Collections',  to: '/admin/collections', icon: <Image size={16} />,         roles: ['admin', 'manager'] },
+    { name: 'Page d\'accueil', to: '/admin/homepage', icon: <LayoutTemplate size={16} />, roles: ['admin', 'manager'] },
     { name: 'Messages',     to: '/admin/chat',      icon: <MessageCircle size={16} />,   roles: ['admin', 'manager'] },
   ]
 
