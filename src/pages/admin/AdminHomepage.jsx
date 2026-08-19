@@ -115,6 +115,11 @@ export default function AdminHomepage() {
     setSettings({ ...settings, promoBar: { ...settings.promoBar, [field]: value } })
   }
 
+  // ---------- SECTION TITLES ----------
+  const updateSectionTitle = function(field, value) {
+    setSettings({ ...settings, sectionTitles: { ...settings.sectionTitles, [field]: value } })
+  }
+
   if (loading || !settings) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -173,6 +178,70 @@ export default function AdminHomepage() {
               </div>
             )
           })}
+        </div>
+      </section>
+
+      {/* ================================================
+          TEXTES DES SECTIONS
+      ================================================ */}
+      <section>
+        <h2 className="text-sm font-medium tracking-wide uppercase text-stone-500 dark:text-stone-400 mb-4">Textes des sections</h2>
+        <div className="bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 rounded-2xl p-5 flex flex-col gap-4 max-w-xl">
+          <div>
+            <label className="text-xs text-stone-400 dark:text-stone-500 block mb-1">Bandeau "Soldes d'Été"</label>
+            <input
+              value={settings.sectionTitles.dealsBannerText}
+              onChange={function(e) { updateSectionTitle('dealsBannerText', e.target.value) }}
+              onBlur={function() { persist({ sectionTitles: settings.sectionTitles }) }}
+              placeholder="Soldes d'Été — Jusqu'à -15%"
+              className="w-full border border-stone-200 dark:border-stone-700 rounded-xl px-4 py-2.5 text-sm bg-[#faf9f7] dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:outline-none focus:border-stone-400"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs text-stone-400 dark:text-stone-500 block mb-1">"Nos Collections" — petit texte</label>
+              <input
+                value={settings.sectionTitles.collectionsEyebrow}
+                onChange={function(e) { updateSectionTitle('collectionsEyebrow', e.target.value) }}
+                onBlur={function() { persist({ sectionTitles: settings.sectionTitles }) }}
+                placeholder="Explorez"
+                className="w-full border border-stone-200 dark:border-stone-700 rounded-xl px-4 py-2.5 text-sm bg-[#faf9f7] dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:outline-none focus:border-stone-400"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-stone-400 dark:text-stone-500 block mb-1">"Nos Collections" — titre</label>
+              <input
+                value={settings.sectionTitles.collectionsTitle}
+                onChange={function(e) { updateSectionTitle('collectionsTitle', e.target.value) }}
+                onBlur={function() { persist({ sectionTitles: settings.sectionTitles }) }}
+                placeholder="Nos Collections"
+                className="w-full border border-stone-200 dark:border-stone-700 rounded-xl px-4 py-2.5 text-sm bg-[#faf9f7] dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:outline-none focus:border-stone-400"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="text-xs text-stone-400 dark:text-stone-500 block mb-1">Bandeau "Produits Tendance"</label>
+            <input
+              value={settings.sectionTitles.trendingTitle}
+              onChange={function(e) { updateSectionTitle('trendingTitle', e.target.value) }}
+              onBlur={function() { persist({ sectionTitles: settings.sectionTitles }) }}
+              placeholder="Produits Tendance"
+              className="w-full border border-stone-200 dark:border-stone-700 rounded-xl px-4 py-2.5 text-sm bg-[#faf9f7] dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:outline-none focus:border-stone-400"
+            />
+          </div>
+
+          <div>
+            <label className="text-xs text-stone-400 dark:text-stone-500 block mb-1">Bandeau "Suivez-nous sur Instagram"</label>
+            <input
+              value={settings.sectionTitles.instagramTitle}
+              onChange={function(e) { updateSectionTitle('instagramTitle', e.target.value) }}
+              onBlur={function() { persist({ sectionTitles: settings.sectionTitles }) }}
+              placeholder="Suivez-nous sur Instagram"
+              className="w-full border border-stone-200 dark:border-stone-700 rounded-xl px-4 py-2.5 text-sm bg-[#faf9f7] dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:outline-none focus:border-stone-400"
+            />
+          </div>
         </div>
       </section>
 

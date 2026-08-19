@@ -112,10 +112,10 @@ function CategoriesBar() {
   )
 }
 
-function DealsBanner() {
+function DealsBanner({ text }) {
   return (
     <div className="bg-black text-white py-5 text-center">
-      <h2 className="text-2xl md:text-3xl font-bold tracking-wide">Soldes d'Été — Jusqu'à -15%</h2>
+      <h2 className="text-2xl md:text-3xl font-bold tracking-wide">{text || "Soldes d'Été — Jusqu'à -15%"}</h2>
     </div>
   )
 }
@@ -153,7 +153,7 @@ const FALLBACK_COLLECTIONS = [
   { key: 'lunettes',  label: 'Lunettes',  title: 'Lunettes\nPremium',   image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=800&q=80', category: 'lunettes' },
 ]
 
-function FeaturedCategories() {
+function FeaturedCategories({ eyebrow, title }) {
   const [cards, setCards] = useState(FALLBACK_COLLECTIONS)
 
   useEffect(function() {
@@ -165,8 +165,8 @@ function FeaturedCategories() {
   return (
     <section className="bg-[#f9f8f6] py-16 px-4">
       <div className="text-center mb-10">
-        <p className="text-xs tracking-[0.5em] uppercase text-stone-400 mb-2">Explorez</p>
-        <h2 className="text-3xl font-light tracking-[0.2em] uppercase text-stone-800">Nos Collections</h2>
+        <p className="text-xs tracking-[0.5em] uppercase text-stone-400 mb-2">{eyebrow || 'Explorez'}</p>
+        <h2 className="text-3xl font-light tracking-[0.2em] uppercase text-stone-800">{title || 'Nos Collections'}</h2>
       </div>
       <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {cards.map((card) => (
@@ -185,7 +185,7 @@ function FeaturedCategories() {
   )
 }
 
-function TrendingProducts({ wishlist, toggleWishlist }) {
+function TrendingProducts({ wishlist, toggleWishlist, title }) {
   const dispatch   = useDispatch()
   const navigate   = useNavigate()
   const { items: products, loading } = useSelector((state) => state.products)
@@ -229,7 +229,7 @@ function TrendingProducts({ wishlist, toggleWishlist }) {
   return (
     <section className="bg-white py-16 px-4">
       <div className="bg-black text-white text-center py-5 mb-10 rounded-xl mx-auto max-w-6xl">
-        <h2 className="text-2xl md:text-3xl font-bold tracking-wide">Produits Tendance</h2>
+        <h2 className="text-2xl md:text-3xl font-bold tracking-wide">{title || 'Produits Tendance'}</h2>
       </div>
 
       {loading && (
@@ -575,7 +575,7 @@ function WhyUs() {
   )
 }
 
-function InstagramSection({ images: customImages }) {
+function InstagramSection({ images: customImages, title }) {
   const { items: products } = useSelector(function(state) { return state.products })
   const realImages = products.filter(function(p) { return p.image && p.image.startsWith('http') }).slice(0, 5)
   const hasCustom = customImages && customImages.length > 0
@@ -594,7 +594,7 @@ function InstagramSection({ images: customImages }) {
   return (
     <section className="bg-white py-0">
       <div className="bg-black text-white text-center py-5">
-        <h2 className="text-2xl md:text-3xl font-bold tracking-wide">Suivez-nous sur Instagram</h2>
+        <h2 className="text-2xl md:text-3xl font-bold tracking-wide">{title || 'Suivez-nous sur Instagram'}</h2>
       </div>
       <div className="max-w-6xl mx-auto px-4 py-10">
         <div className="flex gap-4 justify-center flex-wrap md:flex-nowrap">
@@ -666,14 +666,14 @@ export default function HomePage({ wishlist = [], toggleWishlist = function() {}
     <main>
       <HeroSlider slides={settings?.heroSlides} />
       <CategoriesBar />
-      <DealsBanner />
+      <DealsBanner text={settings?.sectionTitles?.dealsBannerText} />
       <ProductsStrip images={settings?.stripImages} />
-      <FeaturedCategories />
-      <TrendingProducts wishlist={wishlist} toggleWishlist={toggleWishlist} />
+      <FeaturedCategories eyebrow={settings?.sectionTitles?.collectionsEyebrow} title={settings?.sectionTitles?.collectionsTitle} />
+      <TrendingProducts wishlist={wishlist} toggleWishlist={toggleWishlist} title={settings?.sectionTitles?.trendingTitle} />
       <FeaturedProduct />
       <Testimonials />
       <WhyUs />
-      <InstagramSection images={settings?.instagramImages} />
+      <InstagramSection images={settings?.instagramImages} title={settings?.sectionTitles?.instagramTitle} />
       <Newsletter />
     </main>
   )
