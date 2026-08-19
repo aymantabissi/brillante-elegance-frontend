@@ -9,6 +9,16 @@ const toastStyle = {
   fontSize: '13px', borderRadius: '12px', padding: '12px 16px',
 }
 
+const CATEGORY_OPTIONS = [
+  { value: 'colliers',  label: 'Colliers' },
+  { value: 'bracelets', label: 'Bracelets' },
+  { value: 'bagues',    label: 'Bagues' },
+  { value: 'lunettes',  label: 'Lunettes' },
+  { value: 'montres',   label: 'Montres' },
+  { value: 'Sacas',     label: 'Sacs' },
+  { value: 'autres',    label: 'Autres' },
+]
+
 export default function AdminCollections() {
   const [collections, setCollections] = useState([])
   const [loading, setLoading] = useState(true)
@@ -62,12 +72,29 @@ export default function AdminCollections() {
     e.target.value = ''
   }
 
+  const updateLocalField = function(id, field, value) {
+    setCollections(function(prev) {
+      return prev.map(function(c) { return c._id === id ? { ...c, [field]: value } : c })
+    })
+  }
+
+  const persistField = async function(id, field, value) {
+    try {
+      const { data: updated } = await api.put('/collections/' + id, { [field]: value })
+      setCollections(function(prev) {
+        return prev.map(function(c) { return c._id === id ? updated : c })
+      })
+    } catch {
+      toast.error('Erreur lors de l\'enregistrement', { style: toastStyle })
+    }
+  }
+
   return (
     <div>
       <div className="mb-8">
         <h1 className="text-2xl font-light text-stone-900 dark:text-stone-100">Nos Collections</h1>
         <p className="text-sm text-stone-400 dark:text-stone-500 mt-1">
-          Changez les images affichées dans la section "Nos Collections" de la page d'accueil.
+          Modifiez l'image, le titre et la catégorie liée pour chaque carte de la section "Nos Collections".
         </p>
       </div>
 
@@ -93,9 +120,43 @@ export default function AdminCollections() {
                     </label>
                   </div>
                 </div>
-                <div className="p-4">
-                  <p className="text-[10px] tracking-[0.3em] uppercase text-stone-400 dark:text-stone-500 mb-1">{card.label}</p>
-                  <p className="text-sm text-stone-700 dark:text-stone-300 whitespace-pre-line">{card.title}</p>
+                <div className="p-4 flex flex-col gap-2.5">
+                  <div>
+                    <label className="text-[10px] text-stone-400 dark:text-stone-500 block mb-1">Nom (badge)</label>
+                    <input
+                      value={card.label}
+                      onChange={function(e) { updateLocalField(card._id, 'label', e.target.value) }}
+                      onBlur={function(e) { persistField(card._id, 'label', e.target.value) }}
+                      className="w-full border border-stone-200 dark:border-stone-700 rounded-lg px-2.5 py-1.5 text-xs bg-[#faf9f7] dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:outline-none focus:border-stone-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] text-stone-400 dark:text-stone-500 block mb-1">Titre affiché</label>
+                    <textarea
+                      value={card.title}
+                      onChange={function(e) { updateLocalField(card._id, 'title', e.target.value) }}
+                      onBlur={function(e) { persistField(card._id, 'title', e.target.value) }}
+                      rows={2}
+                      className="w-full border border-stone-200 dark:border-stone-700 rounded-lg px-2.5 py-1.5 text-sm bg-[#faf9f7] dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:outline-none focus:border-stone-400 resize-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] text-stone-400 dark:text-stone-500 block mb-1">Catégorie liée</label>
+                    <select
+                      value={card.category}
+                      onChange={function(e) {
+                        updateLocalField(card._id, 'category', e.target.value)
+                        persistField(card._id, 'category', e.target.value)
+                      }}
+                      className="w-full border border-stone-200 dark:border-stone-700 rounded-lg px-2.5 py-1.5 text-xs bg-[#faf9f7] dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:outline-none focus:border-stone-400"
+                    >
+                      {CATEGORY_OPTIONS.map(function(opt) {
+                        return <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      })}
+                    </select>
+                  </div>
                 </div>
               </div>
             )
