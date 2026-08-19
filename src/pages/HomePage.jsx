@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Heart, Eye, ShoppingBag, Check } from 'lucid
 import { addToCart } from '../store/slices/cartSlice'
 import { fetchProducts } from '../store/slices/productSlice'
 import toast from 'react-hot-toast'
+import api from '../services/api'
 import { PLACEHOLDER_IMAGE, onImgError } from '../utils/imageFallback'
 import img1 from '../assets/image1.jpeg'
 import img2 from '../assets/image2.jpeg'
@@ -143,13 +144,22 @@ function ProductsStrip() {
   )
 }
 
+const FALLBACK_COLLECTIONS = [
+  { key: 'colliers',  label: 'Colliers',  title: 'Colliers\nRaffinés',  image: 'https://images.unsplash.com/photo-1635767798638-3e25273a8236?w=400&q=80', category: 'colliers' },
+  { key: 'bracelets', label: 'Bracelets', title: 'Bracelets\nÉlégants', image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80', category: 'bracelets' },
+  { key: 'bagues',    label: 'Bagues',    title: 'Bagues\nPrecieuses',  image: 'https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=800&q=80', category: 'bagues' },
+  { key: 'lunettes',  label: 'Lunettes',  title: 'Lunettes\nPremium',   image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=800&q=80', category: 'lunettes' },
+]
+
 function FeaturedCategories() {
-  const cards = [
-    { label: 'Colliers',  title: 'Colliers\nRaffinés',  image: 'https://images.unsplash.com/photo-1635767798638-3e25273a8236?w=400&q=80', to: '/shop?cat=colliers' },
-    { label: 'Bracelets', title: 'Bracelets\nÉlégants', image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80', to: '/shop?cat=bracelets' },
-    { label: 'Bagues',    title: 'Bagues\nPrecieuses',  image: 'https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=800&q=80', to: '/shop?cat=bagues' },
-    { label: 'Lunettes',  title: 'Lunettes\nPremium',   image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=800&q=80', to: '/shop?cat=lunettes' },
-  ]
+  const [cards, setCards] = useState(FALLBACK_COLLECTIONS)
+
+  useEffect(function() {
+    api.get('/collections')
+      .then(function(res) { if (res.data?.length > 0) setCards(res.data) })
+      .catch(function() {})
+  }, [])
+
   return (
     <section className="bg-[#f9f8f6] py-16 px-4">
       <div className="text-center mb-10">
@@ -158,8 +168,8 @@ function FeaturedCategories() {
       </div>
       <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {cards.map((card) => (
-          <Link key={card.label} to={card.to} className="relative h-[480px] overflow-hidden rounded-2xl group block">
-            <img src={card.image} alt={card.label} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+          <Link key={card.key || card.label} to={'/shop?cat=' + card.category} className="relative h-[480px] overflow-hidden rounded-2xl group block">
+            <img src={card.image} alt={card.label} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" onError={onImgError} />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-6">
               <p className="text-[10px] tracking-[0.4em] uppercase text-white/70 mb-2">{card.label}</p>

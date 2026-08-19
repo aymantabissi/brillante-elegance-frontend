@@ -22,6 +22,7 @@ import AdminProducts  from './pages/admin/AdminProducts'
 import AdminOrders    from './pages/admin/AdminOrders'
 import AdminStats     from './pages/admin/AdminStats'
 import AdminPromos    from './pages/admin/AdminPromos'
+import AdminCollections from './pages/admin/AdminCollections'
 import AdminProfile   from './pages/admin/AdminProfile'
 import AdminChat      from './pages/admin/AdminChat'
 import CreatorLayout    from './pages/creator/CreatorLayout'
@@ -111,6 +112,7 @@ function App() {
             <Route path="orders"   element={<AdminOrders />} />
             <Route path="stats"    element={<AdminStats />} />
             <Route path="promos"   element={<AdminPromos />} />
+            <Route path="collections" element={<AdminCollections />} />
             <Route path="profile"  element={<AdminProfile />} />
             <Route path="chat"     element={<AdminChat />} />
             <Route
