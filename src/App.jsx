@@ -54,14 +54,23 @@ function App() {
   // (le PageView initial est déjà envoyé par index.html —
   // on saute le tout premier mount pour ne pas le doubler,
   // et on couvre seulement la navigation interne du SPA)
+  //
+  // Garde-fou anti-doublon : un redirect rapide (ex: /login
+  // qui redirige vers /admin) peut déclencher deux changements
+  // de pathname en moins de 2s — on ignore le second dans ce cas.
   // =====================================================
   const isFirstPageView = useRef(true)
+  const pageViewCooldownRef = useRef(false)
 
   useEffect(function() {
     if (isFirstPageView.current) {
       isFirstPageView.current = false
       return
     }
+    if (pageViewCooldownRef.current) return
+    pageViewCooldownRef.current = true
+    setTimeout(function() { pageViewCooldownRef.current = false }, 2000)
+
     if (window.fbq) {
       window.fbq('track', 'PageView')
     }
