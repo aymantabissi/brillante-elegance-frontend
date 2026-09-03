@@ -16,6 +16,7 @@ import {
   CreditCard,
   Trash2,
   X,
+  Check,
 } from 'lucide-react'
 
 export default function AdminOrders() {
@@ -173,6 +174,32 @@ export default function AdminOrders() {
       toast.error(
         error.response?.data?.message ||
         'Erreur lors de la modification du paiement'
+      )
+    }
+  }
+
+  // =====================================================
+  // UPDATE CONFIRMATION
+  // =====================================================
+
+  const updateConfirmed = async (id, orderConfirmed) => {
+    try {
+      await api.patch(
+        `/orders/${id}/confirm`,
+        { orderConfirmed }
+      )
+
+      toast.success(
+        orderConfirmed ? 'Commande confirmée' : 'Commande marquée non confirmée'
+      )
+
+      await fetchOrders()
+    } catch (error) {
+      console.error('Confirm error:', error)
+
+      toast.error(
+        error.response?.data?.message ||
+        'Erreur lors de la confirmation'
       )
     }
   }
@@ -627,6 +654,30 @@ export default function AdminOrders() {
 
                       </select>
 
+                      <button
+                        onClick={() =>
+                          updateConfirmed(
+                            order._id,
+                            order.orderConfirmed === false
+                          )
+                        }
+                        className={`mt-2 flex items-center gap-1 text-[11px] font-medium px-3 py-2 rounded-full transition ${
+                          order.orderConfirmed === false
+                            ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
+                            : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                        }`}
+                      >
+                        {order.orderConfirmed === false ? (
+                          <>
+                            <X size={12} /> Non confirmée
+                          </>
+                        ) : (
+                          <>
+                            <Check size={12} /> Confirmée
+                          </>
+                        )}
+                      </button>
+
                     </td>
 
                     {/* =====================================
@@ -640,13 +691,19 @@ export default function AdminOrders() {
                           order.orderStatus ||
                           'not_processed'
                         }
+                        disabled={order.orderConfirmed === false}
                         onChange={(e) =>
                           updateOrderStatus(
                             order._id,
                             e.target.value
                           )
                         }
-                        className={`text-[11px] font-medium px-3 py-2 rounded-full border-0 outline-none cursor-pointer ${
+                        title={order.orderConfirmed === false ? 'Confirmez la commande pour modifier le traitement' : undefined}
+                        className={`text-[11px] font-medium px-3 py-2 rounded-full border-0 outline-none ${
+                          order.orderConfirmed === false
+                            ? 'opacity-50 cursor-not-allowed'
+                            : 'cursor-pointer'
+                        } ${
                           orderStatusColors[
                             order.orderStatus
                           ] ||
@@ -685,13 +742,17 @@ export default function AdminOrders() {
                           order.deliveryMethod ||
                           'national_20dh'
                         }
+                        disabled={order.orderConfirmed === false}
                         onChange={(e) =>
                           updateDeliveryMethod(
                             order._id,
                             e.target.value
                           )
                         }
-                        className="text-[11px] bg-stone-100 dark:bg-stone-700 text-stone-600 dark:text-stone-300 px-3 py-2 rounded-full border-0 outline-none cursor-pointer"
+                        title={order.orderConfirmed === false ? 'Confirmez la commande pour modifier la livraison' : undefined}
+                        className={`text-[11px] bg-stone-100 dark:bg-stone-700 text-stone-600 dark:text-stone-300 px-3 py-2 rounded-full border-0 outline-none ${
+                          order.orderConfirmed === false ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                        }`}
                       >
 
                         <option value="national_20dh">
