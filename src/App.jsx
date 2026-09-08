@@ -24,6 +24,7 @@ import AdminStats     from './pages/admin/AdminStats'
 import AdminPromos    from './pages/admin/AdminPromos'
 import AdminCollections from './pages/admin/AdminCollections'
 import AdminHomepage from './pages/admin/AdminHomepage'
+import AdminCreatorTracking from './pages/admin/AdminCreatorTracking'
 import AdminProfile   from './pages/admin/AdminProfile'
 import AdminChat      from './pages/admin/AdminChat'
 import CreatorLayout    from './pages/creator/CreatorLayout'
@@ -124,6 +125,7 @@ function App() {
             <Route path="promos"   element={<AdminPromos />} />
             <Route path="collections" element={<AdminCollections />} />
             <Route path="homepage" element={<AdminHomepage />} />
+            <Route path="creators" element={<AdminCreatorTracking />} />
             <Route path="profile"  element={<AdminProfile />} />
             <Route path="chat"     element={<AdminChat />} />
             <Route
