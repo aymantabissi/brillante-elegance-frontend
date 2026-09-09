@@ -29,6 +29,54 @@ export default function AdminOrders() {
   const [showBulkConfirm, setShowBulkConfirm] = useState(false)
 
   // =====================================================
+  // FILTRES
+  // =====================================================
+
+  const [dateFilter, setDateFilter] = useState('all')             // all | today | yesterday
+  const [confirmedFilter, setConfirmedFilter] = useState('all')   // all | confirmed | not_confirmed
+  const [deliveredFilter, setDeliveredFilter] = useState('all')   // all | delivered | not_delivered
+  const [paidFilter, setPaidFilter] = useState('all')             // all | paid | not_paid
+
+  const isSameDay = (a, b) =>
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+
+  const filteredOrders = orders.filter((order) => {
+    if (dateFilter !== 'all') {
+      const created = new Date(order.createdAt)
+      const now = new Date()
+      if (dateFilter === 'today' && !isSameDay(created, now)) return false
+      if (dateFilter === 'yesterday') {
+        const yesterday = new Date(now)
+        yesterday.setDate(yesterday.getDate() - 1)
+        if (!isSameDay(created, yesterday)) return false
+      }
+    }
+
+    if (confirmedFilter === 'confirmed' && order.orderConfirmed === false) return false
+    if (confirmedFilter === 'not_confirmed' && order.orderConfirmed !== false) return false
+
+    if (deliveredFilter === 'delivered' && order.orderStatus !== 'delivered') return false
+    if (deliveredFilter === 'not_delivered' && order.orderStatus === 'delivered') return false
+
+    if (paidFilter === 'paid' && order.paymentStatus !== 'paid') return false
+    if (paidFilter === 'not_paid' && order.paymentStatus === 'paid') return false
+
+    return true
+  })
+
+  const resetFilters = () => {
+    setDateFilter('all')
+    setConfirmedFilter('all')
+    setDeliveredFilter('all')
+    setPaidFilter('all')
+  }
+
+  const filtersActive =
+    dateFilter !== 'all' || confirmedFilter !== 'all' || deliveredFilter !== 'all' || paidFilter !== 'all'
+
+  // =====================================================
   // GET ORDERS
   // =====================================================
 
@@ -67,7 +115,7 @@ export default function AdminOrders() {
 
   const toggleSelectAll = () => {
     setSelectedIds((prev) =>
-      prev.length === orders.length ? [] : orders.map((o) => o._id)
+      prev.length === filteredOrders.length ? [] : filteredOrders.map((o) => o._id)
     )
   }
 
@@ -381,10 +429,71 @@ export default function AdminOrders() {
       </div>
 
       {/* =================================================
+          FILTRES
+      ================================================= */}
+
+      <div className="flex flex-wrap items-center gap-3 mb-6">
+
+        <select
+          value={dateFilter}
+          onChange={(e) => setDateFilter(e.target.value)}
+          className="text-xs bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 px-3 py-2.5 rounded-xl outline-none cursor-pointer"
+        >
+          <option value="all">Toutes les dates</option>
+          <option value="today">Aujourd'hui</option>
+          <option value="yesterday">Hier</option>
+        </select>
+
+        <select
+          value={confirmedFilter}
+          onChange={(e) => setConfirmedFilter(e.target.value)}
+          className="text-xs bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 px-3 py-2.5 rounded-xl outline-none cursor-pointer"
+        >
+          <option value="all">Confirmation — Toutes</option>
+          <option value="confirmed">Confirmée</option>
+          <option value="not_confirmed">Non confirmée</option>
+        </select>
+
+        <select
+          value={deliveredFilter}
+          onChange={(e) => setDeliveredFilter(e.target.value)}
+          className="text-xs bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 px-3 py-2.5 rounded-xl outline-none cursor-pointer"
+        >
+          <option value="all">Livraison — Toutes</option>
+          <option value="delivered">Livrée</option>
+          <option value="not_delivered">Non livrée</option>
+        </select>
+
+        <select
+          value={paidFilter}
+          onChange={(e) => setPaidFilter(e.target.value)}
+          className="text-xs bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 px-3 py-2.5 rounded-xl outline-none cursor-pointer"
+        >
+          <option value="all">Paiement — Tous</option>
+          <option value="paid">Payée</option>
+          <option value="not_paid">Non payée</option>
+        </select>
+
+        {filtersActive && (
+          <button
+            onClick={resetFilters}
+            className="flex items-center gap-1 text-xs text-stone-400 dark:text-stone-500 hover:text-stone-700 dark:hover:text-stone-200 transition px-2"
+          >
+            <X size={12} /> Réinitialiser
+          </button>
+        )}
+
+        <span className="text-xs text-stone-400 dark:text-stone-500 ml-auto">
+          {filteredOrders.length} commande{filteredOrders.length > 1 ? 's' : ''}
+        </span>
+
+      </div>
+
+      {/* =================================================
           EMPTY
       ================================================= */}
 
-      {orders.length === 0 ? (
+      {filteredOrders.length === 0 ? (
 
         <div className="bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 rounded-2xl py-20 text-center">
 
@@ -394,7 +503,7 @@ export default function AdminOrders() {
           />
 
           <p className="text-sm text-stone-400 dark:text-stone-500">
-            Aucune commande pour le moment
+            {filtersActive ? 'Aucune commande ne correspond à ces filtres' : 'Aucune commande pour le moment'}
           </p>
 
         </div>
@@ -418,7 +527,7 @@ export default function AdminOrders() {
                   <th className="px-5 py-4 text-left w-10">
                     <input
                       type="checkbox"
-                      checked={orders.length > 0 && selectedIds.length === orders.length}
+                      checked={filteredOrders.length > 0 && selectedIds.length === filteredOrders.length}
                       onChange={toggleSelectAll}
                       className="accent-stone-900 w-4 h-4"
                     />
@@ -462,7 +571,7 @@ export default function AdminOrders() {
 
               <tbody>
 
-                {orders.map((order) => (
+                {filteredOrders.map((order) => (
 
                   <tr
                     key={order._id}
@@ -922,8 +1031,8 @@ export default function AdminOrders() {
 
               <p className="text-xs text-stone-400 dark:text-stone-500">
 
-                {orders.length}{' '}
-                {orders.length > 1
+                {filteredOrders.length}{' '}
+                {filteredOrders.length > 1
                   ? 'commandes'
                   : 'commande'}
 
