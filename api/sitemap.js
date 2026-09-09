@@ -8,15 +8,15 @@ const escapeXml = (value) =>
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
 
+const FALLBACK_API_URL = 'https://brillante-elegance-backend-production.up.railway.app/api'
+
 export default async function handler(req, res) {
-  const apiBase = (process.env.VITE_API_URL || '').replace(/\/api\/?$/, '')
+  const apiBase = (process.env.VITE_API_URL || FALLBACK_API_URL).replace(/\/api\/?$/, '')
 
   let products = []
   try {
-    if (apiBase) {
-      const response = await fetch(apiBase + '/api/products')
-      products = await response.json()
-    }
+    const response = await fetch(apiBase + '/api/products')
+    products = await response.json()
   } catch {
     products = []
   }

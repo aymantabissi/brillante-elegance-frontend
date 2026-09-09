@@ -376,8 +376,17 @@ export default function AdminProducts() {
                 value={form.category}
                 onChange={function(e) { setForm({ ...form, category: e.target.value }) }}
                 className="w-full border border-stone-200 dark:border-stone-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-stone-400 dark:focus:border-stone-500 bg-[#faf9f7] dark:bg-stone-800 text-stone-900 dark:text-stone-100">
-                {['colliers','bracelets','bagues','lunettes','montres','Sacs','autres'].map(function(c) {
-                  return <option key={c} value={c}>{c}</option>
+                {[
+                  { value: 'colliers',     label: 'Colliers' },
+                  { value: 'bracelets',    label: 'Bracelets' },
+                  { value: 'bagues',       label: 'Bagues' },
+                  { value: 'lunettes',     label: 'Lunettes' },
+                  { value: 'montres',      label: 'Montres' },
+                  { value: 'Sacas',        label: 'Sacs' },
+                  { value: 'pack_special', label: 'Pack Spécial' },
+                  { value: 'autres',       label: 'Autres' },
+                ].map(function(c) {
+                  return <option key={c.value} value={c.value}>{c.label}</option>
                 })}
               </select>
             </div>

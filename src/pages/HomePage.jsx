@@ -39,6 +39,7 @@ const heroSlides = [
 const stripImages = [img1,img2, img3,img4, img5,img6,img7, img8]
 
 const categories = [
+  { label: 'Pack Spécial', emoji: '🎁', to: '/shop?cat=pack_special' },
   { label: 'Colliers',  emoji: '📿', to: '/shop?cat=colliers' },
   { label: 'Bracelets', emoji: '💎', to: '/shop?cat=bracelets' },
   { label: 'Bagues',    emoji: '💍', to: '/shop?cat=bagues' },

@@ -9,6 +9,7 @@ const CATEGORY_LABELS = {
   lunettes: 'Lunettes',
   montres: 'Montres',
   Sacas: 'Sacs',
+  pack_special: 'Pack Spécial',
   autres: 'Autres',
 }
 

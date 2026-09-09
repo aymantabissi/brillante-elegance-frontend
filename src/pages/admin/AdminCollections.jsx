@@ -10,13 +10,14 @@ const toastStyle = {
 }
 
 const CATEGORY_OPTIONS = [
-  { value: 'colliers',  label: 'Colliers' },
-  { value: 'bracelets', label: 'Bracelets' },
-  { value: 'bagues',    label: 'Bagues' },
-  { value: 'lunettes',  label: 'Lunettes' },
-  { value: 'montres',   label: 'Montres' },
-  { value: 'Sacas',     label: 'Sacs' },
-  { value: 'autres',    label: 'Autres' },
+  { value: 'colliers',     label: 'Colliers' },
+  { value: 'bracelets',    label: 'Bracelets' },
+  { value: 'bagues',       label: 'Bagues' },
+  { value: 'lunettes',     label: 'Lunettes' },
+  { value: 'montres',      label: 'Montres' },
+  { value: 'Sacas',        label: 'Sacs' },
+  { value: 'pack_special', label: 'Pack Spécial' },
+  { value: 'autres',       label: 'Autres' },
 ]
 
 export default function AdminCollections() {

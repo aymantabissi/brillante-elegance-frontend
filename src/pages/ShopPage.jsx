@@ -9,13 +9,14 @@ import { PLACEHOLDER_IMAGE, onImgError } from '../utils/imageFallback'
 import { useSEO } from '../hooks/useSEO'
 
 const categories = [
-  { value: 'all',       label: 'Tous',      emoji: '✦' },
-  { value: 'colliers',  label: 'Colliers',  emoji: '📿' },
-  { value: 'bracelets', label: 'Bracelets', emoji: '💎' },
-  { value: 'bagues',    label: 'Bagues',    emoji: '💍' },
-  { value: 'lunettes',  label: 'Lunettes',  emoji: '🕶️' },
-  { value: 'montres',   label: 'Montres',   emoji: '⌚' },
-  { value: 'Sacs',      label: 'Sacs',      emoji: '👜' },
+  { value: 'all',          label: 'Tous',         emoji: '✦' },
+  { value: 'pack_special', label: 'Pack Spécial', emoji: '🎁' },
+  { value: 'colliers',     label: 'Colliers',     emoji: '📿' },
+  { value: 'bracelets',    label: 'Bracelets',    emoji: '💎' },
+  { value: 'bagues',       label: 'Bagues',       emoji: '💍' },
+  { value: 'lunettes',     label: 'Lunettes',     emoji: '🕶️' },
+  { value: 'montres',      label: 'Montres',      emoji: '⌚' },
+  { value: 'Sacas',        label: 'Sacs',         emoji: '👜' },
 ]
 
 const sortOptions = [
