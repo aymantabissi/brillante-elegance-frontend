@@ -17,6 +17,7 @@ import {
   Trash2,
   X,
   Check,
+  Search,
 } from 'lucide-react'
 
 export default function AdminOrders() {
@@ -36,6 +37,7 @@ export default function AdminOrders() {
   const [confirmedFilter, setConfirmedFilter] = useState('all')   // all | confirmed | not_confirmed
   const [deliveredFilter, setDeliveredFilter] = useState('all')   // all | delivered | not_delivered
   const [paidFilter, setPaidFilter] = useState('all')             // all | paid | not_paid
+  const [nameFilter, setNameFilter] = useState('')
 
   const isSameDay = (a, b) =>
     a.getFullYear() === b.getFullYear() &&
@@ -43,6 +45,10 @@ export default function AdminOrders() {
     a.getDate() === b.getDate()
 
   const filteredOrders = orders.filter((order) => {
+    if (nameFilter.trim() && !(order.client?.name || '').toLowerCase().includes(nameFilter.trim().toLowerCase())) {
+      return false
+    }
+
     if (dateFilter !== 'all') {
       const created = new Date(order.createdAt)
       const now = new Date()
@@ -71,10 +77,11 @@ export default function AdminOrders() {
     setConfirmedFilter('all')
     setDeliveredFilter('all')
     setPaidFilter('all')
+    setNameFilter('')
   }
 
   const filtersActive =
-    dateFilter !== 'all' || confirmedFilter !== 'all' || deliveredFilter !== 'all' || paidFilter !== 'all'
+    dateFilter !== 'all' || confirmedFilter !== 'all' || deliveredFilter !== 'all' || paidFilter !== 'all' || nameFilter.trim() !== ''
 
   // =====================================================
   // GET ORDERS
@@ -433,6 +440,17 @@ export default function AdminOrders() {
       ================================================= */}
 
       <div className="flex flex-wrap items-center gap-3 mb-6">
+
+        <div className="relative">
+          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 dark:text-stone-500" />
+          <input
+            type="text"
+            value={nameFilter}
+            onChange={(e) => setNameFilter(e.target.value)}
+            placeholder="Nom du client..."
+            className="text-xs bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 pl-8 pr-3 py-2.5 rounded-xl outline-none focus:border-stone-400 dark:focus:border-stone-500 w-44"
+          />
+        </div>
 
         <select
           value={dateFilter}
