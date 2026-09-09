@@ -11,6 +11,7 @@ const toastStyle = {
 const orderStatusLabels = {
   not_processed: 'Non traitée',
   not_required:  'Non requise',
+  no_response:   'Pas de réponse',
   shipping:      'En livraison',
   delivered:     'Livrée',
 }
@@ -19,6 +20,8 @@ const paymentStatusLabels = {
   pending:   'En attente',
   paid:      'Payée',
   cancelled: 'Annulée',
+  return_in_progress: 'Retour en cours',
+  returned:  'Produit retourné',
 }
 
 function StatCard({ icon, label, value, sub }) {

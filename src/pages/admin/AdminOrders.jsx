@@ -334,11 +334,14 @@ export default function AdminOrders() {
     pending: 'Paiement en attente',
     paid: 'Payé',
     cancelled: 'Annulé',
+    return_in_progress: 'Retour en cours',
+    returned: 'Produit retourné',
   }
 
   const orderStatusLabels = {
     not_processed: 'Non traité',
     not_required: 'Non requis',
+    no_response: 'Pas de réponse',
     shipping: 'Livraison en cours',
     delivered: 'Livrée',
   }
@@ -357,11 +360,14 @@ export default function AdminOrders() {
     pending: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
     paid: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
     cancelled: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
+    return_in_progress: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400',
+    returned: 'bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-300',
   }
 
   const orderStatusColors = {
     not_processed: 'bg-stone-100 dark:bg-stone-700 text-stone-600 dark:text-stone-300',
     not_required: 'bg-gray-100 dark:bg-stone-700 text-gray-600 dark:text-stone-300',
+    no_response: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
     shipping: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
     delivered: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
   }
@@ -779,6 +785,14 @@ export default function AdminOrders() {
                           {paymentLabels.cancelled}
                         </option>
 
+                        <option value="return_in_progress">
+                          {paymentLabels.return_in_progress}
+                        </option>
+
+                        <option value="returned">
+                          {paymentLabels.returned}
+                        </option>
+
                       </select>
 
                       <button
@@ -844,6 +858,10 @@ export default function AdminOrders() {
 
                         <option value="not_required">
                           {orderStatusLabels.not_required}
+                        </option>
+
+                        <option value="no_response">
+                          {orderStatusLabels.no_response}
                         </option>
 
                         <option value="shipping">
