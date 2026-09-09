@@ -3,6 +3,9 @@ import { useSelector } from 'react-redux'
 import toast from 'react-hot-toast'
 import { Landmark, Copy, X } from 'lucide-react'
 import api from '../../services/api'
+import Pagination from '../../components/Pagination'
+
+const PAGE_SIZE = 20
 
 export default function AdminUsers() {
   // =====================================================
@@ -22,6 +25,7 @@ export default function AdminUsers() {
   const [showModal, setShowModal] = useState(false)
   const [editingUser, setEditingUser] = useState(null)
   const [ribUser, setRibUser] = useState(null)
+  const [page, setPage] = useState(1)
 
   const [form, setForm] = useState({
     name: '',
@@ -71,6 +75,14 @@ export default function AdminUsers() {
       fetchUsers()
     }
   }, [user])
+
+  // =====================================================
+  // PAGINATION
+  // =====================================================
+
+  const totalPages = Math.max(1, Math.ceil(users.length / PAGE_SIZE))
+  const currentPage = Math.min(page, totalPages)
+  const paginatedUsers = users.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
 
   // =====================================================
   // OPEN ADD MODAL
@@ -556,7 +568,7 @@ export default function AdminUsers() {
 
               ) : (
 
-                users.map((item) => {
+                paginatedUsers.map((item) => {
 
                   const isCurrentUser =
                     item._id === user?._id
@@ -766,6 +778,8 @@ export default function AdminUsers() {
           </table>
 
         </div>
+
+        <Pagination page={currentPage} totalPages={totalPages} onChange={setPage} />
 
       </div>
 

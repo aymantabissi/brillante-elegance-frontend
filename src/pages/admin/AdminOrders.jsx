@@ -4,6 +4,7 @@ import api from '../../services/api'
 import toast from 'react-hot-toast'
 import { onImgError } from '../../utils/imageFallback'
 import ConfirmDialog from '../../components/ConfirmDialog'
+import Pagination from '../../components/Pagination'
 import {
   Package,
   RefreshCw,
@@ -19,6 +20,8 @@ import {
   Check,
   Search,
 } from 'lucide-react'
+
+const PAGE_SIZE = 20
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState([])
@@ -78,10 +81,21 @@ export default function AdminOrders() {
     setDeliveredFilter('all')
     setPaidFilter('all')
     setNameFilter('')
+    setPage(1)
   }
 
   const filtersActive =
     dateFilter !== 'all' || confirmedFilter !== 'all' || deliveredFilter !== 'all' || paidFilter !== 'all' || nameFilter.trim() !== ''
+
+  // =====================================================
+  // PAGINATION
+  // =====================================================
+
+  const [page, setPage] = useState(1)
+
+  const totalPages = Math.max(1, Math.ceil(filteredOrders.length / PAGE_SIZE))
+  const currentPage = Math.min(page, totalPages)
+  const paginatedOrders = filteredOrders.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
 
   // =====================================================
   // GET ORDERS
@@ -122,7 +136,7 @@ export default function AdminOrders() {
 
   const toggleSelectAll = () => {
     setSelectedIds((prev) =>
-      prev.length === filteredOrders.length ? [] : filteredOrders.map((o) => o._id)
+      prev.length === paginatedOrders.length ? [] : paginatedOrders.map((o) => o._id)
     )
   }
 
@@ -452,7 +466,7 @@ export default function AdminOrders() {
           <input
             type="text"
             value={nameFilter}
-            onChange={(e) => setNameFilter(e.target.value)}
+            onChange={(e) => { setNameFilter(e.target.value); setPage(1) }}
             placeholder="Nom du client..."
             className="text-xs bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 pl-8 pr-3 py-2.5 rounded-xl outline-none focus:border-stone-400 dark:focus:border-stone-500 w-44"
           />
@@ -460,7 +474,7 @@ export default function AdminOrders() {
 
         <select
           value={dateFilter}
-          onChange={(e) => setDateFilter(e.target.value)}
+          onChange={(e) => { setDateFilter(e.target.value); setPage(1) }}
           className="text-xs bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 px-3 py-2.5 rounded-xl outline-none cursor-pointer"
         >
           <option value="all">Toutes les dates</option>
@@ -470,7 +484,7 @@ export default function AdminOrders() {
 
         <select
           value={confirmedFilter}
-          onChange={(e) => setConfirmedFilter(e.target.value)}
+          onChange={(e) => { setConfirmedFilter(e.target.value); setPage(1) }}
           className="text-xs bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 px-3 py-2.5 rounded-xl outline-none cursor-pointer"
         >
           <option value="all">Confirmation — Toutes</option>
@@ -480,7 +494,7 @@ export default function AdminOrders() {
 
         <select
           value={deliveredFilter}
-          onChange={(e) => setDeliveredFilter(e.target.value)}
+          onChange={(e) => { setDeliveredFilter(e.target.value); setPage(1) }}
           className="text-xs bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 px-3 py-2.5 rounded-xl outline-none cursor-pointer"
         >
           <option value="all">Livraison — Toutes</option>
@@ -490,7 +504,7 @@ export default function AdminOrders() {
 
         <select
           value={paidFilter}
-          onChange={(e) => setPaidFilter(e.target.value)}
+          onChange={(e) => { setPaidFilter(e.target.value); setPage(1) }}
           className="text-xs bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 px-3 py-2.5 rounded-xl outline-none cursor-pointer"
         >
           <option value="all">Paiement — Tous</option>
@@ -551,7 +565,7 @@ export default function AdminOrders() {
                   <th className="px-5 py-4 text-left w-10">
                     <input
                       type="checkbox"
-                      checked={filteredOrders.length > 0 && selectedIds.length === filteredOrders.length}
+                      checked={paginatedOrders.length > 0 && selectedIds.length === paginatedOrders.length}
                       onChange={toggleSelectAll}
                       className="accent-stone-900 w-4 h-4"
                     />
@@ -595,7 +609,7 @@ export default function AdminOrders() {
 
               <tbody>
 
-                {filteredOrders.map((order) => (
+                {paginatedOrders.map((order) => (
 
                   <tr
                     key={order._id}
@@ -1082,7 +1096,7 @@ export default function AdminOrders() {
 
                 <span className="font-medium text-stone-700 dark:text-stone-300">
 
-                  {orders
+                  {filteredOrders
                     .reduce(
                       (sum, order) =>
                         sum +
@@ -1099,6 +1113,8 @@ export default function AdminOrders() {
             </div>
 
           </div>
+
+          <Pagination page={currentPage} totalPages={totalPages} onChange={setPage} />
 
         </div>
 
