@@ -7,6 +7,7 @@ import { fetchProducts } from '../store/slices/productSlice'
 import toast from 'react-hot-toast'
 import api from '../services/api'
 import { PLACEHOLDER_IMAGE, onImgError } from '../utils/imageFallback'
+import { useSEO } from '../hooks/useSEO'
 import img1 from '../assets/image1.jpeg'
 import img2 from '../assets/image2.jpeg'
 import img3 from '../assets/image3.jpeg'
@@ -655,6 +656,12 @@ function Newsletter() {
 
 export default function HomePage({ wishlist = [], toggleWishlist = function() {} }) {
   const [settings, setSettings] = useState(null)
+
+  useSEO({
+    title: 'Bijoux & Montres au Maroc',
+    description: 'Brillante Élégance — bijoux, montres, bracelets, bagues et accessoires. Livraison rapide partout au Maroc, paiement à la livraison.',
+    path: '/',
+  })
 
   useEffect(function() {
     api.get('/settings')

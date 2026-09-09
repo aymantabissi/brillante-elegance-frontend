@@ -6,6 +6,7 @@ import { Link, useSearchParams, useNavigate } from 'react-router-dom'
 import { Search, SlidersHorizontal, X, Heart, ShoppingBag, ChevronDown, Eye, Check } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { PLACEHOLDER_IMAGE, onImgError } from '../utils/imageFallback'
+import { useSEO } from '../hooks/useSEO'
 
 const categories = [
   { value: 'all',       label: 'Tous',      emoji: '✦' },
@@ -65,6 +66,15 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
   useEffect(function() { dispatch(fetchProducts()) }, [dispatch])
   useEffect(function() { if (catParam) setCategory(catParam) }, [catParam])
   useEffect(function() { setCurrentPage(1) }, [category, search, sort, maxPrice])
+
+  const activeCategoryLabel = categories.find(function(c) { return c.value === category })?.label
+  useSEO({
+    title: category !== 'all' && activeCategoryLabel ? activeCategoryLabel : 'Boutique',
+    description: category !== 'all' && activeCategoryLabel
+      ? activeCategoryLabel + ' — Découvrez notre collection de ' + activeCategoryLabel.toLowerCase() + ', livraison partout au Maroc.'
+      : 'Découvrez toute la collection Brillante Élégance — bijoux et accessoires, livraison partout au Maroc.',
+    path: category !== 'all' ? '/shop?cat=' + category : '/shop',
+  })
 
   const filtered = useMemo(function() {
     let list = [...products]

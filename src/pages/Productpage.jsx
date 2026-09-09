@@ -6,6 +6,7 @@ import { ChevronLeft, ShoppingBag, Heart, Share2, Zap } from 'lucide-react'
 import api from '../services/api'
 import toast from 'react-hot-toast'
 import { PLACEHOLDER_IMAGE, onImgError } from '../utils/imageFallback'
+import { useSEO, useProductSchema } from '../hooks/useSEO'
 
 const toastStyle = {
   background: '#1c1917',
@@ -260,6 +261,14 @@ export default function ProductPage({ wishlist, toggleWishlist }) {
 
   const avgRating  = product?.rating     || 0
   const numReviews = product?.numReviews || reviews.length
+
+  useSEO({
+    title: product?.name,
+    description: product?.description || (product ? product.name + ' — disponible sur Brillante Élégance, livraison partout au Maroc.' : undefined),
+    image: product ? getImageUrl(product.image) : undefined,
+    path: '/product/' + id,
+  })
+  useProductSchema(product)
 
   if (loading) return <main className="min-h-screen bg-[#FAF9F7]"><SkeletonProduct /></main>
 

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Navigate, Outlet, useLocation, Link } from 'react-router-dom'
 import { logout } from '../../store/slices/authSlice'
-import { LayoutDashboard, Package, ShoppingBag, BarChart2, Tag, LogOut, ExternalLink, MessageCircle, Image, LayoutTemplate, Users } from 'lucide-react'
+import { LayoutDashboard, Package, ShoppingBag, BarChart2, Tag, LogOut, ExternalLink, MessageCircle, Image, LayoutTemplate, Users, Target } from 'lucide-react'
 import AdminNavbar from './AdminNavbar'
 import api from '../../services/api'
 
@@ -57,6 +57,7 @@ export default function AdminLayout() {
     { name: 'Commandes',    to: '/admin/orders',    icon: <ShoppingBag size={16} />,     roles: ['admin', 'manager'] },
     { name: 'Users',        to: '/admin/users',     icon: <BarChart2 size={16} />,       roles: ['admin'] },
     { name: 'Statistiques', to: '/admin/stats',     icon: <BarChart2 size={16} />,       roles: ['admin'] },
+    { name: 'Audience',     to: '/admin/audience',  icon: <Target size={16} />,          roles: ['admin'] },
     { name: 'Promos',       to: '/admin/promos',    icon: <Tag size={16} />,             roles: ['admin', 'manager'] },
     { name: 'Suivi Créateurs', to: '/admin/creators', icon: <Users size={16} />,         roles: ['admin', 'manager'] },
     { name: 'Collections',  to: '/admin/collections', icon: <Image size={16} />,         roles: ['admin', 'manager'] },
