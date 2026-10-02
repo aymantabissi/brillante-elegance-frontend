@@ -59,10 +59,18 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
   const [search,      setSearch]      = useState('')
   const [category,    setCategory]    = useState(catParam)
   const [sort,        setSort]        = useState('default')
-  const [maxPrice,    setMaxPrice]    = useState(1000)
+  const [maxPrice,    setMaxPrice]    = useState(Infinity)
   const [showFilters, setShowFilters] = useState(false)
   const [addedId,     setAddedId]     = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
+
+  // Plafond du curseur de prix — calcule dynamiquement a partir
+  // du produit le plus cher, pour ne jamais masquer un nouveau
+  // produit depasse un seuil fixe code en dur.
+  const priceCeiling = useMemo(function() {
+    if (products.length === 0) return 5000
+    return Math.max(1000, Math.ceil(Math.max(...products.map(function(p) { return p.price })) / 100) * 100)
+  }, [products])
 
   useEffect(function() { dispatch(fetchProducts()) }, [dispatch])
   useEffect(function() { if (catParam) setCategory(catParam) }, [catParam])
@@ -209,19 +217,19 @@ export default function ShopPage({ wishlist = [], toggleWishlist = function() {}
             <div>
               <h3 className="text-xs tracking-[0.3em] uppercase font-medium text-stone-500 mb-3">Prix maximum</h3>
               <input
-                type="range" min={100} max={1000} step={10}
-                value={maxPrice}
+                type="range" min={100} max={priceCeiling} step={10}
+                value={maxPrice === Infinity ? priceCeiling : maxPrice}
                 onChange={function(e) { setMaxPrice(Number(e.target.value)) }}
                 className="w-full accent-stone-900 mb-2"
               />
               <div className="flex justify-between text-xs text-stone-400">
                 <span>100 MAD</span>
-                <span className="font-semibold text-stone-700">{maxPrice} MAD</span>
+                <span className="font-semibold text-stone-700">{maxPrice === Infinity ? priceCeiling : maxPrice} MAD</span>
               </div>
             </div>
             <div className="flex items-end">
               <button
-                onClick={function() { setCategory('all'); setSort('default'); setMaxPrice(1000); setSearch(''); setShowFilters(false) }}
+                onClick={function() { setCategory('all'); setSort('default'); setMaxPrice(Infinity); setSearch(''); setShowFilters(false) }}
                 className="w-full py-2.5 text-xs tracking-widest uppercase text-stone-500 border border-stone-200 rounded-xl hover:bg-stone-50 transition"
               >
                 Réinitialiser les filtres
